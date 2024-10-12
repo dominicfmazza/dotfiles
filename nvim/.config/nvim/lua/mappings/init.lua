@@ -4,7 +4,6 @@ map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 
-require "mappings.comment"
 
 local wk = require "which-key"
 wk.add {
