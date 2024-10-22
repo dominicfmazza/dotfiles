@@ -21,7 +21,7 @@ opt.signcolumn = "yes:2"
 opt.cursorlineopt = "number,line"
 opt.wrap = false
 
-opt.updatetime = 200
+opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400

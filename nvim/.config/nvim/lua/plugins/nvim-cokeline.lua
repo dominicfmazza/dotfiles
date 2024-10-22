@@ -68,6 +68,9 @@ return {
           bold = function(buffer)
             return buffer.is_focused
           end,
+          italic = function(buffer)
+            return buffer.is_modified
+          end,
         },
         {
           text = "󰅖",
