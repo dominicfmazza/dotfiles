@@ -54,13 +54,7 @@ return {
           { "<leader>lD", vim.lsp.buf.declaration, desc = "Goto declaration" },
           { "<leader>ld", require("telescope.builtin").lsp_implementations, desc = "Goto implementation" },
           { "<leader>li", require("telescope.builtin").lsp_definitions, desc = "Goto declaration" },
-          -- {
-          --   "<leader>lr",
-          --   function()
-          --     require "nvchad.lsp.renamer"()
-          --   end,
-          --   desc = "Rename",
-          -- },
+          { "<leader>lr", ":IncRename ", desc = "Rename" },
           { "<leader>lR", require("telescope.builtin").lsp_references, desc = "References" },
           { "<leader>la", vim.lsp.buf.code_action, desc = "Code Action" },
           { "<leader>lS", require("telescope.builtin").lsp_workspace_symbols, desc = "Workspace Symbols" },
@@ -85,19 +79,23 @@ return {
         "docker_compose_language_service",
         "dockerls",
         "jedi_language_server",
-    "bashls",
+        "bashls",
         "ruff_lsp",
         "jsonls",
       }
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
 
       for _, lsp in ipairs(servers) do
         lspconfig[lsp].setup(coq.lsp_ensure_capabilities {
           on_attach = custom_on_attach,
+          capabilities = capabilities,
         })
       end
 
       require("lspconfig").lua_ls.setup(coq.lsp_ensure_capabilities {
         on_attach = custom_on_attach,
+        capabilities = capabilities,
 
         settings = {
           Lua = {
@@ -119,6 +117,7 @@ return {
 
       require("lspconfig").clangd.setup(coq.lsp_ensure_capabilities {
         on_attach = custom_on_attach,
+        capabilities = capabilities,
 
         root_dir = require("lspconfig").util.root_pattern(
           ".clangd",
@@ -134,6 +133,7 @@ return {
 
       require("lspconfig").yamlls.setup(coq.lsp_ensure_capabilities {
         on_attach = custom_on_attach,
+        capabilities = capabilities,
 
         settings = {
           yaml = {
