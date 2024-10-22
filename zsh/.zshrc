@@ -110,6 +110,11 @@ fi
 # Compilation flags
 export ARCHFLAGS="-arch $(uname -m)"
 
+if [ -f "/opt/rh/gcc-toolset-13/enable" ]; then
+    source /opt/rh/gcc-toolset-13/enable
+    export X_SCLS="scl enable gcc-toolset-13 'echo $X_SCLS'"
+fi
+
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
 # users are encouraged to define aliases within a top-level file in
