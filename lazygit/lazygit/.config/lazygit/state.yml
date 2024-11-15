@@ -1,0 +1,34 @@
+lastupdatecheck: 0
+recentrepos:
+    - /home/e452541/dotfiles
+    - /home/e452541/repositories/rendering/sgs-optix
+    - /home/e452541/repositories/rendering/gnc-optix
+    - /home/e452541/repositories/rendering/gnc-optix/sgs-optix
+    - /home/e452541/repositories/rendering/cv-optix
+    - /disk01/users/dom/repositories/gnc-optix
+    - /home/e452541/.tmux/plugins/tpm
+    - /home/e452541/repositories/algorithms/camera_calibration
+    - /home/e452541/repositories/algorithms/lmvs
+    - /disk01/users/dom/repositories/sgs-optix
+    - /home/e452541/repositories/rendering/optix-materials
+    - /home/e452541/repositories/rendering/gitlab-profile
+    - /home/e452541/repositories/snippets/sgs_contributing_and_maintenance
+    - /home/e452541/repositories/webservices/scene-ui
+    - /home/e452541/source/lazygit
+    - /home/e452541/repositories/rendering/sgs-fips
+    - /home/e452541/repositories/rendering/configuration-templates
+    - /home/e452541/notes
+    - /home/e452541/repositories/configurations/1850-configurations
+    - /home/e452541/repositories/rendering/sgs-docker
+    - /home/e452541/repositories/rendering/sgs-client
+startuppopupversion: 5
+lastversion: unversioned
+customcommandshistory:
+    - ""
+hidecommandlog: false
+ignorewhitespaceindiffview: false
+diffcontextsize: 1
+localbranchsortorder: recency
+remotebranchsortorder: alphabetical
+gitlogorder: topo-order
+gitlogshowgraph: always
