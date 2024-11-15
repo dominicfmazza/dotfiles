@@ -10,10 +10,14 @@ if [ "$HOSTNAME" = masterchief-svr02 ]; then
 	export XDG_DATA_HOME="/disk01/users/dom/.local/share/"
 	alias ij="/disk01/users/dom/external_source/Fiji.app/ImageJ-linux64"
 fi
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/10_22_2024_gitlab_key
+fi
 
 export GOPATH="$HOME/.go"
 export LUA_INCDIR="/usr/local/include/"
-export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$GOPATH/bin:/usr/local/cuda-12.5/bin:$PATH:$HOME/.local/bin:/usr/local/go/bin"
+export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$GOPATH/bin:/usr/local/cuda-12.5/bin:$PATH:$HOME/.local/bin:/usr/local/go/bin:/disk01/users/dom/external_source/ccls/Release/"
 export RUSTUP_HOME=/data/sgs_optix_data/rust/rustup/
 export CARGO_HOME=/data/sgs_optix_data/rust/cargo/
 export PATH=${PATH}:/data/sgs_optix_data/rust/cargo/bin:$HOME/.cargo/bin
@@ -113,6 +117,11 @@ export ARCHFLAGS="-arch $(uname -m)"
 if [ -f "/opt/rh/gcc-toolset-13/enable" ]; then
     source /opt/rh/gcc-toolset-13/enable
     export X_SCLS="scl enable gcc-toolset-13 'echo $X_SCLS'"
+fi
+
+if [ -f "/usr/bin/clang" ]; then
+    export CXX=/usr/bin/clang++
+    export CC=/usr/bin/clang
 fi
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
