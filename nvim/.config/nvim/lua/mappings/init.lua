@@ -4,19 +4,13 @@ map("n", ";", ":", { desc = "CMD enter command mode" })
 map("i", "jk", "<ESC>")
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 
+require "mappings.comment"
 
 local wk = require "which-key"
 wk.add {
   { "<leader>c", "<cmd>close<cr>", desc = "Close" },
   { "<leader>q", "<cmd>q<cr>", desc = "Quit" },
   { "<leader>w", "<cmd>w<cr>", desc = "Save" },
-}
-
-wk.add {
-  { "<C-H>", "<C-w>h", desc = "Move to left split" },
-  { "<C-J>", "<C-w>j", desc = "Move to below split" },
-  { "<C-K>", "<C-w>k", desc = "Move to above split" },
-  { "<C-L>", "<C-w>l", desc = "Move to right split" },
 }
 
 wk.add {

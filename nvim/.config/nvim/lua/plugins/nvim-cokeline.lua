@@ -68,6 +68,9 @@ return {
           bold = function(buffer)
             return buffer.is_focused
           end,
+          italic = function(buffer)
+            return buffer.is_modified
+          end,
         },
         {
           text = "󰅖",
@@ -93,6 +96,12 @@ return {
         desc = "Pick Buffer to focus",
       },
       {
+        "<leader>bq",
+        "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>",
+        desc = "Close all buffers but current",
+        silent = true,
+      },
+      {
         "<leader>bc",
         function()
           require("cokeline.mappings").pick "close"
@@ -105,7 +114,7 @@ return {
           require("cokeline.utils").buf_delete(vim.fn.bufnr "%")
           vim.cmd.redrawtabline()
         end,
-        desc = "Pick Buffer to close",
+        desc = "Delete current Buffer",
       },
       noremap = true,
     }
