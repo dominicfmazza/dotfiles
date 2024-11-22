@@ -1,6 +1,6 @@
 return {
   "smjonas/inc-rename.nvim",
-  lazy = false,
+  event = "User FilePost",
   config = function()
     require("inc_rename").setup { input_buffer_type = "dressing" }
   end,

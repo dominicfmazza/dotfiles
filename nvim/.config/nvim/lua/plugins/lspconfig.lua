@@ -2,34 +2,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = "User FilePost",
-    dependencies = {
-      -- main one
-      { "ms-jpq/coq_nvim", branch = "coq" },
-
-      -- 9000+ Snippets
-      { "ms-jpq/coq.artifacts", branch = "artifacts" },
-
-      -- lua & third party sources -- See https://github.com/ms-jpq/coq.thirdparty
-      -- Need to **configure separately**
-      { "ms-jpq/coq.thirdparty", branch = "3p" },
-      -- - shell repl
-      -- - nvim lua api
-      -- - scientific calculator
-      -- - comment banner
-      -- - etc
-    },
-    init = function()
-      vim.g.coq_settings = {
-        auto_start = true,
-        display = {
-          mark_highlight_group = "DiffAdd",
-          statusline = { helo = false },
-        },
-      }
-    end,
     config = function()
       local lspconfig = require "lspconfig"
-      local coq = require "coq" -- add this
       local wk = require "which-key"
       wk.add {
         { "<leader>l", group = "LSP" },
@@ -52,14 +26,50 @@ return {
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         wk.add {
           { "<leader>lD", vim.lsp.buf.declaration, desc = "Goto declaration" },
-          { "<leader>ld", require("telescope.builtin").lsp_implementations, desc = "Goto implementation" },
-          { "<leader>li", require("telescope.builtin").lsp_definitions, desc = "Goto declaration" },
+          {
+            "<leader>ld",
+            function()
+              require("fzf-lua").lsp_implementations()
+            end,
+            desc = "Goto implementation",
+          },
+          {
+            "<leader>li",
+            function()
+              require("fzf-lua").lsp_definitions()
+            end,
+            desc = "Goto declaration",
+          },
           { "<leader>lr", ":IncRename ", desc = "Rename" },
-          { "<leader>lR", require("telescope.builtin").lsp_references, desc = "References" },
+          {
+            "<leader>lR",
+            function()
+              require("fzf-lua").lsp_references()
+            end,
+            desc = "References",
+          },
           { "<leader>la", vim.lsp.buf.code_action, desc = "Code Action" },
-          { "<leader>lS", require("telescope.builtin").lsp_workspace_symbols, desc = "Workspace Symbols" },
-          { "<leader>ls", require("telescope.builtin").lsp_document_symbols, desc = "Document Symbols" },
-          { "<leader>lt", require("telescope.builtin").lsp_type_definitions, desc = "Type Definition" },
+          {
+            "<leader>lS",
+            function()
+              require("fzf-lua").lsp_workspace_symbols()
+            end,
+            desc = "Workspace Symbols",
+          },
+          {
+            "<leader>ls",
+            function()
+              require("fzf-lua").lsp_document_symbols()
+            end,
+            desc = "Document Symbols",
+          },
+          {
+            "<leader>lt",
+            function()
+              require("fzf-lua").lsp_type_definitions()
+            end,
+            desc = "Type Definition",
+          },
           {
             buffer = bufnr,
           },
@@ -85,15 +95,32 @@ return {
       }
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
+      capabilities.textDocument.completion.completionItem = {
+        documentationFormat = { "markdown", "plaintext" },
+        snippetSupport = true,
+        preselectSupport = true,
+        insertReplaceSupport = true,
+        labelDetailsSupport = true,
+        deprecatedSupport = true,
+        commitCharactersSupport = true,
+        tagSupport = { valueSet = { 1 } },
+        resolveSupport = {
+          properties = {
+            "documentation",
+            "detail",
+            "additionalTextEdits",
+          },
+        },
+      }
 
       for _, lsp in ipairs(servers) do
-        lspconfig[lsp].setup(coq.lsp_ensure_capabilities {
+        lspconfig[lsp].setup {
           on_attach = custom_on_attach,
           capabilities = capabilities,
-        })
+        }
       end
 
-      require("lspconfig").lua_ls.setup(coq.lsp_ensure_capabilities {
+      require("lspconfig").lua_ls.setup {
         on_attach = custom_on_attach,
         capabilities = capabilities,
 
@@ -113,9 +140,9 @@ return {
             },
           },
         },
-      })
+      }
 
-      require("lspconfig").clangd.setup(coq.lsp_ensure_capabilities {
+      require("lspconfig").clangd.setup {
         on_attach = custom_on_attach,
         capabilities = capabilities,
 
@@ -129,9 +156,9 @@ return {
           "configure.ac",
           ".git"
         ),
-      })
+      }
 
-      require("lspconfig").yamlls.setup(coq.lsp_ensure_capabilities {
+      require("lspconfig").yamlls.setup {
         on_attach = custom_on_attach,
         capabilities = capabilities,
 
@@ -145,7 +172,7 @@ return {
             },
           },
         },
-      })
+      }
     end,
   },
 }

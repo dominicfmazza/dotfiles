@@ -17,7 +17,7 @@ return {
             {
               "<leader>gC",
               function()
-                require("telescope.builtin").git_bcommits { use_file_path = true }
+                require("fzf-lua").git_bcommits { use_file_path = true }
               end,
               desc = "Git commits (current file)",
               buffer = bufnr,
@@ -41,7 +41,7 @@ return {
             {
               "<leader>gb",
               function()
-                require("telescope.builtin").git_branches { use_file_path = true }
+                require("fzf-lua").git_branches { use_file_path = true }
               end,
               desc = "Git branches",
               buffer = bufnr,
@@ -49,7 +49,7 @@ return {
             {
               "<leader>gc",
               function()
-                require("telescope.builtin").git_commits { use_file_path = true }
+                require("fzf-lua").git_commits { use_file_path = true }
               end,
               desc = "Git commits (repository)",
               buffer = bufnr,
@@ -105,7 +105,7 @@ return {
             {
               "<leader>gt",
               function()
-                require("telescope.builtin").git_status { use_file_path = true }
+                require("fzf-lua").git_status { use_file_path = true }
               end,
               desc = "Git status",
               buffer = bufnr,
