@@ -13,11 +13,11 @@ return {
   { "numToStr/Comment.nvim" },
   {
     "nmac427/guess-indent.nvim",
+    event = "User FilePost",
     opts = {},
-    lazy = false,
   },
   {
     "hiphish/rainbow-delimiters.nvim",
-    lazy = false,
+    event = "User FilePost",
   },
 }
