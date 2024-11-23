@@ -12,7 +12,6 @@ require "autocommands"
 -- load plugins
 require("lazy").setup {
   defaults = { lazy = true},
-  install = { colorscheme = { "catppuccin" } },
 
   ui = {
     icons = {
