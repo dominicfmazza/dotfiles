@@ -13,9 +13,9 @@ has_session() {
 
 hydrate() {
     if [ -f $2/.tmux-sessionizer ]; then
-        tmux send-keys -t $1 "source $2/.tmux-sessionizer" c-M
+        tmux run-shell -t $1 "source $2/.tmux-sessionizer $2" 
     elif [ -f $HOME/.tmux-sessionizer ]; then
-        tmux send-keys -t $1 "source $HOME/.tmux-sessionizer" c-M
+        tmux run-shell -t $1 "source $HOME/.tmux-sessionizer $2" 
     fi
 }
 
@@ -24,7 +24,7 @@ if [[ $# -eq 1 ]]; then
 else
     # If someone wants to make this extensible, i'll accept
     # PR
-    selected=$(find ~/ ~/notebooks/ ~/repositories/rendering ~/.config -mindepth 1 -maxdepth 1 -type d | fzf)
+    selected=$(find -L ~/ ~/.config/ ~/notebooks/ ~/repositories/rendering -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
 
 if [[ -z $selected ]]; then
