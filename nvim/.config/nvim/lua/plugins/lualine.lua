@@ -9,7 +9,7 @@ return {
         section_separators = { left = "", right = "" },
         always_divide_middle = false,
         globalstatus = true,
-        theme = "catppuccin",
+        theme = "auto",
       },
       extensions = {
         "neo-tree",

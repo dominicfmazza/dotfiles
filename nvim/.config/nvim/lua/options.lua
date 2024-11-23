@@ -1,6 +1,7 @@
 local opt = vim.opt
 
-vim.cmd.colorscheme "catppuccin-macchiato"
+vim.g.material_style = "darker"
+vim.cmd.colorscheme "material"
 
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
