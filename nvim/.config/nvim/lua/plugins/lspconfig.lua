@@ -89,6 +89,7 @@ return {
         "docker_compose_language_service",
         "dockerls",
         "jedi_language_server",
+        "rust_analyzer",
         "bashls",
         "jsonls",
       }
