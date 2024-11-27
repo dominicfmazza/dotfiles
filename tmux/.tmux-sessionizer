@@ -1,3 +1,7 @@
 tmux new-window -n:NVIM -c $1 'nvim'
 tmux swap-window -t 0 -s 1
 
+navi.tmux -s >> /dev/null
+if [ $? = 1 ]; then
+    tmux run-shell navi.tmux
+fi

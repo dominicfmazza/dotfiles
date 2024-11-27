@@ -1,7 +1,6 @@
 local opt = vim.opt
 
-vim.g.material_style = "darker"
-vim.cmd.colorscheme "material"
+vim.cmd.colorscheme "catppuccin-mocha"
 
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
@@ -19,7 +18,7 @@ opt.cursorline = true
 opt.relativenumber = true
 opt.number = true
 opt.signcolumn = "yes:2"
-opt.cursorlineopt = "number,line"
+opt.cursorlineopt = "number"
 opt.wrap = false
 
 opt.updatetime = 750
