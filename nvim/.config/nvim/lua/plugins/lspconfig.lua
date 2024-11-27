@@ -90,7 +90,6 @@ return {
         "dockerls",
         "jedi_language_server",
         "bashls",
-        "ruff_lsp",
         "jsonls",
       }
       local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -112,6 +111,8 @@ return {
           },
         },
       }
+
+      vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       for _, lsp in ipairs(servers) do
         lspconfig[lsp].setup {
