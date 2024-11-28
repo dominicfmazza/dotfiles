@@ -3,7 +3,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # export NVM_LAZY_LOAD=true
-ZSH_THEME="powerlevel10k/powerlevel10k" # set by `omz`
 plugins=(
 	zoxide
 	direnv
@@ -11,7 +10,6 @@ plugins=(
 	history-substring-search
 )
 
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=5"
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 
 source $ZSH/oh-my-zsh.sh
@@ -59,3 +57,4 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
