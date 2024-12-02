@@ -14,6 +14,7 @@ return {
           yaml = { "prettierd" },
           javascript = { "prettierd" },
           typescript = { "prettierd" },
+          rust = {"rustfmt"},
           vue = { "prettierd" },
           xml = { "prettierd" },
         },
