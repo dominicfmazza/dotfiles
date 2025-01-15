@@ -21,7 +21,6 @@ require("lazy").setup {
       not_loaded = "",
     },
   },
-
   performance = {
     rtp = {
       disabled_plugins = {
