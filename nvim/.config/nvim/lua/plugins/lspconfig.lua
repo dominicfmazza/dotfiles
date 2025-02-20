@@ -123,7 +123,8 @@ return {
         "bashls",
         "jsonls",
         "gitlab_ci_ls",
-        "yamlls"
+        "yamlls",
+        "cpplint"
       }
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
