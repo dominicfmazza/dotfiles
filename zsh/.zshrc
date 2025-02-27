@@ -18,6 +18,7 @@ source_if_exists "$HOME/.config/environment/paths.sh"
 source_if_exists "$HOME/.config/environment/langs.sh" 
 source_if_exists "$HOME/.local/bin/env"
 
+
 source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
@@ -41,4 +42,3 @@ autoload -Uz promptinit && promptinit && prompt powerlevel10k
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
 _zsh_autosuggest_bind_widgets
-
