@@ -34,6 +34,8 @@ DISABLE_AUTO_TITLE=true
 
 source_if_exists $HOME/.cargo/env
 
+zstyle :omz:plugins:ssh-agent identities ~/.config/ssh/{id_rsa*}
+
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
 
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
