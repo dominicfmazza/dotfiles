@@ -4,6 +4,7 @@ ohmyzsh/ohmyzsh path:plugins/colored-man-pages  # load OMZ plugins
 ohmyzsh/ohmyzsh path:plugins/magic-enter
 ohmyzsh/ohmyzsh path:plugins/zoxide
 ohmyzsh/ohmyzsh path:plugins/direnv
+ohmyzsh/ohmyzsh path:plugins/ssh-agent
 
 romkatv/powerlevel10k kind:fpath
 
