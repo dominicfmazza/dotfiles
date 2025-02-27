@@ -10,3 +10,5 @@ if [ -f "/usr/bin/clang" ]; then
     export CXX=/usr/bin/clang++
     export CC=/usr/bin/clang
 fi
+export PATH=/usr/local/go/bin:$PATH
+export GOPATH="$HOME/.go"
