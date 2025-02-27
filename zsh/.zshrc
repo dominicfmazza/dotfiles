@@ -13,6 +13,11 @@ source_if_exists() {
   fi
 }
 
+source_if_exists "$HOME/.config/environment/hosts.sh" 
+source_if_exists "$HOME/.config/environment/paths.sh" 
+source_if_exists "$HOME/.config/environment/langs.sh" 
+source_if_exists "$HOME/.local/bin/env"
+
 source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
@@ -28,10 +33,6 @@ source_if_exists ~/.p10k.zsh
 DISABLE_AUTO_TITLE=true
 
 source_if_exists $HOME/.cargo/env
-source_if_exists "$HOME/.config/environment/hosts.sh" 
-source_if_exists "$HOME/.config/environment/paths.sh" 
-source_if_exists "$HOME/.config/environment/langs.sh" 
-source_if_exists "$HOME/.local/bin/env"
 
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
 
