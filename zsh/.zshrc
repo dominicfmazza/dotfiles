@@ -17,23 +17,10 @@ source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
 
-# export NVM_LAZY_LOAD=true
-plugins=(
-	zoxide
-	direnv
-	zsh-autosuggestions
-	history-substring-search
-)
-
-export ZSH_AUTOSUGGEST_USE_ASYNC="true"
-
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-
-export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
-_zsh_autosuggest_bind_widgets
 
 source_if_exists ~/.fzf.zsh
 source_if_exists ~/.p10k.zsh
@@ -47,3 +34,8 @@ source_if_exists "$HOME/.config/environment/langs.sh"
 source_if_exists "$HOME/.local/bin/env"
 
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
+
+export ZSH_AUTOSUGGEST_USE_ASYNC="true"
+export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
+_zsh_autosuggest_bind_widgets
+
