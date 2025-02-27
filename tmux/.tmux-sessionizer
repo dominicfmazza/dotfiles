@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-tmux new-window -n:NVIM -c $1 'nvim'
+tmux new-window -n:NVIM -c "$1" 'nvim'
 tmux swap-window -t 0 -s 1
 
 navi.tmux -s >> /dev/null
