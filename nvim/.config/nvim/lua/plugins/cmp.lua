@@ -43,6 +43,7 @@ return {
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "delphinus/cmp-ctags",
       "onsails/lspkind.nvim",
+      "hrsh7th/cmp-cmdline",
     },
   },
   config = function()
@@ -164,33 +165,26 @@ return {
         buffers,
       },
       sorting = {
+        -- TODO: Would be cool to add stuff like "See variable names before method names" in rust, or something like that.
         comparators = {
-          compare.offset,
-          compare.exact,
-          function(entry1, entry2) -- sort by length ignoring "=~"
-            local len1 = string.len(string.gsub(entry1.completion_item.label, "[=~()_]", ""))
-            local len2 = string.len(string.gsub(entry2.completion_item.label, "[=~()_]", ""))
-            if len1 ~= len2 then
-              return len1 - len2 < 0
+          cmp.config.compare.locality,
+          cmp.config.compare.recently_used,
+          cmp.config.compare.score,
+          cmp.config.compare.offset,
+          cmp.config.compare.order,
+          -- copied from cmp-under, but I don't think I need the plugin for this.
+          -- I might add some more of my own.
+          function(entry1, entry2)
+            local _, entry1_under = entry1.completion_item.label:find "^_+"
+            local _, entry2_under = entry2.completion_item.label:find "^_+"
+            entry1_under = entry1_under or 0
+            entry2_under = entry2_under or 0
+            if entry1_under > entry2_under then
+              return false
+            elseif entry1_under < entry2_under then
+              return true
             end
           end,
-          compare.recently_used,
-          function(entry1, entry2) -- sort by compare kind (Variable, Function etc)
-            local kind1 = modified_kind(entry1:get_kind())
-            local kind2 = modified_kind(entry2:get_kind())
-            if kind1 ~= kind2 then
-              return kind1 - kind2 < 0
-            end
-          end,
-          function(entry1, entry2) -- score by lsp, if available
-            local t1 = entry1.completion_item.sortText
-            local t2 = entry2.completion_item.sortText
-            if t1 ~= nil and t2 ~= nil and t1 ~= t2 then
-              return t1 < t2
-            end
-          end,
-          compare.score,
-          compare.order,
         },
       },
       formatting = {
