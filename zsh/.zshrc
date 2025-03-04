@@ -18,6 +18,21 @@ source_if_exists "$HOME/.config/environment/paths.sh"
 source_if_exists "$HOME/.config/environment/langs.sh" 
 source_if_exists "$HOME/.local/bin/env"
 
+if [ -f /opt/homebrew/bin/brew ]; then
+    brew_prefix=/opt/homebrew
+elif [ -f "/usr/local/homebrew/bin/brew" ]; then
+    brew_prefix="/usr/local/homebrew"
+elif [ -f /home/linuxbrew/bin/brew ]; then
+    brew_prefix=/home/linuxbrew
+fi
+
+if [ -n $brew_prefix ]; then
+    eval "$($brew_prefix/bin/brew shellenv)"
+fi
+
+if [ -n $GOPATH ]; then
+    export PATH=$PATH:$GOPATH/bin
+fi 
 
 source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
@@ -42,3 +57,5 @@ autoload -Uz promptinit && promptinit && prompt powerlevel10k
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
 _zsh_autosuggest_bind_widgets
+
+. "$HOME/.local/share//../bin/env"
