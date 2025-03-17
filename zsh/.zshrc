@@ -18,17 +18,16 @@ source_if_exists "$HOME/.config/environment/paths.sh"
 source_if_exists "$HOME/.config/environment/langs.sh" 
 source_if_exists "$HOME/.local/bin/env"
 
-if [ -f /opt/homebrew/bin/brew ]; then
-    brew_prefix=/opt/homebrew
-elif [ -f "/usr/local/homebrew/bin/brew" ]; then
-    brew_prefix="/usr/local/homebrew"
-elif [ -f /home/linuxbrew/bin/brew ]; then
-    brew_prefix=/home/linuxbrew
-fi
 
-if [ -n $brew_prefix ]; then
-    eval "$($brew_prefix/bin/brew shellenv)"
-fi
+check_brew() { 
+    if [ -f $1/bin/brew ]; then
+        eval "$($1/bin/brew shellenv)"
+    fi
+}
+
+check_brew /opt/homebrew
+check_brew "/usr/local/homebrew"
+check_brew /home/linuxbrew/.linuxbrew
 
 if [ -n $GOPATH ]; then
     export PATH=$PATH:$GOPATH/bin
