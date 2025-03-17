@@ -120,6 +120,7 @@ return {
         "dockerls",
         "jedi_language_server",
         "rust_analyzer",
+        "glsl_analyzer",
         "bashls",
         "jsonls",
         "gitlab_ci_ls",
