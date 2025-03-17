@@ -3,7 +3,8 @@ return {
   event = "VeryLazy",
   config = function()
     require("scratch").setup {
-      use_telescope = true,
+      use_telescope = false,
+      filepicker = "fzflua",
       filetypes = { "py", "md", "lua", "js", "sh", "ts" }, -- you can simply put filetype here
     }
     local wk = require "which-key"
@@ -22,11 +23,6 @@ return {
       "<leader>so",
       "<cmd>ScratchOpen<cr>",
       desc = "Open Existing Scratch File",
-    },
-    {
-      "<leader>so",
-      "<cmd>ScratchOpenFzf<cr>",
-      desc = "Fuzzyfind Scratch File",
-    },
+    }
   },
 }
