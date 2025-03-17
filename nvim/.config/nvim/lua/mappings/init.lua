@@ -1,6 +1,7 @@
 local map = vim.keymap.set
 
 map("i", "jk", "<ESC>")
+map("i", "kj", "<ESC>")
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 
 require "mappings.comment"
