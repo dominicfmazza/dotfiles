@@ -25,21 +25,6 @@ return {
         -- Buffer local mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         wk.add {
-          { "<leader>lD", vim.lsp.buf.declaration, desc = "Goto declaration" },
-          {
-            "<leader>ld",
-            function()
-              require("fzf-lua").lsp_implementations()
-            end,
-            desc = "Goto implementation",
-          },
-          {
-            "<leader>li",
-            function()
-              require("fzf-lua").lsp_definitions()
-            end,
-            desc = "Goto declaration",
-          },
           { "<leader>lr", ":IncRename ", desc = "Rename" },
           {
             "<leader>lR",
@@ -49,27 +34,6 @@ return {
             desc = "References",
           },
           { "<leader>la", vim.lsp.buf.code_action, desc = "Code Action" },
-          {
-            "<leader>lS",
-            function()
-              require("fzf-lua").lsp_workspace_symbols()
-            end,
-            desc = "Workspace Symbols",
-          },
-          {
-            "<leader>ls",
-            function()
-              require("fzf-lua").lsp_document_symbols()
-            end,
-            desc = "Document Symbols",
-          },
-          {
-            "<leader>lt",
-            function()
-              require("fzf-lua").lsp_type_definitions()
-            end,
-            desc = "Type Definition",
-          },
           {
             buffer = bufnr,
           },

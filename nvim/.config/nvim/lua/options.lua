@@ -17,10 +17,9 @@ opt.termguicolors = true
 opt.cursorline = true
 opt.relativenumber = true
 opt.number = true
-opt.signcolumn = "yes:2"
+opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
 opt.wrap = false
-
 opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
