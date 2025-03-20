@@ -64,8 +64,7 @@ return {
     { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
     { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
     -- BUFFERS
-    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
-    { "<leader>bb", function() Snacks.picker.buffers() end, desc = "Buffers" },
+    { "<leader>bf", function() Snacks.picker.buffers() end, desc = "Buffers" },
     -- -- Other
     { "<leader>n", function() Snacks.picker.notifications() end, desc = "Notification History" },
     { "<leader>Z", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
