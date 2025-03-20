@@ -14,8 +14,8 @@ wk.add {
 }
 
 wk.add {
-  { "J", "5jzz", desc = "Move to left split" },
-  { "K", "5kzz", desc = "Move to above split" },
+  { "J", "5j", desc = "Move to left split" },
+  { "K", "5k", desc = "Move to above split" },
   noremap = true,
   mode = { "n", "v" },
 }
