@@ -62,6 +62,14 @@ return {
       map("n", "<Space>bl", "<Cmd>BufferOrderByLanguage<CR>", opts)
       map("n", "<Space>bw", "<Cmd>BufferOrderByWindowNumber<CR>", opts)
       require("barbar").setup {
+        icons = {
+          buffer_index = "superscript",
+          gitsigns = {
+            added = { enabled = true, icon = "+" },
+            changed = { enabled = true, icon = "~" },
+            deleted = { enabled = true, icon = "-" },
+          },
+        },
         sidebar_filetypes = {
           ["neo-tree"] = { event = "BufWipeout" },
         },
