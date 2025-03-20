@@ -19,10 +19,11 @@ hydrate() {
     fi
 }
 
+tmux_running=$(pgrep tmux)
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find -L ~/dotfiles/*/ ~/repositories/*/ -mindepth 1 -maxdepth 1 -type d | fzf)
+    selected=$(find -L ~/dotfiles/*/ ~/repositories/*/ -mindepth 1 -maxdepth 1 -type d | fzf --tmux)
 fi
 
 if [[ -z $selected ]]; then
@@ -30,7 +31,6 @@ if [[ -z $selected ]]; then
 fi
 
 selected_name=$(basename "$selected" | tr . _)
-tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
     tmux new-session -ds "$selected_name" -c "$selected"
