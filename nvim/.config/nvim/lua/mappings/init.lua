@@ -21,13 +21,6 @@ wk.add {
 }
 
 wk.add {
-  { "<C-d>", "<C-d>zz" },
-  { "<C-d>", "<C-d>zz" },
-  noremap = true,
-  mode = { "n", "v" },
-}
-
-wk.add {
   { "<S-Tab>", "<gv", desc = "Unindent line", mode = "v" },
   { "<Tab>", ">gv", desc = "Indent line", mode = "v" },
 }
