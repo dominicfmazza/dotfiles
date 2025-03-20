@@ -9,7 +9,7 @@ return {
     explorer = { enabled = true },
     indent = { enabled = true, animate = { enabled = false } },
     input = { enabled = true },
-    picker = { enabled = true, sources = { explorer = { auto_close = true, layout = { preset = "vertical" } } } },
+    picker = { enabled = true, sources = { explorer = { auto_close = true, layout = { preset = "sidebar" } } } },
     notifier = { enabled = true },
     quickfile = { enabled = true },
     scope = { enabled = true },
@@ -20,10 +20,10 @@ return {
   },
   keys = {
     -- EXPLORER
-    { "<leader><leader>", function() Snacks.explorer() end, desc = "File Explorer" },
+    { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer" },
     -- FIND
     { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
-    { "<leader>fb", function() Snacks.picker.grep_buffers() end, desc = "Buffers" },
+    { "<leader>fb", function() Snacks.picker.grep_buffers() end, desc = "Grep in Buffers" },
     { "<leader>fg", function() Snacks.picker.grep() end, desc = "Grep" },
     { "<leader>f:", function() Snacks.picker.command_history() end, desc = "Command History" },
     { "<leader>fw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
@@ -68,10 +68,12 @@ return {
     { "<leader>lt", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
     { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
     { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
+    -- BUFFERS
+    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
+    { "<leader>bb", function() Snacks.picker.buffers() end, desc = "Buffers" },
     -- -- Other
     { "<leader>n", function() Snacks.picker.notifications() end, desc = "Notification History" },
     { "<leader>Z", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
-    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
     { "<c-/>", function() Snacks.terminal() end, desc = "Toggle Terminal" },
     { "<c-_>", function() Snacks.terminal() end, desc = "which_key_ignore" },
     { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Next Reference", mode = { "n", "t" } },
