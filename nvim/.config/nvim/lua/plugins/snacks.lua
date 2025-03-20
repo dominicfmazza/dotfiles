@@ -4,30 +4,26 @@ return {
   lazy = false,
   ---@type snacks.Config
   opts = {
-    bigfile = { enabled = false },
+    bigfile = { enabled = true },
     dashboard = { enabled = true },
-    explorer = { enabled = true },
     indent = { enabled = true, animate = { enabled = false } },
     input = { enabled = true },
     picker = { enabled = true, sources = { explorer = { auto_close = true, layout = { preset = "sidebar" } } } },
     notifier = { enabled = true },
     quickfile = { enabled = true },
     scope = { enabled = true },
-    scroll = { enabled = true },
     statuscolumn = { enabled = true },
     words = { enabled = true },
     styles = { notification = { border = "top", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
   },
   keys = {
-    -- EXPLORER
-    { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer" },
     -- FIND
     { "<leader>ff", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
     { "<leader>fb", function() Snacks.picker.grep_buffers() end, desc = "Grep in Buffers" },
     { "<leader>fg", function() Snacks.picker.grep() end, desc = "Grep" },
     { "<leader>f:", function() Snacks.picker.command_history() end, desc = "Command History" },
     { "<leader>fw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
-    { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" },
+    -- { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find TODOs" }, -- Add back when TODO works with Snacks
     { '<leader>f"', function() Snacks.picker.registers() end, desc = "Registers" },
     { "<leader>f/", function() Snacks.picker.search_history() end, desc = "Search History" },
     { "<leader>fa", function() Snacks.picker.autocmds() end, desc = "Autocmds" },
@@ -46,7 +42,6 @@ return {
     { "<leader>fq", function() Snacks.picker.qflist() end, desc = "Quickfix List" },
     { "<leader>fR", function() Snacks.picker.resume() end, desc = "Resume" },
     { "<leader>fu", function() Snacks.picker.undo() end, desc = "Undo History" },
-    { "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", desc = "Close all buffers but current", silent = true },
     -- SCRATCH
     { "<leader>ss", function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
     { "<leader>so", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },

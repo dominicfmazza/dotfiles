@@ -14,8 +14,8 @@ wk.add {
 }
 
 wk.add {
-  { "J", "5j", desc = "Move to left split" },
-  { "K", "5k", desc = "Move to above split" },
+  { "J", "5jzz", desc = "Move to left split" },
+  { "K", "5kzz", desc = "Move to above split" },
   noremap = true,
   mode = { "n", "v" },
 }
@@ -34,4 +34,7 @@ wk.add {
 wk.add {
   { "\\", "<cmd>split<cr>", desc = "Horizontal Split" },
   { "|", "<cmd>vsplit<cr>", desc = "Vertical Split" },
+}
+wk.add {
+  { "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", desc = "Close all buffers but current", silent = true },
 }

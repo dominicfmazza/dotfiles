@@ -39,6 +39,14 @@ return {
             crust = "#1a1a1a",
           },
         },
+        highlight_overrides = {
+          all = function(colors)
+            return {
+              SnacksIndentScope = { fg = colors.subtext0 },
+              SnacksIndentChunk = { fg = colors.subtext0 },
+            }
+          end,
+        },
         integrations = {
           cmp = true,
           gitsigns = true,
