@@ -55,14 +55,6 @@ return {
     { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
     { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)" },
     { "<leader>gf", function() Snacks.picker.git_log_file() end, desc = "Git Log File" },
-    -- LSP
-    { "<leader>ld", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
-    { "<leader>lD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
-    { "<leader>lR", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
-    { "<leader>li", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
-    { "<leader>lt", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
-    { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
-    { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
     -- BUFFERS
     { "<leader>bf", function() Snacks.picker.buffers() end, desc = "Buffers" },
     -- -- Other
