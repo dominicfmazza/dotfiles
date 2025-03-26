@@ -30,7 +30,7 @@ return {
           -- json
           "json-lsp", -- lsp
           -- python
-          "jedi-language-server",
+          "basedpyright",
           "black", -- lsp
           -- yaml
           "yaml-language-server", -- lsp
@@ -46,4 +46,6 @@ return {
       }
     end,
   },
+  {
+  }
 }

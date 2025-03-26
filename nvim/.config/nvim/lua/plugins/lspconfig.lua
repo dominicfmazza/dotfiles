@@ -11,9 +11,7 @@ return {
         { "<leader>lq", vim.diagnostic.open_float, desc = "Set LSP Loclist" },
         {
           "<leader>lf",
-          function()
-            require("conform").format { lsp_fallback = true }
-          end,
+          function() require("conform").format { lsp_fallback = true } end,
           desc = "Format",
         },
       }
@@ -26,13 +24,14 @@ return {
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         wk.add {
           { "<leader>lr", ":IncRename ", desc = "Rename" },
-          {
-            "<leader>lR",
-            function()
-              require("fzf-lua").lsp_references()
-            end,
-            desc = "References",
-          },
+          -- LSP
+          { "<leader>ld", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
+          { "<leader>lD", function() Snacks.picker.lsp_declarations() end, desc = "Goto Declaration" },
+          { "<leader>lR", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
+          { "<leader>li", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
+          { "<leader>lt", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
+          { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
+          { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
           { "<leader>la", vim.lsp.buf.code_action, desc = "Code Action" },
           {
             buffer = bufnr,
@@ -62,9 +61,7 @@ return {
               table.insert(newVirtText, { chunkText, hlGroup })
               chunkWidth = vim.fn.strdisplaywidth(chunkText)
               -- str width returned from truncate() may less than 2nd argument, need padding
-              if curWidth + chunkWidth < targetWidth then
-                suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
-              end
+              if curWidth + chunkWidth < targetWidth then suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth) end
               break
             end
             curWidth = curWidth + chunkWidth
@@ -82,13 +79,13 @@ return {
         "marksman",
         "docker_compose_language_service",
         "dockerls",
-        "jedi_language_server",
         "rust_analyzer",
         "glsl_analyzer",
         "bashls",
         "jsonls",
         "gitlab_ci_ls",
-        "yamlls"
+        "basedpyright",
+        "yamlls",
       }
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
@@ -149,16 +146,7 @@ return {
         on_attach = custom_on_attach,
         capabilities = capabilities,
 
-        root_dir = require("lspconfig").util.root_pattern(
-          ".clangd",
-          ".clang-tidy",
-          ".clang-format",
-          "compile_commands.json",
-          "build/compile_commands.json",
-          "compile_flags.txt",
-          "configure.ac",
-          ".git"
-        ),
+        root_dir = require("lspconfig").util.root_pattern(".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "build/compile_commands.json", "compile_flags.txt", "configure.ac", ".git"),
       }
 
       require("lspconfig").yamlls.setup {
@@ -176,6 +164,7 @@ return {
           },
         },
       }
+
     end,
   },
 }
