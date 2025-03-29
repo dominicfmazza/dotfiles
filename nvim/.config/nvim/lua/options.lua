@@ -26,6 +26,7 @@ opt.splitright = true
 opt.timeoutlen = 400
 opt.undofile = true
 
+vim.diagnostic.config { virtual_lines = true }
 
 function my_paste(reg)
   return function(lines)

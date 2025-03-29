@@ -2,7 +2,7 @@ return {
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    opts = { preset = "helix" },
+    opts = { preset = "modern" },
   },
   {
     "folke/todo-comments.nvim",
@@ -10,14 +10,18 @@ return {
     lazy = false,
     opts = {},
   },
-  { "numToStr/Comment.nvim" },
   {
     "nmac427/guess-indent.nvim",
     event = "User FilePost",
     opts = {},
   },
   {
-    "hiphish/rainbow-delimiters.nvim",
-    event = "User FilePost",
-  },
+    "folke/lazydev.nvim",
+    ft = "lua", -- only load on lua files
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  }
 }

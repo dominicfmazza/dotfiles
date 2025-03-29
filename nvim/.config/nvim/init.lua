@@ -11,7 +11,7 @@ vim.opt.rtp:prepend(lazypath)
 require "autocommands"
 -- load plugins
 require("lazy").setup {
-  defaults = { lazy = true},
+  defaults = { lazy = true },
 
   ui = {
     icons = {
@@ -59,5 +59,19 @@ require("lazy").setup {
     { import = "plugins" },
   },
 }
+vim.lsp.config("*", {
+  capabilities = {
+    workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+    textDocument = {
+      foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      },
+    },
+  },
+})
+
 require "options"
 require "mappings"
+require "fold"
+require "lsp"

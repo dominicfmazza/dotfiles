@@ -5,5 +5,6 @@ return {
   lazy = false,
   opts = {
     resetting_keys = { ["j"] = { "n", "x" }, ["k"] = { "n", "x" } },
+    disabled_keys = { ["<ESC>"] = {} },
   },
 }
