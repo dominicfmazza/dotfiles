@@ -41,12 +41,11 @@ return {
     },
     fuzzy = { implementation = "prefer_rust_with_warning" },
     cmdline = {
+      completion = { menu = { auto_show = true } },
       keymap = {
         preset = "none",
         ["<Tab>"] = {
-          function(cmp)
-            if has_words_before() then return cmp.insert_next() end
-          end,
+          "insert_next",
           "fallback",
         },
         ["<S-Tab>"] = { "insert_prev" },
