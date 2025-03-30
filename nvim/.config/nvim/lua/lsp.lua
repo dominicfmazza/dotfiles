@@ -65,9 +65,19 @@ vim.api.nvim_create_user_command("LspStop", function()
   vim.cmd "edit"
 end, {})
 
+local empty = function(tab)
+  for _, _ in pairs(tab) do
+    return false
+  end
+  return true
+end
+
 vim.api.nvim_create_user_command("LspRestart", function()
-  vim.cmd "LspStop"
-  vim.cmd "LspStart"
+  local lsp_clients = vim.lsp.get_clients()
+  if not empty(lsp_clients) then
+    vim.cmd "LspStop"
+    vim.cmd "LspStart"
+  end
 end, {})
 
 vim.api.nvim_create_user_command("LspLog", function()
