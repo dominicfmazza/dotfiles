@@ -59,17 +59,6 @@ require("lazy").setup {
     { import = "plugins" },
   },
 }
-vim.lsp.config("*", {
-  capabilities = {
-    workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
-    textDocument = {
-      foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      },
-    },
-  },
-})
 
 require "options"
 require "mappings"
