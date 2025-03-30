@@ -1,10 +1,11 @@
 local wk = require "which-key"
 local snacks = require "snacks"
 
-vim.lsp.enable {
+local lsps = {
   "luals",
   "clangd",
 }
+vim.lsp.enable(lsps)
 
 wk.add {
   { "gr", group = "+LSP" },
@@ -26,3 +27,33 @@ wk.add {
   { "<C-s>", vim.lsp.buf.signature_help, desc = "LSP Signature Help" },
   noremap = true,
 }
+
+vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
+
+vim.api.nvim_create_user_command("LspStart", function(args)
+  local arg1 = args.fargs[1] or ""
+
+  if arg1 == "" then
+    vim.lsp.enable(lsps)
+  else
+    vim.lsp.enable(arg1)
+  end
+
+  vim.cmd "edit"
+end, {
+  nargs = "*",
+  complete = function() return lsps end,
+})
+
+vim.api.nvim_create_user_command("LspStop", function()
+  vim.lsp.stop_client(vim.lsp.get_clients())
+  vim.wait(500)
+  vim.cmd "edit"
+end, {})
+
+vim.api.nvim_create_user_command("LspRestart", "<cmd>LspStop | LspStart<cr>", {})
+
+vim.api.nvim_create_user_command("LspLog", function()
+  local log = vim.lsp.log.get_filename()
+  vim.cmd("e " .. log)
+end, {})
