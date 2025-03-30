@@ -1,9 +1,23 @@
 local wk = require "which-key"
 local snacks = require "snacks"
 
+vim.lsp.config("*", {
+  capabilities = {
+    workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+    textDocument = {
+      foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      },
+    },
+  },
+})
+
 local lsps = {
   "luals",
   "clangd",
+  "jsonls",
+  "yamlls",
 }
 vim.lsp.enable(lsps)
 
@@ -51,7 +65,10 @@ vim.api.nvim_create_user_command("LspStop", function()
   vim.cmd "edit"
 end, {})
 
-vim.api.nvim_create_user_command("LspRestart", "<cmd>LspStop | LspStart<cr>", {})
+vim.api.nvim_create_user_command("LspRestart", function()
+  vim.cmd "LspStop"
+  vim.cmd "LspStart"
+end, {})
 
 vim.api.nvim_create_user_command("LspLog", function()
   local log = vim.lsp.log.get_filename()
