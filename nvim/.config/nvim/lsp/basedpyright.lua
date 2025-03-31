@@ -1,7 +1,7 @@
 return {
   cmd = { "basedpyright-langserver", "--stdio" },
   filetypes = { "python" },
-  root_dir = {
+  root_markers = {
     "pyproject.toml",
     "setup.py",
     "setup.cfg",
@@ -12,12 +12,10 @@ return {
   },
   single_file_support = true,
   settings = {
-    basedpyright = {
-      analysis = {
-        autoSearchPaths = true,
-        useLibraryCodeForTypes = true,
-        diagnosticMode = "openFilesOnly",
-      },
+    analysis = {
+      autoSearchPaths = true,
+      useLibraryCodeForTypes = true,
+      diagnosticMode = "openFilesOnly",
     },
   },
 }
