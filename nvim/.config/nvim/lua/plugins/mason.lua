@@ -2,11 +2,15 @@ return {
   {
     "williamboman/mason.nvim",
     cmd = { "Mason", "MasonInstall", "MasonInstallAll", "MasonUpdate" },
-    opts = {},
+    opts = {
+      pip = {
+        install_args = { "--default-timeout", "1000" },
+      },
+    },
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,
     config = function()
       require("mason-tool-installer").setup {
         ensure_installed = {
