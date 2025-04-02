@@ -19,14 +19,12 @@ opt.relativenumber = true
 opt.number = true
 opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
-opt.wrap = false
+opt.wrap = true
 opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400
 opt.undofile = true
-
-vim.diagnostic.config { virtual_lines = true }
 
 function my_paste(reg)
   return function(lines)

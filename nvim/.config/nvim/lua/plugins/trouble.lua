@@ -1,3 +1,5 @@
+vim.diagnostic.config { virtual_text = true }
+
 return {
   {
     "folke/trouble.nvim",
@@ -5,7 +7,7 @@ return {
     keys = {
       {
         "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
+        "<cmd>Trouble diagnostics toggle win.type=split win.position=right focus=false<cr>",
         desc = "Diagnostics (Trouble)",
       },
       {
