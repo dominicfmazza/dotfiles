@@ -1,0 +1,31 @@
+local M = {}
+
+M.colortable = {
+  rosewater = "#ffd7d9",
+  flamingo = "#ffb3b8",
+  pink = "#ff9cac",
+  mauve = "#c792ea",
+  red = "#f07178",
+  maroon = "#dc6068",
+  peach = "#f78c6c",
+  yellow = "#ffcb6b",
+  green = "#c3e88d",
+  teal = "#89ddff",
+  sky = "#b0c9ff",
+  sapphire = "#82aaff",
+  blue = "#6e98eb",
+  lavender = "#b480d6",
+  text = "#f4f4f4",
+  subtext1 = "#e0e0e0",
+  subtext0 = "#c6c6c6",
+  overlay2 = "#a8a8a8",
+  overlay1 = "#8d8d8d",
+  overlay0 = "#6f6f6f",
+  surface2 = "#474747",
+  surface1 = "#3f3f3f",
+  surface0 = "#343434",
+  base = "#212121",
+  mantle = "#1a1a1a",
+  crust = "#1a1a1a",
+}
+return M

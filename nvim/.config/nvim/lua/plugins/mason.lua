@@ -28,6 +28,7 @@ return {
           "beautysh",
           "stylua",
           "gersemi",
+          "black",
         },
       }
     end,
