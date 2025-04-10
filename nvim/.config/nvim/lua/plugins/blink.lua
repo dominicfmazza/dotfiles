@@ -7,7 +7,19 @@ end
 
 return {
   "saghen/blink.cmp",
-  dependencies = { "rafamadriz/friendly-snippets" },
+  priority = 900,
+  dependencies = {
+    {
+      "L3MON4D3/LuaSnip",
+      version = "v2.*",
+      priority = 901,
+      keys = function()
+        -- Disable default tab keybinding in LuaSnip
+        return {}
+      end,
+    },
+    { "rafamadriz/friendly-snippets" },
+  },
   version = "1.*",
   lazy = false,
   ---@module 'blink.cmp'
@@ -16,11 +28,13 @@ return {
       preset = "none",
       ["<Tab>"] = {
         function(cmp)
-          if has_words_before() then return cmp.insert_next() end
+          if cmp.snippet_active() then return cmp.accept() end
+          if has_words_before() and cmp.is_visible() then return cmp.insert_next() end
         end,
+        "snippet_forward",
         "fallback",
       },
-      ["<S-Tab>"] = { "insert_prev" },
+      ["<S-Tab>"] = { "insert_prev", "fallback" },
       ["<Enter>"] = { "accept", "fallback" },
     },
     appearance = {
@@ -28,8 +42,10 @@ return {
     },
     completion = {
       documentation = { auto_show = false },
+      trigger = { show_in_snippet = false },
       list = { selection = { preselect = false }, cycle = { from_top = false } },
     },
+    snippets = { preset = "luasnip" },
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
       providers = {
@@ -48,7 +64,7 @@ return {
           "insert_next",
           "fallback",
         },
-        ["<S-Tab>"] = { "insert_prev" },
+        ["<S-Tab>"] = { "insert_prev", "fallback" },
         ["<Enter>"] = { "accept_and_enter", "fallback" },
       },
     },
