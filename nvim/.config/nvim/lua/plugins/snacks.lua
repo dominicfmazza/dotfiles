@@ -7,6 +7,7 @@ return {
     dashboard = { enabled = true },
     indent = { enabled = true, animate = { enabled = false } },
     input = { enabled = true },
+    image = { enabled = true },
     picker = { enabled = true, sources = { explorer = { auto_close = true, layout = { preset = "sidebar" } } } },
     notifier = { enabled = true },
     quickfile = { enabled = true },
@@ -14,7 +15,6 @@ return {
     scroll = { enabled = true },
     scratch = { enabled = true, ft = "markdown" },
     statuscolumn = { enabled = true },
-    words = { enabled = true },
     styles = { notification = { border = "top", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
   },
   keys = {
