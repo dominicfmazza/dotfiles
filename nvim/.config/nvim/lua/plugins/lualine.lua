@@ -166,6 +166,10 @@ return {
         color = { fg = "#ffffff", gui = "bold" },
       }
 
+      ins_left {
+        "overseer",
+      }
+
       -- Add components to right sections
       ins_right {
         "o:encoding", -- option component same as &encoding in viml
