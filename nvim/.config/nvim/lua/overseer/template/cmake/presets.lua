@@ -7,12 +7,13 @@ local tmpl = {
   priority = 60,
   tags = { TAG.BUILD },
   params = {
+    cmd = { optional = false },
     args = { optional = true, type = "list", delimiter = " " },
     cwd = { optional = true },
   },
   builder = function(params)
     return {
-      cmd = { "cmake" },
+      cmd = params.cmd,
       args = params.args,
       cwd = params.cwd,
     }
@@ -31,25 +32,34 @@ return {
       stdout_buffered = true,
       on_stdout = vim.schedule_wrap(function(_, output)
         assert(output)
-        vim.print(output)
-        vim.print(_)
         local presets = require("overseer.cmakeutils").parse_preset_list(output)
         for _, target in ipairs(presets) do
+          local command = "cmake"
+          local args = { "--workflow", string.format("--preset=%s", target) }
+          if vim.fn.executable "direnv" == 1 then
+            command = "direnv"
+            table.insert(args, 1, "exec")
+            table.insert(args, 2, ".")
+            table.insert(args, 3, "cmake")
+          end
           table.insert(
             ret,
             overseer.wrap_template(tmpl, {
-              name = string.format("Preset %s", target),
+              name = string.format("%s", target),
             }, {
-              args = { "--workflow", string.format("--preset=%s", target) },
+              cmd = command,
+              args = args,
               cwd = cwd,
             })
           )
+          table.insert(args, "--fresh")
           table.insert(
             ret,
             overseer.wrap_template(tmpl, {
-              name = string.format("Preset %s - Fresh", target),
+              name = string.format("%s - Fresh", target),
             }, {
-              args = { "--workflow", string.format("--preset=%s", target), "--fresh" },
+              cmd = command,
+              args = args,
               cwd = cwd,
             })
           )
@@ -71,5 +81,4 @@ return {
       return true
     end,
   },
-  cache_key = function(opts) return get_presets(opts) end,
 }
