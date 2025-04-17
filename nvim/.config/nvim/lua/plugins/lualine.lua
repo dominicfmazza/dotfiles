@@ -13,7 +13,7 @@ return {
 -- Color table for highlights
 -- stylua: ignore
       local colors = {
-        bg       = colortable.crust,
+        bg       = colortable.mantle,
         fg       = colortable.text,
         yellow   = colortable.yellow,
         cyan     = colortable.teal,
