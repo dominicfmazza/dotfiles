@@ -8,11 +8,55 @@ return {
     indent = { enabled = true, animate = { enabled = false } },
     input = { enabled = true },
     image = { enabled = true },
-    picker = { enabled = true, sources = { explorer = { auto_close = true, layout = { preset = "sidebar" } } } },
+    picker = {
+      enabled = true,
+      layout = {
+        -- The default layout for "telescopy" pickers, e.g. `files`, `commands`, ...
+        -- It will not override non-standard pickers, e.g. `explorer`, `lines`, ...
+        preset = function() return vim.o.columns >= 120 and "telescope" or "vertical" end,
+      },
+      layouts = {
+        telescope = {
+          -- Copy from https://github.com/folke/snacks.nvim/blob/main/docs/picker.md#telescope
+          reverse = false,
+          layout = {
+            box = "horizontal",
+            backdrop = false,
+            height = 0.8,
+            width = 0.7,
+            border = { "┌", "─", "┐", "│", "┘", "─", "└", "│" },
+            {
+              box = "vertical",
+              {
+                title = "Find {title} {live} {flags}",
+                win = "list",
+                border = { "┌", "─", "┐", "│", "┤", "─", "├", "│" },
+              },
+              { win = "input", border = { "", "", "", "│", "┘", "─", "└", "│" }, height = 1 },
+            },
+            {
+              win = "preview",
+              title = "{preview:Preview}",
+              width = 0.51, -- Change the preview width
+              border = { "┌", "─", "┐", "│", "┘", "─", "└", "│" },
+              title_pos = "center",
+            },
+          },
+        },
+      },
+      sources = {
+        files = {},
+        lines = {
+          layout = {
+            preset = function() return vim.o.columns >= 120 and "telescope" or "vertical" end,
+          },
+        },
+      },
+    },
     notifier = { enabled = true },
     quickfile = { enabled = true },
     scope = { enabled = true },
-    scroll = { enabled = true },
+    scroll = { enabled = false },
     scratch = { enabled = true, ft = "markdown" },
     statuscolumn = { enabled = true },
     styles = { notification = { border = "top", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
@@ -67,6 +111,19 @@ return {
     { "[[", function() require("snacks").words.jump(-vim.v.count1) end, desc = "Prev Reference", mode = { "n", "t" } },
   },
   init = function()
+    local colortable = require("colors").colortable
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = colortable.base, bg = colortable.base })
+    vim.api.nvim_set_hl(0, "SnacksPickerTitle", { bg = colortable.base, fg = colortable.text })
+    vim.api.nvim_set_hl(0, "SnacksPickerPreview", { bg = colortable.base })
+    vim.api.nvim_set_hl(0, "SnacksPickerPreviewBorder", { bg = colortable.base, fg = colortable.surface2 })
+    vim.api.nvim_set_hl(0, "SnacksPickerList", { bg = colortable.base })
+    vim.api.nvim_set_hl(0, "SnacksPickerBorder", { bg = colortable.base, fg = colortable.base })
+    vim.api.nvim_set_hl(0, "SnacksPickerListBorder", { bg = colortable.base, fg = colortable.surface2 })
+    vim.api.nvim_set_hl(0, "SnacksPickerListTitle", { bg = colortable.base, fg = colortable.text })
+    vim.api.nvim_set_hl(0, "SnacksPickerInputTitle", { bg = colortable.base, fg = colortable.text })
+    vim.api.nvim_set_hl(0, "SnacksPickerInputBorder", { bg = colortable.base, fg = colortable.surface2 })
+    vim.api.nvim_set_hl(0, "SnacksPickerInputSearch", { bg = colortable.base, fg = colortable.text })
+    vim.api.nvim_set_hl(0, "SnacksPickerInput", { bg = colortable.base })
     vim.api.nvim_create_autocmd("User", {
       pattern = "VeryLazy",
       callback = function()

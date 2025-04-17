@@ -23,5 +23,6 @@ return {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
-  }
+  },
+  { "norcalli/nvim-colorizer.lua", opts = {} },
 }
