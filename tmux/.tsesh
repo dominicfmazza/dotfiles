@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-tmux new-window -n:NVIM -c "$1" "/bin/bash -c nvim"
+tmux new-window -n "neovim" -c "$1" "/bin/bash -c nvim"
 tmux swap-window -t 0 -s 1
+tmux rename-window "shell"
 
 navi.tmux -s >> /dev/null
 if [ $? = 1 ]; then
