@@ -1,54 +1,76 @@
-local function switch_source_handler(_err, uri)
-  if not uri or uri == "" then
-    vim.api.nvim_echo({ { "Corresponding file cannot be determined" } }, false, {})
-    return
+local function switch_source_header(bufnr)
+  local method_name = 'textDocument/switchSourceHeader'
+  local client = vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
+  if not client then
+    return vim.notify(('method %s is not supported by any servers active on the current buffer'):format(method_name))
   end
-  local file_name = vim.uri_to_fname(uri)
-  vim.api.nvim_cmd({
-    cmd = "edit",
-    args = { file_name },
-  }, {})
+  local params = vim.lsp.util.make_text_document_params(bufnr)
+  client.request(method_name, params, function(err, result)
+    if err then
+      error(tostring(err))
+    end
+    if not result then
+      vim.notify('corresponding file cannot be determined')
+      return
+    end
+    vim.cmd.edit(vim.uri_to_fname(result))
+  end, bufnr)
 end
 
-local function symbol_info_handler(err, result)
-  if err or (#result == 0) then return end
-  local name_str = string.format("name: %s", result[1].name)
-  local container_str = string.format("container: %s", result[1].containerName)
-  vim.lsp.util.open_floating_preview({ name_str, container_str }, "", {
-    height = 2,
-    width = math.max(string.len(name_str), string.len(container_str)),
-    focusable = false,
-    focus = false,
-  })
+local function symbol_info()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clangd_client = vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
+  if not clangd_client or not clangd_client.supports_method 'textDocument/symbolInfo' then
+    return vim.notify('Clangd client not found', vim.log.levels.ERROR)
+  end
+  local win = vim.api.nvim_get_current_win()
+  local params = vim.lsp.util.make_position_params(win, clangd_client.offset_encoding)
+  clangd_client.request('textDocument/symbolInfo', params, function(err, res)
+    if err or #res == 0 then
+      -- Clangd always returns an error, there is not reason to parse it
+      return
+    end
+    local container = string.format('container: %s', res[1].containerName) ---@type string
+    local name = string.format('name: %s', res[1].name) ---@type string
+    vim.lsp.util.open_floating_preview({ name, container }, '', {
+      height = 2,
+      width = math.max(string.len(name), string.len(container)),
+      focusable = false,
+      focus = false,
+      border = 'single',
+      title = 'Symbol Info',
+    })
+  end, bufnr)
 end
+
+
 
 return {
   cmd = {
     "clangd",
     "--clang-tidy",
     "--background-index",
+    "-j=8",
+    "--malloc-trim",
+    "--pch-storage=memory",
     "--fallback-style=llvm",
   },
-  filetypes = { "cuda", "c", "cpp", "h", "hpp" },
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
   root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "build/compile_commands.json", "compile_flags.txt", "configure.ac", ".git" },
-  commands = {
-    ClangdSwitchSourceHeader = {
-      function()
-        vim.lsp.buf_request(0, "textDocument/switchSourceHeader", {
-          uri = vim.uri_from_bufnr(0),
-        }, switch_source_handler)
-      end,
+  capabilities = {
+    textDocument = {
+      completion = {
+        editsNearCursor = true,
+      },
     },
-    ClangdSymbolInfo = {
-      vim.lsp.buf_request(0, "textDocument/symbolInfo", {
-        textDocument = {
-          uri = vim.uri_from_bufnr(0),
-        },
-        position = {
-          line = vim.fn.getcurpos()[2] - 1,
-          character = vim.fn.getcurpos()[3] - 1,
-        },
-      }, symbol_info_handler),
-    },
+    offsetEncoding = { "utf-8", "utf-16" },
   },
-}
+  on_attach = function()
+    vim.api.nvim_buf_create_user_command(0, 'LspClangdSwitchSourceHeader', function()
+      switch_source_header(0)
+    end, { desc = 'Switch between source/header' })
+
+    vim.api.nvim_buf_create_user_command(0, 'LspClangdShowSymbolInfo', function()
+      symbol_info()
+    end, { desc = 'Show symbol info' })
+  end,}
