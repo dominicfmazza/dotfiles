@@ -18,17 +18,6 @@ source_if_exists "$HOME/.config/environment/paths.sh"
 source_if_exists "$HOME/.config/environment/langs.sh" 
 source_if_exists "$HOME/.local/bin/env"
 
-
-check_brew() { 
-    if [ -f $1/bin/brew ]; then
-        eval "$($1/bin/brew shellenv)"
-    fi
-}
-
-check_brew /opt/homebrew
-check_brew "/usr/local/homebrew"
-check_brew /home/linuxbrew/.linuxbrew
-
 if [ -n $GOPATH ]; then
     export PATH=$PATH:$GOPATH/bin
 fi 
@@ -57,4 +46,7 @@ export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
 _zsh_autosuggest_bind_widgets
 
-. "$HOME/.local/share//../bin/env"
+source_if_exists "$HOME/.local/share/bin/env"
+export PATH="$HOME/.local/bin:$HOME/.tmux/:$PATH"
+export XDG_DATA_HOME="$HOME/.local/share/"
+eval "$(~/.local/bin/mise activate zsh)"
