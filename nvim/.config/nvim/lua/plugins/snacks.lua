@@ -53,7 +53,12 @@ return {
         },
       },
     },
-    notifier = { enabled = true },
+    notifier = {
+      margin = { top = 0, right = 1, bottom = 2 },
+      top_down = false,
+      enabled = true,
+      style = "minimal",
+    },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },
