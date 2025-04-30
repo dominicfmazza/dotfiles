@@ -19,29 +19,15 @@ opt.relativenumber = true
 opt.number = true
 opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
-opt.wrap = true
+opt.wrap = false
 opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400
 opt.undofile = true
+opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-function my_paste(reg)
-  return function(lines)
-    local content = vim.fn.getreg '"'
-    return vim.split(content, "\n")
-  end
-end
+vim.g.smart_motion_log_level = "debug"
 
 opt.clipboard:append "unnamedplus"
-vim.g.clipboard = {
-  name = "OSC 52",
-  copy = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy "+",
-    ["*"] = require("vim.ui.clipboard.osc52").copy "*",
-  },
-  paste = {
-    ["+"] = my_paste "+",
-    ["*"] = my_paste "*",
-  },
-}
+vim.g.clipboard = 'osc52'
