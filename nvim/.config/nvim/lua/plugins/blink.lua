@@ -24,11 +24,12 @@ return {
   lazy = false,
   ---@module 'blink.cmp'
   opts = {
+    signature = { enabled = true, window = { show_documentation = false } },
     keymap = {
       preset = "none",
       ["<Tab>"] = {
         function(cmp)
-          if cmp.snippet_active() then return cmp.accept() end
+          if cmp.snippet_active() and not cmp.is_visible() then return cmp.accept() end
           if has_words_before() and cmp.is_visible() then return cmp.insert_next() end
         end,
         "snippet_forward",
@@ -36,13 +37,14 @@ return {
       },
       ["<S-Tab>"] = { "insert_prev", "fallback" },
       ["<Enter>"] = { "accept", "fallback" },
+      ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+      ["<C-f>"] = { "scroll_documentation_down", "fallback" },
     },
     appearance = {
-      nerd_font_variant = "mono",
+      nerd_font_variant = "normal",
     },
     completion = {
-      documentation = { auto_show = false },
-      trigger = { show_in_snippet = false },
+      documentation = { auto_show = true },
       list = { selection = { preselect = false }, cycle = { from_top = false } },
     },
     snippets = { preset = "luasnip" },
