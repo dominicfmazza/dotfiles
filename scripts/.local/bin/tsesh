@@ -35,9 +35,9 @@ has_session() {
 }
 
 hydrate() {
-    if [ -f "$2"/.tmux-sessionizer ]; then
+    if [ -f "$2"/.tsesh ]; then
         tmux run-shell -t "$1" "$2/.tsesh $2 2>&1"
-    elif [ -f "$HOME"/.tmux-sessionizer ]; then
+    elif [ -f "$HOME"/.tsesh ]; then
         tmux run-shell -t "$1" "$HOME/.tsesh $2 2>&1"
     fi
 }
