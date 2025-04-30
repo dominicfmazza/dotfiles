@@ -1,0 +1,12 @@
+[tools]
+lazygit = 'latest'
+npm = 'latest'
+fzf = 'latest'
+fd = 'latest'
+btop = 'latest'
+lua = 'latest'
+zoxide = 'latest'
+ripgrep = "latest"
+uv = "latest"
+tmux = "latest"
+
