@@ -24,6 +24,12 @@ wk.add {
 }
 
 wk.add {
+  { "<C-J>", "<cmd>join<cr>", desc = "5Down" },
+  noremap = true,
+  mode = { "n", "v" },
+}
+
+wk.add {
   { "<S-Tab>", "<gv", desc = "Unindent line", mode = "v" },
   { "<Tab>", ">gv", desc = "Indent line", mode = "v" },
 }
