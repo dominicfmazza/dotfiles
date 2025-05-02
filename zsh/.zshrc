@@ -1,4 +1,4 @@
-ZDOTDIR=$HOME/.config/zsh/
+ZDOTDIR=$HOME/.config/zsh
 [[ "$TERM" == "xterm" ]] && export TERM=xterm-256color
 
 export LANG=en_US.UTF-8
