@@ -25,4 +25,5 @@ return {
     },
   },
   { "norcalli/nvim-colorizer.lua", opts = {} },
+  { "echasnovski/mini.align", opts = {}, version = false, lazy = false },
 }
