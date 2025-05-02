@@ -1,12 +1,17 @@
+[settings]
+all_compile = true
+
 [tools]
 lazygit = 'latest'
 npm = 'latest'
 fzf = 'latest'
 fd = 'latest'
-btop = 'latest'
+btop = "latest"
 lua = 'latest'
 zoxide = 'latest'
 ripgrep = "latest"
 uv = "latest"
 tmux = "latest"
-
+bat = "latest"
+jq = "latest"
+"asdf:neovim" = "ref:a9a3981"
