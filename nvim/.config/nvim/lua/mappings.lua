@@ -17,8 +17,8 @@ wk.add {
 }
 
 wk.add {
-  { "J", "5j", desc = "5Down" },
-  { "K", "5k", desc = "5Up" },
+  { "J", "5gj", desc = "5Down" },
+  { "K", "5gk", desc = "5Up" },
   noremap = true,
   mode = { "n", "v" },
 }
@@ -40,3 +40,9 @@ wk.add {
 wk.add {
   { "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", desc = "Close all buffers but current", silent = true },
 }
+
+vim.keymap.set({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, noremap = true })
+vim.keymap.set({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, noremap = true })
+
+vim.keymap.set({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = true })
+vim.keymap.set({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })

@@ -25,9 +25,12 @@ opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400
 opt.undofile = true
-opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-vim.g.smart_motion_log_level = "debug"
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakat = " \t;:,!?"
+vim.opt.breakindentopt = { "shift:2", "sbr" }
 
 opt.clipboard:append "unnamedplus"
-vim.g.clipboard = 'osc52'
+vim.g.clipboard = "osc52"
