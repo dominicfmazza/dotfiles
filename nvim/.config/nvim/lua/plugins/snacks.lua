@@ -68,7 +68,7 @@ return {
   },
   keys = {
     -- FIND
-    { "<leader>ff", function() require("snacks").picker.smart() end, desc = "Smart Find Files" },
+    { "<leader>ff", function() require("snacks").picker.files({hidden = true}) end, desc = "Smart Find Files" },
     { "<leader>fb", function() require("snacks").picker.grep_buffers() end, desc = "Grep in Buffers" },
     { "<leader>fg", function() require("snacks").picker.grep() end, desc = "Grep" },
     { "<leader>f:", function() require("snacks").picker.command_history() end, desc = "Command History" },
