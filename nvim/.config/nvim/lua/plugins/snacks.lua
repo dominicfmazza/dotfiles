@@ -68,7 +68,7 @@ return {
   },
   keys = {
     -- FIND
-    { "<leader>ff", function() require("snacks").picker.files({hidden = true}) end, desc = "Smart Find Files" },
+    { "<leader>ff", function() require("snacks").picker.files { hidden = true } end, desc = "Smart Find Files" },
     { "<leader>fb", function() require("snacks").picker.grep_buffers() end, desc = "Grep in Buffers" },
     { "<leader>fg", function() require("snacks").picker.grep() end, desc = "Grep" },
     { "<leader>f:", function() require("snacks").picker.command_history() end, desc = "Command History" },
@@ -148,15 +148,6 @@ return {
         require("snacks").toggle.inlay_hints():map "<leader>uh"
         require("snacks").toggle.indent():map "<leader>ug"
         require("snacks").toggle.dim():map "<leader>uD"
-        require("which-key").add {
-          "<leader>uw",
-          function() require("wrap").ToggleWrap() end,
-          icon = function()
-            local state = require("wrap").wrapenabled
-            return { icon = state and " " or " ", color = state and "green" or "yellow" }
-          end,
-          desc = function() return require("wrap").wrapenabled and "Disable wrap" or "Enable wrap" end,
-        }
       end,
     })
   end,
