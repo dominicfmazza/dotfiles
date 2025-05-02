@@ -139,7 +139,6 @@ return {
 
         -- Create some toggle mappings
         require("snacks").toggle.option("spell", { name = "Spelling" }):map "<leader>us"
-        require("snacks").toggle.option("wrap", { name = "Wrap" }):map "<leader>uw"
         require("snacks").toggle.option("relativenumber", { name = "Relative Number" }):map "<leader>uL"
         require("snacks").toggle.diagnostics():map "<leader>ud"
         require("snacks").toggle.line_number():map "<leader>ul"
@@ -149,6 +148,15 @@ return {
         require("snacks").toggle.inlay_hints():map "<leader>uh"
         require("snacks").toggle.indent():map "<leader>ug"
         require("snacks").toggle.dim():map "<leader>uD"
+        require("which-key").add {
+          "<leader>uw",
+          function() require("wrap").ToggleWrap() end,
+          icon = function()
+            local state = require("wrap").wrapenabled
+            return { icon = state and " " or " ", color = state and "green" or "yellow" }
+          end,
+          desc = function() return require("wrap").wrapenabled and "Disable wrap" or "Enable wrap" end,
+        }
       end,
     })
   end,
