@@ -11,7 +11,7 @@ return {
           light = "latte",
         },
         color_overrides = {
-          mocha = colortable
+          mocha = colortable,
         },
         highlight_overrides = {
           all = function(colors)
@@ -26,6 +26,7 @@ return {
           gitsigns = true,
           nvimtree = true,
           treesitter = true,
+          which_key = true,
           fzf = true,
           mini = {
             enabled = true,
