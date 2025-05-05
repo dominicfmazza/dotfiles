@@ -19,7 +19,7 @@ opt.relativenumber = true
 opt.number = true
 opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
-opt.wrap = false
+opt.confirm = true
 opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
@@ -27,10 +27,11 @@ opt.timeoutlen = 400
 opt.undofile = true
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-vim.opt.wrap = true
-vim.opt.linebreak = true
-vim.opt.breakat = " \t;:,!?"
-vim.opt.breakindentopt = { "shift:2", "sbr" }
+opt.wrap = true
+opt.linebreak = true
+opt.breakindent = true
+opt.breakat = "\t;:,!? "
+opt.showbreak = "-->"
 
 opt.clipboard:append "unnamedplus"
 vim.g.clipboard = "osc52"
