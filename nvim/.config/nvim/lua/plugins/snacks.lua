@@ -64,13 +64,24 @@ return {
     scroll = { enabled = false },
     scratch = { enabled = true, ft = "markdown" },
     statuscolumn = { enabled = true },
-    styles = { notification = { border = "top", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
+    words = { enabled = true },
+    styles = {
+      notification = {
+        border = "rounded",
+        wo = {
+          winblend = 5,
+          wrap = false,
+          conceallevel = 2,
+          colorcolumn = "",
+        },
+      },
+    },
   },
   keys = {
     -- FIND
     { "<leader>ff", function() require("snacks").picker.files { hidden = true } end, desc = "Smart Find Files" },
     { "<leader>fb", function() require("snacks").picker.grep_buffers() end, desc = "Grep in Buffers" },
-    { "<leader>fg", function() require("snacks").picker.grep() end, desc = "Grep" },
+    { "<leader>fg", function() require("snacks").picker.grep { hidden = true } end, desc = "Grep" },
     { "<leader>f:", function() require("snacks").picker.command_history() end, desc = "Command History" },
     { "<leader>fw", function() require("snacks").picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" } },
     { '<leader>f"', function() require("snacks").picker.registers() end, desc = "Registers" },
@@ -117,16 +128,18 @@ return {
   },
   init = function()
     local colortable = require("colors").colortable
-    vim.api.nvim_set_hl(0, "FloatBorder", { fg = colortable.base, bg = colortable.base })
+    local borderhl = { fg = colortable.overlay0, bg = colortable.base }
+    vim.api.nvim_set_hl(0, "FloatBorder", borderhl)
+    vim.api.nvim_set_hl(0, "SnacksPickerBorder", borderhl)
+    vim.api.nvim_set_hl(0, "SnacksPickerPreviewBorder", borderhl)
+    vim.api.nvim_set_hl(0, "SnacksPickerListBorder", borderhl)
+    vim.api.nvim_set_hl(0, "SnacksPickerInputBorder", borderhl)
+
     vim.api.nvim_set_hl(0, "SnacksPickerTitle", { bg = colortable.base, fg = colortable.text })
     vim.api.nvim_set_hl(0, "SnacksPickerPreview", { bg = colortable.base })
-    vim.api.nvim_set_hl(0, "SnacksPickerPreviewBorder", { bg = colortable.base, fg = colortable.surface2 })
     vim.api.nvim_set_hl(0, "SnacksPickerList", { bg = colortable.base })
-    vim.api.nvim_set_hl(0, "SnacksPickerBorder", { bg = colortable.base, fg = colortable.base })
-    vim.api.nvim_set_hl(0, "SnacksPickerListBorder", { bg = colortable.base, fg = colortable.surface2 })
     vim.api.nvim_set_hl(0, "SnacksPickerListTitle", { bg = colortable.base, fg = colortable.text })
     vim.api.nvim_set_hl(0, "SnacksPickerInputTitle", { bg = colortable.base, fg = colortable.text })
-    vim.api.nvim_set_hl(0, "SnacksPickerInputBorder", { bg = colortable.base, fg = colortable.surface2 })
     vim.api.nvim_set_hl(0, "SnacksPickerInputSearch", { bg = colortable.base, fg = colortable.text })
     vim.api.nvim_set_hl(0, "SnacksPickerInput", { bg = colortable.base })
     vim.api.nvim_create_autocmd("User", {
