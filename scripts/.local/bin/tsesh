@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TMUX Shortened commands
-
+export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
 export TSESH_DIR_FILE="$HOME/.tsesh_dirs"
 touch ${TSESH_DIR_FILE}
 
