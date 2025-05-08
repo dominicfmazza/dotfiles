@@ -33,4 +33,5 @@ return {
   --   end,
   -- },
   { "echasnovski/mini.align", opts = {}, version = false, lazy = false },
+  {"yochem/jq-playground.nvim", cmd = {"JqPlayground"}}
 }

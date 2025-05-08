@@ -2,6 +2,8 @@ local opt = vim.opt
 
 vim.cmd.colorscheme "catppuccin-mocha"
 
+vim.g.have_nerd_font = true 
+
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
 opt.hlsearch = true -- Hilight searches by default
@@ -24,8 +26,11 @@ opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400
+opt.updatetime = 250
 opt.undofile = true
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+opt.scrolloff = 10
+opt.inccommand = 'split'
 
 opt.wrap = true
 opt.linebreak = true
