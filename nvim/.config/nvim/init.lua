@@ -60,3 +60,9 @@ require "options"
 require "mappings"
 require "fold"
 require "lsp"
+
+if vim.g.neovide then
+  require "neovide"
+end
+
+
