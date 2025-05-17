@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+# TMUX Shortened commands
+export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40% --layout reverse --border top'
+export TSESH_DIR_FILE="$HOME/.tsesh_dirs"
+touch ${TSESH_DIR_FILE}
+
+exists() {
+    if ! command -v $1 2>&1 >/dev/null; then
+        echo "$1 could not be found"
+        exit 1
+    fi
+}
+
+switch_to() {
+    zellij pipe --plugin switcher -- "--session $1"
+}
+
+switch_or_create() {
+    zellij pipe --plugin switcher -- "--session $1 --cwd $2 --layout development"
+}
+
+resume() {
+    exists fzf
+    exists zellij
+    session=$(zellij list-sessions -n | sed "s/\(.*\)\[.*/\1/g" | fzf)
+    if [ -z "$session" ]; then
+        exit 0
+    fi
+    switch_to $session
+}
+
+has_session() {
+    tmux list-sessions | grep -q "^$1:"
+}
+
+
+refresh() {
+    exists fzf
+    exists zellij
+    zellij --layout development
+}
+
+get_dirs() {
+    declare -a zellij_dirs
+    while read -r line; do
+        zellij_dirs+=("$line")
+    done <$1
+    IFS=","
+    echo "${zellij_dirs[*]}"
+}
+
+finder() {
+    exists fzf
+    exists zellij
+
+    tmux_running=$(pgrep zellij)
+    if [[ $# -eq 1 ]]; then
+        selected=$1
+    else
+
+        dirs=$(get_dirs $TSESH_DIR_FILE)
+        IFS="," read -r -a tsesh_dirs <<<"$dirs"
+        selected=$(printf "%s\n" "${tsesh_dirs[@]}" | fzf --tmux)
+    fi
+
+    if [[ -z $selected ]]; then
+        exit 0
+    fi
+
+    selected_name=$(basename "$selected" | tr . _)
+
+    if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+        zellij 
+    fi
+    switch_or_create "$selected_name" "$selected"
+}
+
+add() {
+    touch ${TSESH_DIR_FILE}.tmp
+    name=""
+    if [ "$#" -eq 0 ]; then
+        name=$(pwd)
+    elif [ -d $1 ]; then
+        name=$(readlink -f $1)
+    else
+        echo "Improper directory specified"
+        exit 1
+    fi
+    dirs=$(get_dirs $TSESH_DIR_FILE)
+    IFS="," read -r -a tsesh_dirs <<<"$dirs"
+    tsesh_dirs+=("$name")
+    for element in "${tsesh_dirs[@]}"; do
+        echo "$element" >>${TSESH_DIR_FILE}.tmp
+    done
+    mv ${TSESH_DIR_FILE}.tmp ${TSESH_DIR_FILE}
+    echo "Added $name to $TSESH_DIR_FILE"
+}
+
+remove() {
+    touch ${TSESH_DIR_FILE}.tmp
+    name=""
+    dirs=$(get_dirs $TSESH_DIR_FILE)
+    IFS="," read -r -a tsesh_dirs <<<"$dirs"
+
+    to_remove=$(printf "%s\n" "${tsesh_dirs[@]}" | fzf)
+    if [ -z "$to_remove" ]; then
+        exit 0
+    fi
+    for index in ${!tsesh_dirs[@]}; do
+        if [ ${tsesh_dirs[$index]} == $to_remove ]; then
+            unset tsesh_dirs[$index]
+            break
+        fi
+    done
+    for element in "${tsesh_dirs[@]}"; do
+        echo "$element" >>${TSESH_DIR_FILE}.tmp
+    done
+    mv ${TSESH_DIR_FILE}.tmp ${TSESH_DIR_FILE}
+    echo "Removed $to_remove from $TSESH_DIR_FILE"
+}
+
+# Function to display usage instructions
+usage() {
+    echo "Usage: $0 <command> [options]"
+    echo "Base Command:"
+    echo "  Runs a fuzzy-finder to select sessions from list in $TSESH_DIR_FILE"
+    echo "Commands:"
+    echo "  add: Add directory to tsesh. Will add current directory if not otherwise specified"
+    echo "  rm: fzf remove from directory list"
+    echo "  help: Display this help message"
+    exit 1
+}
+
+# Main execution logic
+case "$1" in
+"add")
+    add "${@:2}"
+    ;;
+"rm")
+    remove
+    ;;
+"resume")
+    resume
+    ;;
+"help")
+    usage
+    ;;
+"refresh")
+    refresh
+    ;;
+"")
+    finder
+    ;;
+*)
+    echo "Error: Invalid command: $1"
+    usage
+    ;;
+esac
