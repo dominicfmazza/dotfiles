@@ -26,24 +26,12 @@ autocmd({ "UIEnter", "BufReadPost", "BufNewFile" }, {
   end,
 })
 
+-- checks for gitlab-ci files
+-- TODO: Could definitely be in a filetype configuration file
 autocmd({ "BufRead", "BufNewFile" }, {
   pattern = "*.{gitlab-ci,pipeline,ci}*.{yml,yaml}",
   callback = function()
     vim.bo.filetype = "yaml.gitlab"
-  end,
-})
-
-vim.api.nvim_create_autocmd('BufWinEnter', {
-  pattern = { '*.md' },
-  callback = function()
-    vim.opt.textwidth = 80
-  end,
-})
-
-vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
-  pattern = { '*.md' },
-  callback = function()
-    vim.opt.textwidth = 0
   end,
 })
 
