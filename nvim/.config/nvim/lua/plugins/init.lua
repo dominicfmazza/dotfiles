@@ -24,14 +24,14 @@ return {
       },
     },
   },
-  -- {
-  --   "norcalli/nvim-colorizer.lua",
-  --   lazy = false,
-  --   config = function()
-  --     vim.o.termguicolors = true
-  --     require("colorizer").setup()
-  --   end,
-  -- },
+  {
+    "norcalli/nvim-colorizer.lua",
+    lazy = false,
+    config = function()
+      vim.o.termguicolors = true
+      require("colorizer").setup()
+    end,
+  },
   { "echasnovski/mini.align", opts = {}, version = false, lazy = false },
   {"yochem/jq-playground.nvim", cmd = {"JqPlayground"}}
 }

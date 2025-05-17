@@ -39,4 +39,6 @@ opt.breakat = "\t;:,!? "
 opt.showbreak = "-->"
 
 opt.clipboard:append "unnamedplus"
-vim.g.clipboard = "osc52"
+if vim.g.neovide then
+    require "neovide"
+end
