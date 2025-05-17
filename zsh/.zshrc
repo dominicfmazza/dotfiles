@@ -26,27 +26,35 @@ source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
 
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 
 source_if_exists ~/.fzf.zsh
 source_if_exists ~/.p10k.zsh
-
 DISABLE_AUTO_TITLE=true
-
 source_if_exists $HOME/.cargo/env
-
 zstyle :omz:plugins:ssh-agent lazy yes
-
 autoload -Uz promptinit && promptinit && prompt powerlevel10k
-
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
 _zsh_autosuggest_bind_widgets
-
 source_if_exists "$HOME/.local/share/bin/env"
 export PATH="$HOME/.local/bin:$HOME/.tmux/:$PATH"
 export XDG_DATA_HOME="$HOME/.local/share/"
 eval "$(~/.local/bin/mise activate zsh)"
+source_if_exists "$HOME/.aliases"
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+if [[ -z "$ZELLIJ" ]]; then
+    if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
+        zellij attach -c
+    else
+        zellij
+    fi
+
+    if [[ "$ZELLIJ_AUTO_EXIT" == "true" ]]; then
+        exit
+    fi
+fi

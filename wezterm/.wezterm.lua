@@ -17,6 +17,30 @@ config.font = wezterm.font({
   assume_emoji_presentation = true,
 })
 
+config.window_background_opacity = 0.9
+config.macos_window_background_blur = 30
+config.window_decorations = 'RESIZE'
+config.window_frame = {
+  font = wezterm.font({ family = 'MonaspiceAr Nerd Font', weight = 'Bold' }),
+  font_size = 11,
+}
+
+wezterm.on('update-status', function(window)
+  local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
+
+  local color_scheme = window:effective_config().resolved_palette
+  local bg = color_scheme.background
+  local fg = color_scheme.foreground
+
+  window:set_right_status(wezterm.format({
+    { Background = { Color = 'none' } },
+    { Foreground = { Color = bg } },
+    { Text = SOLID_LEFT_ARROW },
+    { Background = { Color = bg } },
+    { Foreground = { Color = fg } },
+    { Text = ' ' .. wezterm.hostname() .. ' ' },
+  }))
+end)
 
 -- Finally, return the configuration to wezterm:
 return config
