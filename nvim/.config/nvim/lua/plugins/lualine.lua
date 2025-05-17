@@ -5,9 +5,6 @@ return {
     lazy = false,
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      -- Eviline config for lualine
-      -- Author: shadmansaleh
-      -- Credit: glepnir
       local lualine = require "lualine"
 
       local colors = {
@@ -38,30 +35,23 @@ return {
       -- Config
       local config = {
         options = {
-          -- Disable sections and component separators
           component_separators = "",
           section_separators = "",
           theme = {
-            -- We are going to use lualine_c an lualine_x as left and
-            -- right section. Both are highlighted by c theme .  So we
-            -- are just setting default looks o statusline
             normal = { c = { fg = colors.fg, bg = colors.bg } },
             inactive = { c = { fg = colors.fg, bg = colors.bg } },
           },
           globalstatus = true,
         },
         sections = {
-          -- these are to remove the defaults
           lualine_a = {},
           lualine_b = {},
           lualine_y = {},
           lualine_z = {},
-          -- These will be filled later
           lualine_c = {},
           lualine_x = {},
         },
         inactive_sections = {
-          -- these are to remove the defaults
           lualine_a = {},
           lualine_b = {},
           lualine_y = {},
@@ -71,36 +61,33 @@ return {
         },
       }
 
-      -- Inserts a component in lualine_c at left section
       local function ins_left(component) table.insert(config.sections.lualine_c, component) end
 
-      -- Inserts a component in lualine_x at right section
       local function ins_right(component) table.insert(config.sections.lualine_x, component) end
 
       ins_left {
         "mode",
         color = function()
-          -- auto change color according to neovims mode
           local mode_color = {
-            n = colors.red,
+            n = colors.blue,
             i = colors.green,
-            v = colors.blue,
-            [""] = colors.blue,
-            V = colors.blue,
+            v = colors.red,
+            [""] = colors.red,
+            V = colors.red,
             c = colors.magenta,
-            no = colors.red,
+            no = colors.blue,
             s = colors.orange,
             S = colors.orange,
             ic = colors.yellow,
             R = colors.violet,
             Rv = colors.violet,
-            cv = colors.red,
-            ce = colors.red,
+            cv = colors.blue,
+            ce = colors.blue,
             r = colors.cyan,
             rm = colors.cyan,
             ["r?"] = colors.cyan,
-            ["!"] = colors.red,
-            t = colors.red,
+            ["!"] = colors.blue,
+            t = colors.blue,
           }
           return { gui = "bold", fg = colors.bg, bg = mode_color[vim.fn.mode()] }
         end,
@@ -124,8 +111,6 @@ return {
         },
       }
 
-      -- Insert mid section. You can make any number of sections in neovim :)
-      -- for lualine it's any number greater then 2
       ins_left {
         function() return "%=" end,
       }
@@ -169,8 +154,8 @@ return {
 
       ins_right {
         function() return "▊" end,
-        color = { fg = colors.divider }, -- Sets highlighting of component
-        padding = { left = 0, right = 0 }, -- We don't need space before this
+        color = { fg = colors.divider },
+        padding = { left = 0, right = 0 }, 
       }
 
       ins_right {
@@ -185,11 +170,10 @@ return {
 
       ins_right {
         function() return "▊" end,
-        color = { fg = colors.bg }, -- Sets highlighting of component
-        padding = { left = 1, right = 1 }, -- We don't need space before this
+        color = { fg = colors.bg }, 
+        padding = { left = 1, right = 1 }, 
       }
 
-      -- Now don't forget to initialize lualine
       lualine.setup(config)
     end,
   },
