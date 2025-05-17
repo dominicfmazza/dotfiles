@@ -14,7 +14,6 @@ return {
     config = function()
       require("mason-tool-installer").setup {
         ensure_installed = {
-          -- LSPs
           "dockerfile-language-server",
           "yaml-language-server",
           "basedpyright",
@@ -23,12 +22,12 @@ return {
           "marksman",
           "clangd",
           "lua-language-server",
-          -- Formatters
           "prettierd",
           "beautysh",
           "stylua",
           "gersemi",
           "black",
+          "rust-analyzer"
         },
       }
     end,
