@@ -10,20 +10,19 @@ return {
       -- Credit: glepnir
       local lualine = require "lualine"
 
--- Color table for highlights
--- stylua: ignore
       local colors = {
-        bg       = colortable.mantle,
-        fg       = colortable.text,
-        yellow   = colortable.yellow,
-        cyan     = colortable.teal,
+        bg = colortable.mantle,
+        fg = colortable.subtext0,
+        yellow = colortable.yellow,
+        cyan = colortable.teal,
         darkblue = colortable.sapphire,
-        green    = colortable.green,
-        orange   = colortable.flamingo,
-        violet   = colortable.lavender,
-        magenta  = colortable.mauve,
-        blue     = colortable.blue,
-        red      = colortable.red,
+        green = colortable.green,
+        orange = colortable.flamingo,
+        violet = colortable.lavender,
+        magenta = colortable.mauve,
+        blue = colortable.blue,
+        red = colortable.red,
+        divider = colortable.surface2,
       }
 
       local conditions = {
@@ -79,14 +78,7 @@ return {
       local function ins_right(component) table.insert(config.sections.lualine_x, component) end
 
       ins_left {
-        function() return "▊" end,
-        color = { fg = colors.blue }, -- Sets highlighting of component
-        padding = { left = 0, right = 1 }, -- We don't need space before this
-      }
-
-      ins_left {
-        -- mode component
-        function() return "" end,
+        "mode",
         color = function()
           -- auto change color according to neovims mode
           local mode_color = {
@@ -99,7 +91,6 @@ return {
             no = colors.red,
             s = colors.orange,
             S = colors.orange,
-            [""] = colors.orange,
             ic = colors.yellow,
             R = colors.violet,
             Rv = colors.violet,
@@ -111,26 +102,16 @@ return {
             ["!"] = colors.red,
             t = colors.red,
           }
-          return { fg = mode_color[vim.fn.mode()] }
+          return { gui = "bold", fg = colors.bg, bg = mode_color[vim.fn.mode()] }
         end,
-        padding = { right = 1 },
-      }
-
-      ins_left {
-        -- filesize component
-        "filesize",
-        cond = conditions.buffer_not_empty,
+        padding = { left = 1, right = 1 },
       }
 
       ins_left {
         "filename",
         cond = conditions.buffer_not_empty,
-        color = { fg = colors.magenta, gui = "bold" },
+        color = { fg = colors.fg, gui = "bold" },
       }
-
-      ins_left { "location" }
-
-      ins_left { "progress", color = { fg = colors.fg, gui = "bold" } }
 
       ins_left {
         "diagnostics",
@@ -150,7 +131,23 @@ return {
       }
 
       ins_left {
-        -- Lsp server name .
+        "branch",
+        icon = "",
+        color = { fg = colors.fg, gui = "bold" },
+      }
+
+      ins_left {
+        "diff",
+        symbols = { added = " ", modified = "󰝤 ", removed = " " },
+        diff_color = {
+          added = { fg = colors.green },
+          modified = { fg = colors.orange },
+          removed = { fg = colors.red },
+        },
+        cond = conditions.hide_in_width,
+      }
+
+      ins_right {
         function()
           local msg = "No Active Lsp"
           local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
@@ -162,51 +159,34 @@ return {
           end
           return msg
         end,
-        icon = " LSP:",
-        color = { fg = "#ffffff", gui = "bold" },
+        icon = " ",
+        color = { fg = colors.fg, gui = "bold" },
       }
 
-      ins_left {
+      ins_right {
         "overseer",
-      }
-
-      -- Add components to right sections
-      ins_right {
-        "o:encoding", -- option component same as &encoding in viml
-        fmt = string.upper, -- I'm not sure why it's upper case either ;)
-        cond = conditions.hide_in_width,
-        color = { fg = colors.green, gui = "bold" },
-      }
-
-      ins_right {
-        "fileformat",
-        fmt = string.upper,
-        icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
-        color = { fg = colors.green, gui = "bold" },
-      }
-
-      ins_right {
-        "branch",
-        icon = "",
-        color = { fg = colors.violet, gui = "bold" },
-      }
-
-      ins_right {
-        "diff",
-        -- Is it me or the symbol for modified us really weird
-        symbols = { added = " ", modified = "󰝤 ", removed = " " },
-        diff_color = {
-          added = { fg = colors.green },
-          modified = { fg = colors.orange },
-          removed = { fg = colors.red },
-        },
-        cond = conditions.hide_in_width,
       }
 
       ins_right {
         function() return "▊" end,
-        color = { fg = colors.blue },
-        padding = { left = 1 },
+        color = { fg = colors.divider }, -- Sets highlighting of component
+        padding = { left = 0, right = 0 }, -- We don't need space before this
+      }
+
+      ins_right {
+        -- filesize component
+        "filesize",
+        cond = conditions.buffer_not_empty,
+      }
+
+      ins_right { "location" }
+
+      ins_right { "progress", color = { fg = colors.fg, guifg = "bold" } }
+
+      ins_right {
+        function() return "▊" end,
+        color = { fg = colors.bg }, -- Sets highlighting of component
+        padding = { left = 1, right = 1 }, -- We don't need space before this
       }
 
       -- Now don't forget to initialize lualine
