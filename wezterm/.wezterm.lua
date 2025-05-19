@@ -9,7 +9,7 @@ config.initial_cols = 120
 config.initial_rows = 28
 
 -- or, changing the font size and color scheme.
-config.font_size = 12
+config.font_size = 13
 config.color_scheme = 'Material Darker (base16)'
 
 config.font = wezterm.font({
@@ -17,12 +17,10 @@ config.font = wezterm.font({
   assume_emoji_presentation = true,
 })
 
-config.window_background_opacity = 0.9
-config.macos_window_background_blur = 30
 config.window_decorations = 'RESIZE'
 config.window_frame = {
   font = wezterm.font({ family = 'MonaspiceAr Nerd Font', weight = 'Bold' }),
-  font_size = 11,
+  font_size = 13,
 }
 
 wezterm.on('update-status', function(window)
