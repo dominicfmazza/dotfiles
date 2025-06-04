@@ -1,15 +1,23 @@
 return {
   {
-    "swaits/zellij-nav.nvim",
-    lazy = true,
-    event = "VeryLazy",
-    -- cond = vim.env.ZELLIJ == 0,
-    keys = {
-      { "<M-h>", "<cmd>ZellijNavigateLeftTab<cr>", { silent = true, desc = "navigate left or tab" } },
-      { "<M-j>", "<cmd>ZellijNavigateDown<cr>", { silent = true, desc = "navigate down" } },
-      { "<M-k>", "<cmd>ZellijNavigateUp<cr>", { silent = true, desc = "navigate up" } },
-      { "<M-l>", "<cmd>ZellijNavigateRightTab<cr>", { silent = true, desc = "navigate right or tab" } },
+    "christoomey/vim-tmux-navigator",
+    lazy = false,
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
     },
-    opts = {},
-  },
-}
+    init = function()
+      vim.g.tmux_navigator_no_mappings = 1
+      vim.g.tmux_navigator_no_wrap = 1
+    end,
+    keys = {
+      { "<M-h>", "<cmd>TmuxNavigateLeft<cr>" },
+      { "<M-j>", "<cmd>TmuxNavigateDown<cr>" },
+      { "<M-k>", "<cmd>TmuxNavigateUp<cr>" },
+      { "<M-l>", "<cmd>TmuxNavigateRight<cr>" },
+      { "<M-\\>", "<cmd>TmuxNavigatePrevious<cr>" },
+    },
+  }}
