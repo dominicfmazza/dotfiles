@@ -2,7 +2,7 @@ local opt = vim.opt
 
 vim.cmd.colorscheme "catppuccin-mocha"
 
-vim.g.have_nerd_font = true 
+vim.g.have_nerd_font = false
 
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
