@@ -24,14 +24,7 @@ return {
       },
     },
   },
-  {
-    "norcalli/nvim-colorizer.lua",
-    lazy = false,
-    config = function()
-      vim.o.termguicolors = true
-      require("colorizer").setup()
-    end,
-  },
   { "echasnovski/mini.align", opts = {}, version = false, lazy = false },
-  {"yochem/jq-playground.nvim", cmd = {"JqPlayground"}}
+  { "yochem/jq-playground.nvim", cmd = { "JqPlayground" } },
+  { "echasnovski/mini.ai", version = "*", event = "User FilePost", config = function() require("mini.ai").setup() end },
 }
