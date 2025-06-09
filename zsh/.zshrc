@@ -26,8 +26,6 @@ source_if_exists ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
 
-
-
 source_if_exists ~/.fzf.zsh
 source_if_exists ~/.p10k.zsh
 DISABLE_AUTO_TITLE=true
