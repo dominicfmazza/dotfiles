@@ -24,6 +24,8 @@ config.window_frame = {
 }
 
 local status, hosts = pcall(require, "hosts")
+
+if status then
   hosts.configure_hosts(config)
 end
 
