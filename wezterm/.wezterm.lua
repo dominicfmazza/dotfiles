@@ -23,7 +23,11 @@ config.window_frame = {
   font_size = 13,
 }
 
-require("~/.config/environments/wezterm/hosts.lua").configure_hosts(config)
+local status, hosts = pcall(require, "hosts")
+
+if status then
+  hosts.configure_hosts(config)
+end
 
 wezterm.on('update-status', function(window)
   local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
