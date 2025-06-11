@@ -13,8 +13,7 @@ config.font_size = 13
 config.color_scheme = 'Material Darker (base16)'
 
 config.font = wezterm.font({
-  family = "MonaspiceAr Nerd Font",
-  assume_emoji_presentation = true,
+  family = "MonaspiceNe Nerd Font",
 })
 
 config.window_decorations = 'RESIZE'
