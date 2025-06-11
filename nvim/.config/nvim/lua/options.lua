@@ -31,6 +31,7 @@ opt.undofile = true
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 opt.scrolloff = 10
 opt.inccommand = 'split'
+opt.showmode = false
 
 opt.wrap = true
 opt.linebreak = true
