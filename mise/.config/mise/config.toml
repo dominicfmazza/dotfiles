@@ -17,3 +17,8 @@ jq = "latest"
 "asdf:neovim" = "ref:master"
 usage = "latest"
 eza = "latest"
+zellij = "latest"
+go = "latest"
+
+[env]
+_.file = "~/.env.json"
