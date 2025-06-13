@@ -7,7 +7,6 @@ return {
     dashboard = { enabled = true },
     indent = { enabled = true, animate = { enabled = false } },
     input = { enabled = true },
-    image = { enabled = true },
     picker = {
       enabled = true,
       layout = {
