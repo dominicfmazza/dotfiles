@@ -14,7 +14,6 @@ return {
           "vimdoc",
           "luadoc",
           "query",
-          "help",
           "cpp",
           "cuda",
           "c",
