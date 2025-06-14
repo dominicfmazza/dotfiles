@@ -19,6 +19,7 @@ usage = "latest"
 eza = "latest"
 zellij = "latest"
 go = "latest"
+yazi = "latest"
 
 [env]
 _.file = "~/.env.json"
