@@ -14,6 +14,7 @@ config.color_scheme = 'Material Darker (base16)'
 
 config.font = wezterm.font({
   family = "MonaspiceNe Nerd Font",
+    weight = "Medium"
 })
 
 config.window_decorations = 'RESIZE'
