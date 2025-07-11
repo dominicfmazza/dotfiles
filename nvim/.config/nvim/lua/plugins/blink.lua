@@ -49,17 +49,11 @@ return {
     },
     snippets = { preset = "luasnip" },
     sources = {
-      default = { "lazydev", "lsp", "path", "snippets", "buffer" },
+      default = { "lsp", "path", "snippets", "buffer" },
       providers = {
         cmdline = {
           -- ignores cmdline completions when executing shell commands
           enabled = function() return vim.fn.getcmdtype() ~= ":" or not vim.fn.getcmdline():match "^[%%0-9,'<>%-]*!" end,
-        },
-        lazydev = {
-          name = "LazyDev",
-          module = "lazydev.integrations.blink",
-          -- make lazydev completions top priority (see `:h blink.cmp`) 
-          score_offset = 100,
         },
         buffer = {
           opts = {
