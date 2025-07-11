@@ -1,7 +1,6 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
-    event = "User FilePost",
     config = function()
       require("gitsigns").setup {
         signcolumn = true,
