@@ -19,6 +19,7 @@ return {
           nvimtree = true,
           treesitter = true,
           which_key = true,
+          fidget = true,
           fzf = true,
           mini = {
             enabled = true,
