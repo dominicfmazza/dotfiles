@@ -20,6 +20,7 @@ eza = "latest"
 zellij = "latest"
 go = "latest"
 yazi = "latest"
+imagemagick = "latest"
 
 [env]
 _.file = "~/.env.json"
