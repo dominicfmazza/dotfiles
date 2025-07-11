@@ -33,34 +33,17 @@ return {
 
       -- Pin/unpin buffer
       map("n", "<A-p>", "<Cmd>BufferPin<CR>", opts)
-
-      -- Goto pinned/unpinned buffer
-      --                 :BufferGotoPinned
-      --                 :BufferGotoUnpinned
-
-      -- Close buffer
       map("n", "<A-c>", "<Cmd>BufferClose<CR>", opts)
 
-      -- Wipeout buffer
-      --                 :BufferWipeout
-
-      -- Close commands
-      --                 :BufferCloseAllButCurrent
-      --                 :BufferCloseAllButPinned
-      --                 :BufferCloseAllButCurrentOrPinned
-      --                 :BufferCloseBuffersLeft
-      --                 :BufferCloseBuffersRight
-
-      -- Magic buffer-picking mode
       map("n", "<space>bb", "<Cmd>BufferPick<CR>", opts)
       map("n", "<space>bd", "<Cmd>BufferPickDelete<CR>", opts)
 
-      -- Sort automatically by...
       map("n", "<Space>bx", "<Cmd>BufferOrderByBufferNumber<CR>", opts)
       map("n", "<Space>bn", "<Cmd>BufferOrderByName<CR>", opts)
       map("n", "<Space>bD", "<Cmd>BufferOrderByDirectory<CR>", opts)
       map("n", "<Space>bl", "<Cmd>BufferOrderByLanguage<CR>", opts)
       map("n", "<Space>bw", "<Cmd>BufferOrderByWindowNumber<CR>", opts)
+
       require("barbar").setup {
         icons = {
           buffer_index = true,
