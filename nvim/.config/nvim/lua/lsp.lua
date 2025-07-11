@@ -59,7 +59,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       { "<leader>lt", function() snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
       { "<leader>ls", function() snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
       { "<leader>lS", function() snacks.picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
-      { "<leader>a", '<cmd>lua require("fastaction").code_action()<CR>', desc = "LSP: Code Action" },
+      { "<leader>a", function() vim.lsp.buf.code_action() end, desc = "LSP: Code Action" },
       { "<C-k>", vim.lsp.buf.hover, desc = "LSP: Hover LSP Help" },
       { "<C-s>", vim.lsp.buf.signature_help, desc = "LSP Signature Help" },
       buffer = args.buf,
