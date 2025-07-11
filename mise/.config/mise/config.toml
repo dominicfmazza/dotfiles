@@ -1,11 +1,16 @@
 [settings]
-all_compile = true
 idiomatic_version_file_enable_tools = ["python"]
 experimental = true
 
 [tools]
-lazygit = 'latest'
+# language support
+go = "latest"
 npm = 'latest'
+rust = 'latest'
+python = 'latest'
+npm = 'latest'
+
+# tools
 fzf = 'latest'
 fd = 'latest'
 lua = 'latest'
@@ -14,13 +19,14 @@ ripgrep = "latest"
 uv = "latest"
 bat = "latest"
 jq = "latest"
-"asdf:neovim" = "ref:master"
 usage = "latest"
 eza = "latest"
-zellij = "latest"
-go = "latest"
-yazi = "latest"
 imagemagick = "latest"
+
+# tuis
+"asdf:neovim" = "ref:master"
+lazygit = 'latest'
+yazi = "latest"
 
 # formatters
 "cargo:stylua" = "latest"
