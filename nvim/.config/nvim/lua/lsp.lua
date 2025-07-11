@@ -1,5 +1,4 @@
 local wk = require "which-key"
-local snacks = require "snacks"
 
 local lsp_capabilities = {
   workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },

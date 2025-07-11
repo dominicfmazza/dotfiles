@@ -13,14 +13,6 @@ return {
         color_overrides = {
           mocha = colortable,
         },
-        highlight_overrides = {
-          all = function(colors)
-            return {
-              SnacksIndentScope = { fg = colors.subtext0 },
-              SnacksIndentChunk = { fg = colors.subtext0 },
-            }
-          end,
-        },
         integrations = {
           blink_cmp = true,
           gitsigns = true,
