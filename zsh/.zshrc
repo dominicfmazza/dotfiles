@@ -39,6 +39,7 @@ export PATH="$HOME/.local/bin:$HOME/.tmux/:$PATH"
 export XDG_DATA_HOME="$HOME/.local/share/"
 eval "$(~/.local/bin/mise activate zsh)"
 source_if_exists "$HOME/.aliases"
+navi.tmux -s >> /dev/null
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
