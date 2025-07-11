@@ -9,17 +9,12 @@ return {
           cmake = { "gersemi" },
           python = { "black" },
           bash = { "beautysh" },
-          markdown = { "prettierd" },
-          json = { "prettierd" },
-          yaml = { "prettierd" },
-          javascript = { "prettierd" },
-          typescript = { "prettierd" },
+          markdown = { "mdformat" },
+          json = { "jq" },
+          yaml = { "yamlfmt" },
           rust = {"rustfmt"},
-          vue = { "prettierd" },
-          xml = { "prettierd" },
         },
       }
-
       require("conform").setup(options)
     end,
   },
