@@ -1,13 +1,13 @@
 [settings]
 all_compile = true
 idiomatic_version_file_enable_tools = ["python"]
+experimental = true
 
 [tools]
 lazygit = 'latest'
 npm = 'latest'
 fzf = 'latest'
 fd = 'latest'
-btop = "latest"
 lua = 'latest'
 zoxide = 'latest'
 ripgrep = "latest"
@@ -21,6 +21,23 @@ zellij = "latest"
 go = "latest"
 yazi = "latest"
 imagemagick = "latest"
+
+# formatters
+"cargo:stylua" = "latest"
+"pipx:gersemi" = "latest"
+"pipx:black" = "latest"
+"pipx:beautysh" = "latest"
+"pipx:mdformat" = "latest"
+"go:github.com/google/yamlfmt/cmd/yamlfmt" = "latest"
+
+# language servers
+"npm:vscode-json-languageservice" = "latest"
+"ubi:artempyanykh/marksman" = "latest"
+"ubi:LuaLS/lua-language-server" = "latest"
+"npm:bash-language-server" = "latest"
+"pipx:basedpyright" = "latest"
+"npm:yaml-language-server" = "latest"
+"npm:dockerfile-language-server-nodejs" = "latest"
 
 [env]
 _.file = "~/.env.json"
