@@ -28,7 +28,6 @@ opt.splitright = true
 opt.timeoutlen = 400
 opt.updatetime = 250
 opt.undofile = true
-opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 opt.scrolloff = 10
 opt.inccommand = 'split'
 opt.showmode = false
@@ -38,6 +37,7 @@ opt.linebreak = true
 opt.breakindent = true
 opt.breakat = "\t;:,!? "
 opt.showbreak = "-->"
+
 
 opt.clipboard:append "unnamedplus"
 if vim.g.neovide then
