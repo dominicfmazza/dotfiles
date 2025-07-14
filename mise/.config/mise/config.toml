@@ -38,11 +38,12 @@ yazi = "latest"
 # language servers
 "npm:vscode-json-languageservice" = "latest"
 "ubi:artempyanykh/marksman" = "latest"
-"ubi:LuaLS/lua-language-server" = "latest"
 "npm:bash-language-server" = "latest"
 "pipx:basedpyright" = "latest"
 "npm:yaml-language-server" = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
+"asdf:lua-language-server" = "latest"
 
 [env]
+UV_NATIVE_TLS = "true"
 _.file = "~/.env.json"
