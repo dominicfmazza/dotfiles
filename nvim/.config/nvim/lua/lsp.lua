@@ -42,14 +42,17 @@ vim.api.nvim_create_autocmd("LspDetach", {
   end,
 })
 
+wk.add {
+  {
+    "<leader>lf",
+    function() require("conform").format { async = true, lsp_fallback = true } end,
+    desc = "Format",
+  },
+}
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     wk.add {
-      {
-        "<leader>lf",
-        function() require("conform").format { async = true, lsp_fallback = true } end,
-        desc = "Format",
-      },
       { "<leader>ln", function() vim.lsp.buf.rename() end, desc = "LSP: Rename" },
       { "<leader>ld", function() FzfLua.lsp_definitions() end, desc = "LSP: Goto Definition" },
       { "<leader>lD", function() FzfLua.lsp_declarations() end, desc = "LSP: Goto Declaration" },
