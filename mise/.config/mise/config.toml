@@ -8,7 +8,6 @@ go = "latest"
 npm = 'latest'
 rust = 'latest'
 python = 'latest'
-npm = 'latest'
 
 # tools
 fzf = 'latest'
