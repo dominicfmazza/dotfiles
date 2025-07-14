@@ -12,9 +12,9 @@ source_if_exists() {
   fi
 }
 
-source_if_exists "$HOME/.config/environment/hosts.sh" 
-source_if_exists "$HOME/.config/environment/paths.sh" 
-source_if_exists "$HOME/.config/environment/langs.sh" 
+source_if_exists "$HOME/.config/environments/hosts.sh" 
+source_if_exists "$HOME/.config/environments/paths.sh" 
+source_if_exists "$HOME/.config/environments/langs.sh" 
 source_if_exists "$HOME/.local/bin/env"
 
 if [ -n $GOPATH ]; then
