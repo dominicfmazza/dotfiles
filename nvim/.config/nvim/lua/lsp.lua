@@ -19,6 +19,7 @@ local lsps = {
   "clangd",
   "jsonls",
   "yamlls",
+  "cmake",
   "bashls",
   "marksman",
   "dockerls",

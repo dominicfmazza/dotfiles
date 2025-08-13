@@ -9,7 +9,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require "autocommands"
--- load plugins
 require("lazy").setup {
   defaults = { lazy = true },
 

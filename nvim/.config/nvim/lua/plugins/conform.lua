@@ -9,7 +9,7 @@ return {
           cmake = { "gersemi" },
           python = { "black" },
           bash = { "beautysh" },
-          markdown = { "mdformat" },
+          markdown = { "prettierd" },
           json = { "jq" },
           yaml = { "yamlfmt" },
           rust = {"rustfmt"},

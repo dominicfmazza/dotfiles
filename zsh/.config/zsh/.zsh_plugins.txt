@@ -5,10 +5,10 @@ ohmyzsh/ohmyzsh path:plugins/magic-enter
 ohmyzsh/ohmyzsh path:plugins/zoxide
 ohmyzsh/ohmyzsh path:plugins/ssh-agent
 
-romkatv/powerlevel10k kind:fpath
-
 mattmc3/zfunctions
 zsh-users/zsh-autosuggestions
 zdharma-continuum/fast-syntax-highlighting kind:defer
 zsh-users/zsh-history-substring-search
 jeffreytse/zsh-vi-mode
+
+romkatv/powerlevel10k
