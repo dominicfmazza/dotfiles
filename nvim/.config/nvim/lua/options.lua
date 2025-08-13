@@ -31,6 +31,7 @@ opt.undofile = true
 opt.scrolloff = 10
 opt.inccommand = 'split'
 opt.showmode = false
+opt.shortmess:append "sI"
 
 opt.wrap = true
 opt.linebreak = true

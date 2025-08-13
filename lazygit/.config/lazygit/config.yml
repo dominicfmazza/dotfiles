@@ -21,3 +21,7 @@ gui:
       - '#eed49f'
 
   nerdFontsVersion: "3"
+
+git:
+  log:
+    order: default

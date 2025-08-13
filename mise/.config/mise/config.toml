@@ -21,9 +21,10 @@ jq = "latest"
 usage = "latest"
 eza = "latest"
 imagemagick = "latest"
+"asdf:aphecetche/asdf-tmux" = "master"
 
 # tuis
-"asdf:neovim" = "ref:master"
+"asdf:neovim" = "ref:v0.11.3"
 lazygit = 'latest'
 yazi = "latest"
 
@@ -34,15 +35,18 @@ yazi = "latest"
 "pipx:beautysh" = "latest"
 "pipx:mdformat" = "latest"
 "go:github.com/google/yamlfmt/cmd/yamlfmt" = "latest"
+"npm:@fsouza/prettierd" = "latest"
 
 # language servers
 "npm:vscode-json-languageservice" = "latest"
 "ubi:artempyanykh/marksman" = "latest"
 "npm:bash-language-server" = "latest"
 "pipx:basedpyright" = "latest"
+"pipx:cmake-language-server" = "latest"
 "npm:yaml-language-server" = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
 "asdf:lua-language-server" = "latest"
+clang-format = "20.1.8"
 
 [env]
 UV_NATIVE_TLS = "true"
