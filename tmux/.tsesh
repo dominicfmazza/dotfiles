@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-tmux new-window -n "neovim" -c "$1" "/bin/bash -c nvim"
+tmux new-window -n "neovim" -c "$1" "/bin/zsh -c nvim"
+
 tmux swap-window -t 0 -s 1
 tmux rename-window "shell"
 
