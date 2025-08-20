@@ -2,7 +2,6 @@ return {
   cmd = {
     "clangd",
     "--background-index=true",
-    "--pch-storage=memory",
     "--malloc-trim",
     "-j=24",
   },
