@@ -6,10 +6,7 @@ return {
     priority = 1000,
     config = function()
       require("catppuccin").setup {
-        background = {
-          dark = "frappe",
-          light = "latte",
-        },
+        transparent_background = true,
         color_overrides = {
           mocha = colortable,
         },

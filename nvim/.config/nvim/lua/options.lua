@@ -2,7 +2,7 @@ local opt = vim.opt
 
 vim.cmd.colorscheme "catppuccin-mocha"
 
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
@@ -17,7 +17,7 @@ opt.shiftwidth = 4
 opt.expandtab = true
 opt.termguicolors = true
 opt.cursorline = true
-opt.relativenumber = true
+opt.relativenumber = false
 opt.number = true
 opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
@@ -29,7 +29,7 @@ opt.timeoutlen = 400
 opt.updatetime = 250
 opt.undofile = true
 opt.scrolloff = 10
-opt.inccommand = 'split'
+opt.inccommand = "split"
 opt.showmode = false
 opt.shortmess:append "sI"
 
@@ -39,8 +39,5 @@ opt.breakindent = true
 opt.breakat = "\t;:,!? "
 opt.showbreak = "-->"
 
-
 opt.clipboard:append "unnamedplus"
-if vim.g.neovide then
-    require "neovide"
-end
+

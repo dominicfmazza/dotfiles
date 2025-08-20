@@ -1,6 +1,7 @@
 return {
   {
     priority = 902,
+    lazy = false,
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPost", "BufNewFile" },
     cmd = { "TSInstall", "TSBufEnable", "TSBufDisable", "TSModuleInfo" },

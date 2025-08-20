@@ -24,8 +24,8 @@ M.colortable = {
   surface2 = "#474747",
   surface1 = "#3f3f3f",
   surface0 = "#343434",
-  base = "#212121",
-  mantle = "#1a1a1a",
-  crust = "#1a1a1a",
+  base = "#0d0d0d",
+  mantle = "#0e0e0e",
+  crust = "#0f0f0f",
 }
 return M

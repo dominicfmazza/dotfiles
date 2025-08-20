@@ -3,44 +3,25 @@ local map = vim.keymap.set
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 
-local wk = require "which-key"
-wk.add {
-  { "<leader>c", "<cmd>close<cr>", desc = "Close" },
-  { "<leader>q", "<cmd>q<cr>", desc = "Quit" },
-  { "<leader>w", "<cmd>w<cr>", desc = "Save" },
-}
-wk.add {
-  { "<Leader>/", "gcc", remap = true, desc = "Toggle comment line", mode = { "n" } },
-  { "<Leader>/", "gc", remap = true, desc = "Toggle comment", mode = { "x" } },
-}
+map("n", "<leader>c", "<cmd>close<cr>")
+map("n", "<leader>q", "<cmd>q<cr>")
+map("n", "<leader>w", "<cmd>w<cr>")
+map("n", "<Leader>/", "gcc", { remap = true })
+map("n", "<Leader>/", "gc", { remap = true })
 
-wk.add {
-  { "J", "5gj", desc = "5Down" },
-  { "K", "5gk", desc = "5Up" },
-  noremap = true,
-  mode = { "n", "v" },
-}
+map({ "n", "x" }, "J", "5gj", { noremap = true })
+map({ "n", "x" }, "K", "5gk")
 
-wk.add {
-  { "<C-J>", "<cmd>join<cr>", desc = "5Down" },
-  noremap = true,
-  mode = { "n", "v" },
-}
+map({ "n", "v" }, "<C-J>", "<cmd>join<cr>", { noremap = true })
 
-wk.add {
-  { "<S-Tab>", "<gv", desc = "Unindent line", mode = "v" },
-  { "<Tab>", ">gv", desc = "Indent line", mode = "v" },
-}
-wk.add {
-  { "\\", "<cmd>split<cr>", desc = "Horizontal Split" },
-  { "|", "<cmd>vsplit<cr>", desc = "Vertical Split" },
-}
-wk.add {
-  { "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", desc = "Close all buffers but current", silent = true },
-}
+map("v", "<S-Tab>", "<gv")
+map("v", "<Tab>", ">gv")
 
-vim.keymap.set({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, noremap = true })
-vim.keymap.set({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, noremap = true })
+map("n", "\\", "<cmd>split<cr>")
+map("n", "|", "<cmd>vsplit<cr>")
+map("n", "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", { silent = true })
 
-vim.keymap.set({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = true })
-vim.keymap.set({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })
+map({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, noremap = true })
+map({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, noremap = true })
+map({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = true })
+map({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })

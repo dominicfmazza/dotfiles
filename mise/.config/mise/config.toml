@@ -47,6 +47,7 @@ yazi = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
 "asdf:lua-language-server" = "latest"
 clang-format = "20.1.8"
+cmake = "3.31.6"
 
 [env]
 UV_NATIVE_TLS = "true"
