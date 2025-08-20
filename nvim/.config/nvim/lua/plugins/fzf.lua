@@ -7,7 +7,7 @@ return {
     priority = 900,
     config = function()
       -- calling `setup` is optional for customization
-      require("fzf-lua").setup {"tmux"}
+      require("fzf-lua").setup {"fzf-tmux"}
 
     end,
     keys = {
