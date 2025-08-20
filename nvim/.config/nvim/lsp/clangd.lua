@@ -1,7 +1,9 @@
 return {
   cmd = {
     "clangd",
-    "--clang-tidy",
+    "--background-index=true",
+    "--pch-storage=memory",
+    "--malloc-trim",
     "-j=24",
   },
   filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },

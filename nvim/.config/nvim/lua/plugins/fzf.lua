@@ -7,13 +7,8 @@ return {
     priority = 900,
     config = function()
       -- calling `setup` is optional for customization
-      require("fzf-lua").setup {"telescope"}
+      require("fzf-lua").setup {"tmux"}
 
-      local wk = require "which-key"
-      wk.add {
-        { "<leader>f", group = "Telescope" },
-        noremap = true,
-      }
     end,
     keys = {
       {

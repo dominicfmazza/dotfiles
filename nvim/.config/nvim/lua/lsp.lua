@@ -1,5 +1,3 @@
-local wk = require "which-key"
-
 local lsp_capabilities = {
   workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   textDocument = {
@@ -27,10 +25,6 @@ local lsps = {
 }
 vim.lsp.enable(lsps)
 
-wk.add {
-  { "<leader>l", group = "+LSP" },
-}
-
 vim.api.nvim_create_autocmd("LspDetach", {
   callback = function(args)
     -- Get the detaching client
@@ -43,33 +37,23 @@ vim.api.nvim_create_autocmd("LspDetach", {
   end,
 })
 
-wk.add {
-  {
-    "<leader>lf",
-    function() require("conform").format { async = true, lsp_fallback = true } end,
-    desc = "Format",
-  },
-}
+vim.keymap.set("n", "<leader>lf", function() require("conform").format { async = true, lsp_fallback = true } end)
 
 vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function(args)
-    wk.add {
-      { "<leader>ln", function() vim.lsp.buf.rename() end, desc = "LSP: Rename" },
-      { "<leader>ld", function() FzfLua.lsp_definitions() end, desc = "LSP: Goto Definition" },
-      { "<leader>lD", function() FzfLua.lsp_declarations() end, desc = "LSP: Goto Declaration" },
-      { "<leader>lr", function() FzfLua.lsp_references() end, nowait = true, desc = "LSP: References" },
-      { "<leader>li", function() FzfLua.lsp_implementations() end, desc = "Goto Implementation" },
-      { "<leader>lt", function() FzfLua.lsp_typedefs() end, desc = "Goto T[y]pe Definition" },
-      { "<leader>lS", function() FzfLua.lsp_document_symbols() end, desc = "LSP Symbols" },
-      { "<leader>ls", function() FzfLua.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
-      { "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, desc = "LSP Workspace Symbols" },
-      { "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, desc = "LSP Workspace Symbols" },
-      { "<leader>a", function() vim.lsp.buf.code_action() end, desc = "LSP: Code Action" },
-      { "<C-k>", vim.lsp.buf.hover, desc = "LSP: Hover LSP Help" },
-      { "<C-s>", vim.lsp.buf.signature_help, desc = "LSP Signature Help" },
-      buffer = args.buf,
-      noremap = true,
-    }
+  callback = function()
+    vim.keymap.set("n", "<leader>ln", function() vim.lsp.buf.rename() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ld", function() FzfLua.lsp_definitions() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lD", function() FzfLua.lsp_declarations() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lr", function() FzfLua.lsp_references() end, { nowait = true, noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>li", function() FzfLua.lsp_implementations() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lt", function() FzfLua.lsp_typedefs() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lS", function() FzfLua.lsp_document_symbols() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ls", function() FzfLua.lsp_workspace_symbols() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>a", function() vim.lsp.buf.code_action() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<C-s>", vim.lsp.buf.signature_help, { noremap = true, buffer = true })
   end,
 })
 
