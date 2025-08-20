@@ -1,10 +1,15 @@
 return {
-  "bluz71/nvim-linefly",
+  "nvim-lualine/lualine.nvim",
   lazy = false,
+  dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
-    vim.opt.laststatus = 3
-    vim.g.linefly_options = {
-      winbar = true,
+    require("lualine").setup {
+      options = {
+        globalstatus = true,
+        theme = "auto",
+        component_separators = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
+      },
     }
   end,
 }
