@@ -7,7 +7,7 @@ map("n", "<leader>c", "<cmd>close<cr>")
 map("n", "<leader>q", "<cmd>q<cr>")
 map("n", "<leader>w", "<cmd>w<cr>")
 map("n", "<Leader>/", "gcc", { remap = true })
-map("n", "<Leader>/", "gc", { remap = true })
+map("x", "<Leader>/", "gc", { remap = true })
 
 map({ "n", "x" }, "J", "5gj", { noremap = true })
 map({ "n", "x" }, "K", "5gk")
