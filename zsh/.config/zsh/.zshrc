@@ -1,6 +1,9 @@
 emulate sh
-. /app/share/Profile
+if [[ -f /app/share/Profile ]]; then
+  . /app/share/Profile 
+fi
 umask 022
+emulate zsh
 export EDITOR='nvim'
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
@@ -11,7 +14,6 @@ export XDG_DATA_HOME="$HOME/.local/share/"
 . "$HOME/.local/bin/env"
 . "$HOME/.cargo/env"
 . "$HOME/.aliases"
-emulate zsh
 . ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
