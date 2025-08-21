@@ -11,6 +11,10 @@ config.initial_rows = 28
 -- or, changing the font size and color scheme.
 config.font_size = 13
 config.color_scheme = 'Material Darker (base16)'
+config.colors = {
+  background = '#0f0f0f'
+}
+
 
 config.font = wezterm.font({
   family = "MonaspiceNe Nerd Font",
