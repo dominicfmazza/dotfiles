@@ -32,6 +32,7 @@ opt.scrolloff = 10
 opt.inccommand = "split"
 opt.showmode = false
 opt.shortmess:append "sI"
+opt.cursorline = true
 
 opt.wrap = true
 opt.linebreak = true
