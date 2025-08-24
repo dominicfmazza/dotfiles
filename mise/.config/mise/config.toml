@@ -48,6 +48,7 @@ yazi = "latest"
 "asdf:lua-language-server" = "latest"
 clang-format = "20.1.8"
 cmake = "3.31.6"
+"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"
