@@ -1,4 +1,6 @@
 vim.g.mapleader = " "
+require "options"
+
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
 if not vim.loop.fs_stat(lazypath) then
@@ -59,6 +61,7 @@ require("lazy").setup {
   },
 }
 
-require "options"
+vim.cmd "colorscheme catppuccin-mocha"
+
 require "mappings"
 require "lsp"
