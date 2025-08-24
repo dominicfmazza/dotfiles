@@ -48,6 +48,17 @@ blocks:
         type: status
         style: plain
   - type: prompt
+    alignment: right
+    segments:
+      - type: executiontime
+        style: text
+        foreground: "#ffcb6b"
+        template: " {{ .FormattedMs }} "
+        properties:
+          threshold: 1
+          style: austin
+          always_enabled: true
+  - type: prompt
     alignment: left
     newline: true
     segments:
