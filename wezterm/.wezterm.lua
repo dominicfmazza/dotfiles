@@ -17,7 +17,7 @@ config.colors = {
 
 
 config.font = wezterm.font({
-  family = "MonaspiceNe Nerd Font",
+  family = "MonaspiceAr Nerd Font",
     weight = "Medium"
 })
 
