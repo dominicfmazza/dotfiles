@@ -1,39 +1,58 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
-
 upgrade:
-    source: cdn
-    interval: 168h
-    auto: false
-    notice: false
+  source: cdn
+  interval: 168h
+  auto: false
+  notice: false
+final_space: true
+transient_prompt:
+  background: transparent
+  foreground: "#6f6f6f"
+  template: "~>"
 blocks:
-    - type: prompt
-      alignment: left
-      segments:
-        - template: <#C591E8>❯</><#69FF94>❯</>
-          foreground: '#ffffff'
-          type: text
-          style: plain
-        - properties:
-            style: folder
-          template: ' {{ .Path }} '
-          foreground: '#56B6C2'
-          type: path
-          style: plain
-        - properties:
-            branch_icon: ""
-            fetch_status: false
-          template: <#5FAAE8>git:(</>{{ .HEAD }}<#5FAAE8>)</>
-          foreground: '#D0666F'
-          type: git
-          style: plain
-        - template: ' '
-          foreground: '#DCB977'
-          type: status
-          style: plain
-        - properties:
-            time_format: "15:04"
-          template: ' {{ .CurrentDate | date .Format }} '
-          foreground: '#66F68F'
-          type: time
-          style: plain
+  - type: prompt
+    alignment: left
+    segments:
+      - template: '{{ .UserName }}@{{ .HostName }}'
+        foreground: '#a8a8a8'
+        type: text
+        style: plain
+      - properties:
+          style: folder
+        template: ' {{ .PWD }} '
+        foreground: '#f4f4f4'
+        type: path
+        style: plain
+      - type: git
+        style: plain
+        foreground: "#82afff"
+        template: "{{ .HEAD }}"
+        properties:
+          fetch_status: false
+      - type: git
+        style: plain
+        foreground: "#c3e88d"
+        template: "{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}"
+        properties:
+          fetch_status: true
+          source: cli
+      - type: git
+        style: plain
+        foreground: "#6f6f6f"
+        template: "{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}"
+        properties:
+          fetch_status: true
+          source: cli
+      - template: ' X '
+        foreground: '#f78c6c'
+        type: status
+        style: plain
+  - type: prompt
+    alignment: left
+    newline: true
+    segments:
+      - template: ❯
+        foreground: '#c6c6c6'
+        type: text
+        style: plain
 version: 3
