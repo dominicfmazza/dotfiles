@@ -7,14 +7,14 @@ upgrade:
 final_space: true
 transient_prompt:
   background: transparent
-  foreground: "#6f6f6f"
+  foreground: "#626262"
   template: "~>"
 blocks:
   - type: prompt
     alignment: left
     segments:
       - template: '{{ .UserName }}@{{ .HostName }}'
-        foreground: '#a8a8a8'
+        foreground: '#a1a1a1'
         type: text
         style: plain
       - properties:
@@ -38,7 +38,7 @@ blocks:
           source: cli
       - type: git
         style: plain
-        foreground: "#6f6f6f"
+        foreground: "#626262"
         template: "{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}"
         properties:
           fetch_status: true
@@ -63,7 +63,7 @@ blocks:
     newline: true
     segments:
       - template: ❯
-        foreground: '#c6c6c6'
+        foreground: '#6f6f6f'
         type: text
         style: plain
 version: 3
