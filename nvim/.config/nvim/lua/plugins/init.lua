@@ -46,4 +46,11 @@ return {
     dependencies = { "lewis6991/gitsigns.nvim" },
     config = function() require("statuscol").setup {} end,
   },
+  {
+    'norcalli/nvim-colorizer.lua',
+    lazy = false,
+    config = function ()
+      require("colorizer").setup()
+    end
+  }
 }
