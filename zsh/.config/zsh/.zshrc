@@ -4,7 +4,6 @@ if [[ -f /app/share/Profile ]]; then
 fi
 umask 022
 emulate zsh
-export EDITOR='nvim'
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
 
