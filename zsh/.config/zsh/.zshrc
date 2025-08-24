@@ -8,17 +8,17 @@ export EDITOR='nvim'
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
 
-. "$HOME/.config/environments/hosts.sh" 
-. "$HOME/.config/environments/paths.sh" 
-. "$HOME/.config/environments/langs.sh" 
-. "$HOME/.local/bin/env"
-. "$HOME/.cargo/env"
-. "$HOME/.aliases"
-. ${ZDOTDIR:-~}/.antidote/antidote.zsh
+[ -f "$HOME/.config/environments/hosts.sh"  ] && . "$HOME/.config/environments/hosts.sh" 
+[ -f "$HOME/.config/environments/paths.sh"  ] && . "$HOME/.config/environments/paths.sh" 
+[ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+[ -f "$HOME/.aliases" ] && . "$HOME/.aliases"
+[ -f ${ZDOTDIR:-~}/.antidote/antidote.zsh ] && . ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 antidote load
 
-. ~/.fzf.zsh
+[ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
 
 DISABLE_AUTO_TITLE=true
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
@@ -32,8 +32,5 @@ bindkey '^f' autosuggest-accept
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
-. ${ZDOTDIR:-~}/.p10k.zsh
 
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
