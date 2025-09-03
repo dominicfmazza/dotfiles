@@ -21,6 +21,7 @@ jq = "latest"
 usage = "latest"
 eza = "latest"
 imagemagick = "latest"
+"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
 "asdf:aphecetche/asdf-tmux" = "master"
 
 # tuis
@@ -48,7 +49,7 @@ yazi = "latest"
 "asdf:lua-language-server" = "latest"
 clang-format = "20.1.8"
 cmake = "3.31.6"
-"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
+"pipx:clangd" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"

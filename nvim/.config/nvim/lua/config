@@ -1,0 +1,5 @@
+--hidden
+--glob=!.git/
+--glob=!build/
+--glob=!tmp/
+--smart-case

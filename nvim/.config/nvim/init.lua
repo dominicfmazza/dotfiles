@@ -65,3 +65,4 @@ vim.cmd "colorscheme catppuccin-mocha"
 
 require "mappings"
 require "lsp"
+require "picker"

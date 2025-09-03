@@ -16,7 +16,7 @@ return {
           fidget = true,
           fzf = true,
           mini = {
-            enabled = true,
+            enabled = false,
             indentscope_color = "",
           },
         },
