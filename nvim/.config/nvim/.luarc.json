@@ -2,6 +2,7 @@
     "workspace.checkThirdParty": false,
     "diagnostics.globals": [
         "vim",
-        "MiniPick"
+        "MiniPick",
+        "MiniExtra"
     ]
 }

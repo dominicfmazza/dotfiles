@@ -9,7 +9,7 @@ local lsp_capabilities = {
 }
 
 vim.lsp.config("*", {
-  capabilities = require("blink.cmp").get_lsp_capabilities(lsp_capabilities),
+  capabilities = lsp_capabilities,
 })
 
 local lsps = {
@@ -42,16 +42,14 @@ vim.keymap.set("n", "<leader>lf", function() require("conform").format { async =
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function()
     vim.keymap.set("n", "<leader>ln", function() vim.lsp.buf.rename() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>ld", function() FzfLua.lsp_definitions() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lD", function() FzfLua.lsp_declarations() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lr", function() FzfLua.lsp_references() end, { nowait = true, noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>li", function() FzfLua.lsp_implementations() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lt", function() FzfLua.lsp_typedefs() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lS", function() FzfLua.lsp_document_symbols() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>ls", function() FzfLua.lsp_workspace_symbols() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>a", function() vim.lsp.buf.code_action() end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ld", function() MiniExtra.pickers.lsp { scope = "definition" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lD", function() MiniExtra.pickers.lsp { scope = "declaration" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lr", function() MiniExtra.pickers.lsp { scope = "references" } end, { nowait = true, noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>li", function() MiniExtra.pickers.lsp { scope = "implementation" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lt", function() MiniExtra.pickers.lsp { scope = "type_definition" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lS", function() MiniExtra.pickers.lsp { scope = "document_symbol" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ls", function() MiniExtra.pickers.lsp { scope = "workspace_symbol" } end, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leadeer>a", function() vim.lsp.buf.code_action() end, { noremap = true, buffer = true })
     vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, { noremap = true, buffer = true })
     vim.keymap.set("n", "<C-s>", vim.lsp.buf.signature_help, { noremap = true, buffer = true })
   end,
