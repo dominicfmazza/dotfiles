@@ -66,10 +66,6 @@ return {
         desc = "Unstage Hunk",
         buffer = true,
       },
-      { "<leader>gb", function() FzfLua.git_branches() end, desc = "Git Branches" },
-      { "<leader>gf", function() FzfLua.git_bcommits() end, desc = "Buffer Log" },
-      { "<leader>gs", function() FzfLua.git_status() end, desc = "Git Status" },
-      { "<leader>gd", function() FzfLua.git_diff() end, desc = "Git Diff (Hunks)" },
       {
         "]g",
         function() require("gitsigns").next_hunk() end,

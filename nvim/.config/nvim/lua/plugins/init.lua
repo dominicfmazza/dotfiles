@@ -1,11 +1,5 @@
 return {
   {
-    "folke/todo-comments.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    lazy = false,
-    opts = {},
-  },
-  {
     "nmac427/guess-indent.nvim",
     lazy = false,
     opts = {},
@@ -45,12 +39,5 @@ return {
     lazy = false,
     dependencies = { "lewis6991/gitsigns.nvim" },
     config = function() require("statuscol").setup {} end,
-  },
-  {
-    'norcalli/nvim-colorizer.lua',
-    lazy = false,
-    config = function ()
-      require("colorizer").setup()
-    end
   }
 }
