@@ -25,7 +25,7 @@ imagemagick = "latest"
 "asdf:aphecetche/asdf-tmux" = "master"
 
 # tuis
-"asdf:neovim" = "ref:v0.11.3"
+"asdf:neovim" = "ref:nightly"
 lazygit = 'latest'
 yazi = "latest"
 
