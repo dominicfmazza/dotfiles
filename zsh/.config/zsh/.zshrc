@@ -3,6 +3,7 @@ if [[ -f /app/share/Profile ]]; then
   . /app/share/Profile 
 fi
 umask 022
+stty erase "^?"
 emulate zsh
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
