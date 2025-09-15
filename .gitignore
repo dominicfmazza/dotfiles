@@ -5,3 +5,4 @@ tmux/.tmux/plugins/tpm
 tmux/.tmux/plugins/minimal-tmux-status
 zsh/.config/zsh/.zsh_plugins.zsh
 glazewm/.glzr/zebar/tmp*
+.zcompdump*

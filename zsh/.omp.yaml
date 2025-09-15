@@ -62,6 +62,10 @@ blocks:
     alignment: left
     newline: true
     segments:
+      - type: python
+        style: plain
+        foreground: "#a1a1a1"
+        template: "  {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} "
       - template: ❯
         foreground: '#6f6f6f'
         type: text
