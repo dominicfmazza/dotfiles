@@ -1,5 +1,4 @@
 [settings]
-idiomatic_version_file_enable_tools = ["python"]
 experimental = true
 
 [tools]
@@ -7,7 +6,6 @@ experimental = true
 go = "latest"
 npm = 'latest'
 rust = 'latest'
-python = 'latest'
 
 # tools
 fzf = 'latest'
