@@ -32,78 +32,236 @@ opt.inccommand = "split"
 opt.showmode = false
 opt.shortmess:append "sI"
 
+opt.clipboard:append "unnamedplus"
+
+-- WRAP --
 opt.wrap = true
 opt.linebreak = true
 opt.breakindent = true
 opt.breakat = "\t;:,!? "
 opt.showbreak = "-->"
 
-opt.clipboard:append "unnamedplus"
-
+-- COMPLETION --
 opt.completeopt = "menuone,noselect,fuzzy,nosort"
 opt.complete = ".,w,b"
 
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
+-- GLOBAL STATUSLINE --
+opt.laststatus = 3
 
-if not vim.loop.fs_stat(lazypath) then
-  local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
-end
+vim.pack.add {
+  "https://github.com/nvim-mini/mini.nvim",
+  "https://github.com/rachartier/tiny-inline-diagnostic.nvim",
+  "https://github.com/lewis6991/gitsigns.nvim",
+  "https://github.com/luukvbaal/statuscol.nvim",
+  "https://github.com/stevearc/conform.nvim",
+  "https://github.com/stevearc/quicker.nvim",
+  "https://github.com/nmac427/guess-indent.nvim",
+  "https://github.com/christoomey/vim-tmux-navigator",
+  "https://github.com/nvim-treesitter/nvim-treesitter",
+  "https://github.com/nvim-lua/plenary.nvim",
+  "https://github.com/jiaoshijie/undotree",
+  "https://github.com/benomahony/uv.nvim",
+  "https://github.com/nvim-neo-tree/neo-tree.nvim",
+  "https://github.com/nvim-tree/nvim-web-devicons",
+  "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/ibhagwan/fzf-lua",
+  "https://github.com/saghen/blink.cmp",
+}
 
-vim.opt.rtp:prepend(lazypath)
+require "colors"
 
-require "autocommands"
-require("lazy").setup {
-  defaults = { lazy = true },
-
-  ui = {
-    icons = {
-      ft = "",
-      lazy = "󰂠 ",
-      loaded = "",
-      not_loaded = "",
-    },
-  },
-
-  performance = {
-    rtp = {
-      disabled_plugins = {
-        "2html_plugin",
-        "tohtml",
-        "getscript",
-        "getscriptPlugin",
-        "gzip",
-        "logipat",
-        "matchit",
-        "tar",
-        "netrw",
-        "netrwPlugin",
-        "netrwFileManager",
-        "netrwSettings",
-        "tarPlugin",
-        "rrhelper",
-        "spellfile_plugin",
-        "vimball",
-        "vimballPlugin",
-        "zip",
-        "zipPlugin",
-        "tutor",
-        "rplugin",
-        "syntax",
-        "synmenu",
-        "optwin",
-        "compiler",
-        "bugreport",
-        "ftplugin",
-      },
-    },
-  },
-  spec = {
-    { import = "plugins" },
+require("quicker").setup()
+vim.keymap.set("n", "<leader>vq", function() require("quicker").toggle() end, {
+  desc = "Toggle quickfix",
+})
+vim.keymap.set("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
+  desc = "Toggle loclist",
+})
+require("gitsigns").setup {
+  signcolumn = true,
+  signs = {
+    delete = { text = "󰍵" },
+    changedelete = { text = "󱕖" },
   },
 }
 
+local set_keymap = function(lhs, rhs, mode) vim.keymap.set(mode or "n", lhs, rhs, { noremap = true }) end
+set_keymap("<leader>gL", function() require("gitsigns").blame_line { full = true } end)
+set_keymap("<leader>gS", function() require("gitsigns").stage_buffer() end)
+set_keymap("<leader>gd", function() require("gitsigns").diffthis() end)
+set_keymap("<leader>gh", function() require("gitsigns").reset_hunk() end)
+set_keymap("<leader>gl", function() require("gitsigns").blame_line() end)
+set_keymap("<leader>gp", function() require("gitsigns").preview_hunk() end)
+set_keymap("<leader>gr", function() require("gitsigns").reset_buffer() end)
+set_keymap("<leader>gs", function() require("gitsigns").stage_hunk() end)
+set_keymap("<leader>gu", function() require("gitsigns").undo_stage_hunk() end)
+set_keymap("]g", function() require("gitsigns").next_hunk() end)
+set_keymap("[g", function() require("gitsigns").prev_hunk() end)
+
+require("nvim-treesitter.configs").setup {
+  ensure_installed = {
+    "vim",
+    "lua",
+    "vimdoc",
+    "luadoc",
+    "query",
+    "cpp",
+    "cuda",
+    "c",
+    "cmake",
+    "yaml",
+    "python",
+    "markdown",
+    "markdown_inline",
+    "bash",
+    "regex",
+  },
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,
+  },
+}
+
+vim.diagnostic.config {
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "󰌵",
+    },
+  },
+}
+
+require("tiny-inline-diagnostic").setup {
+  options = {
+    show_source = {
+      if_many = true,
+    },
+    multilines = {
+      enabled = true,
+      always_show = true,
+    },
+  },
+}
+
+set_keymap("<leader>u", function() require("undotree").toggle() end)
+
+require("statuscol").setup()
+
+require("conform").setup {
+  formatters_by_ft = {
+    lua = { "stylua" },
+    cpp = { "clang_format" },
+    cmake = { "gersemi" },
+    python = { "black" },
+    bash = { "beautysh" },
+    markdown = { "prettierd" },
+    json = { "jq" },
+    yaml = { "yamlfmt" },
+    rust = { "rustfmt" },
+  },
+}
+
+require("guess-indent").setup()
+
+require("uv").setup {
+  keymaps = {
+    prefix = "<leader>p",
+  },
+}
+
+require("neo-tree").setup {
+  filesystem = {
+    filtered_items = {
+      hide_dotfiles = false,
+    },
+  },
+}
+
+require("mini.icons").setup()
+require("mini.icons").tweak_lsp_kind()
+require("mini.ai").setup()
+require("mini.align").setup()
+require("mini.hipatterns").setup {
+  highlighters = {
+    -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
+    fixme = { pattern = "%f[%w]()FIXME()%f[%W]", group = "MiniHipatternsFixme" },
+    hack = { pattern = "%f[%w]()HACK()%f[%W]", group = "MiniHipatternsHack" },
+    todo = { pattern = "%f[%w]()TODO()%f[%W]", group = "MiniHipatternsTodo" },
+    note = { pattern = "%f[%w]()NOTE()%f[%W]", group = "MiniHipatternsNote" },
+
+    -- Highlight hex color strings (`#rrggbb`) using that color
+    hex_color = require("mini.hipatterns").gen_highlighter.hex_color(),
+  },
+}
+require("mini.extra").setup()
+require("mini.statusline").setup()
+require("mini.jump").setup {
+  delay = { highlight = 1e7 },
+}
+
+require("mini.notify").setup()
+local opts = { ERROR = { duration = 10000 } }
+vim.notify = require("mini.notify").make_notify(opts)
+
+require("mini.snippets").setup()
+local miniclue = require "mini.clue"
+miniclue.setup {
+  triggers = {
+    -- Leader triggers
+    { mode = "n", keys = "<Leader>" },
+    { mode = "x", keys = "<Leader>" },
+
+    -- Built-in completion
+    { mode = "i", keys = "<C-x>" },
+
+    -- `g` key
+    { mode = "n", keys = "g" },
+    { mode = "x", keys = "g" },
+
+    -- Marks
+    { mode = "n", keys = "'" },
+    { mode = "n", keys = "`" },
+    { mode = "x", keys = "'" },
+    { mode = "x", keys = "`" },
+
+    -- Registers
+    { mode = "n", keys = '"' },
+    { mode = "x", keys = '"' },
+    { mode = "i", keys = "<C-r>" },
+    { mode = "c", keys = "<C-r>" },
+
+    -- Window commands
+    { mode = "n", keys = "<C-w>" },
+
+    -- `z` key
+    { mode = "n", keys = "z" },
+    { mode = "x", keys = "z" },
+  },
+
+  clues = {
+    -- Enhance this by adding descriptions for <Leader> mapping groups
+    miniclue.gen_clues.builtin_completion(),
+    miniclue.gen_clues.g(),
+    miniclue.gen_clues.marks(),
+    miniclue.gen_clues.registers(),
+    miniclue.gen_clues.windows(),
+    miniclue.gen_clues.z(),
+  },
+}
+
+vim.g.tmux_navigator_no_mappings = 1
+vim.g.tmux_navigator_no_wrap = 1
 local map = vim.keymap.set
+map("n", "<M-h>", "<cmd>TmuxNavigateLeft<cr>")
+map("n", "<M-j>", "<cmd>TmuxNavigateDown<cr>")
+map("n", "<M-k>", "<cmd>TmuxNavigateUp<cr>")
+map("n", "<M-l>", "<cmd>TmuxNavigateRight<cr>")
+map("n", "<M-\\>", "<cmd>TmuxNavigatePrevious<cr>")
 
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
@@ -131,19 +289,8 @@ map({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, noremap = tru
 map({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = true })
 map({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })
 
-local imap_expr = function(lhs, rhs) vim.keymap.set("i", lhs, rhs, { expr = true }) end
-imap_expr("<Tab>", [[pumvisible() ? "\<C-n>" : "\<Tab>"]])
-imap_expr("<S-Tab>", [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]])
-_G.cr_action = function()
-  -- If there is selected item in popup, accept it with <C-y>
-  if vim.fn.complete_info()["selected"] ~= -1 then return "\25" end
-  -- Fall back to plain `<CR>`. You might want to customize according
-  -- to other plugins. For example if 'mini.pairs' is set up, replace
-  -- next line with `return MiniPairs.cr()`
-  return "\r"
-end
-
-vim.keymap.set("i", "<CR>", "v:lua.cr_action()", { expr = true })
+map("n", "<leader>e", "<cmd>Neotree focus filesystem toggle<cr>", { noremap = true })
 
 require "lsp"
 require "picker"
+require "autocommands"

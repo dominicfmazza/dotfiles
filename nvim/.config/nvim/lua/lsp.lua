@@ -1,3 +1,70 @@
+local has_words_before = function()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  if col == 0 then return false end
+  local line = vim.api.nvim_get_current_line()
+  return line:sub(col, col):match "%s" == nil
+end
+
+require("blink.cmp").setup {
+  keymap = {
+    preset = "none",
+    ["<C-k>"] = { "show_documentation", "hide_documentation", "fallback" },
+    ["<C-s>"] = { "show_signature", "hide_signature", "fallback" },
+    ["<C-e>"] = { "hide", "fallback" },
+    ["<CR>"] = { "accept", "fallback" },
+
+    ["<Tab>"] = {
+      function(cmp)
+        if cmp.snippet_active() and not cmp.is_visible() then return cmp.accept() end
+        if has_words_before() and cmp.is_visible() then return cmp.insert_next() end
+      end,
+      "snippet_forward",
+      "fallback",
+    },
+    ["<S-Tab>"] = { "insert_prev", "fallback" },
+    ["<Up>"] = { "select_prev", "fallback" },
+    ["<Down>"] = { "select_next", "fallback" },
+    ["<C-up>"] = { "scroll_documentation_up", "fallback" },
+    ["<C-down>"] = { "scroll_documentation_down", "fallback" },
+  },
+  completion = { documentation = { auto_show = false }, list = { selection = { preselect = false }, cycle = { from_top = false } } },
+  sources = {
+    default = { "lsp", "path", "snippets", "buffer" },
+    providers = {
+      buffer = {
+        opts = {
+          get_bufnrs = function()
+            return vim.tbl_filter(function(bufnr) return vim.bo[bufnr].buftype == "" end, vim.api.nvim_list_bufs())
+          end,
+        },
+      },
+    },
+  },
+  fuzzy = { implementation = "lua" },
+  cmdline = {
+    completion = {
+      menu = {
+        auto_show = true,
+      },
+      list = {
+        selection = {
+          preselect = false,
+        },
+      },
+    },
+    keymap = {
+      preset = "none",
+      ["<Tab>"] = {
+        "insert_next",
+        "fallback",
+      },
+      ["<S-Tab>"] = { "insert_prev", "fallback" },
+      ["<Enter>"] = { "accept_and_enter", "fallback" },
+    },
+  },
+  signature = { enabled = true },
+}
+
 local lsp_capabilities = {
   workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
   textDocument = {
@@ -25,82 +92,25 @@ local lsps = {
 }
 vim.lsp.enable(lsps)
 
-vim.api.nvim_create_autocmd("LspDetach", {
-  callback = function(args)
-    -- Get the detaching client
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    -- Remove the autocommand to format the buffer on save, if it exists
-    if client:supports_method "textDocument/formatting" then vim.api.nvim_clear_autocmds {
-      event = "BufWritePre",
-      buffer = args.buf,
-    } end
-  end,
-})
-
 vim.keymap.set("n", "<leader>lf", function() require("conform").format { async = true, lsp_fallback = true } end)
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function()
-    vim.keymap.set("n", "<leader>ln", function() vim.lsp.buf.rename() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>ld", function() MiniExtra.pickers.lsp { scope = "definition" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lD", function() MiniExtra.pickers.lsp { scope = "declaration" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lr", function() MiniExtra.pickers.lsp { scope = "references" } end, { nowait = true, noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>li", function() MiniExtra.pickers.lsp { scope = "implementation" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lt", function() MiniExtra.pickers.lsp { scope = "type_definition" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>lS", function() MiniExtra.pickers.lsp { scope = "document_symbol" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>ls", function() MiniExtra.pickers.lsp { scope = "workspace_symbol" } end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<leadeer>a", function() vim.lsp.buf.code_action() end, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<C-k>", vim.lsp.buf.hover, { noremap = true, buffer = true })
-    vim.keymap.set("n", "<C-s>", vim.lsp.buf.signature_help, { noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ln", function() vim.lsp.buf.rename() end, { desc = "Rename", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ld", function() FzfLua.lsp_definitions() end, { desc = "Definitions", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lD", function() FzfLua.lsp_declarations() end, { desc = "Declarations", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lr", function() FzfLua.lsp_references() end, { desc = "References", nowait = true, noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>li", function() FzfLua.lsp_implementations() end, { desc = "Implementations", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lt", function() FzfLua.lsp_typedefs() end, { desc = "Typedefs", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lS", function() FzfLua.lsp_document_symbols() end, { desc = "Document Symbols", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>ls", function() FzfLua.lsp_workspace_symbols() end, { desc = "Workspace Symbols", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, { desc = "Document Diagnostics", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, { desc = "Workspace Diagnostics", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>a", function() vim.lsp.buf.code_action() end, { desc = "Code Actions", noremap = true, buffer = true })
   end,
 })
 
 vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
-
-vim.api.nvim_create_user_command("LspStart", function(args)
-  local arg1 = args.fargs[1] or ""
-
-  if arg1 == "" then
-    vim.lsp.enable(lsps)
-  else
-    vim.lsp.enable(arg1)
-  end
-
-  vim.cmd "edit"
-end, {
-  nargs = "*",
-  complete = function() return lsps end,
-})
-
-vim.api.nvim_create_user_command("LspStop", function(args)
-  local arg1 = args.fargs[1] or ""
-  local lsp_clients = vim.lsp.get_clients()
-  if not arg1 == "" then lsp_clients = vim.lsp.get_clients { name = arg1 } end
-  vim.lsp.stop_client(lsp_clients)
-  vim.wait(1000)
-  vim.cmd "edit"
-end, { nargs = "*" })
-
-local empty = function(tab)
-  for _, _ in pairs(tab) do
-    return false
-  end
-  return true
-end
-
-vim.api.nvim_create_user_command("LspRestart", function(args)
-  local arg1 = args.fargs[1] or ""
-  if not arg1 == "" then
-    vim.cmd("LspStop  " .. arg1)
-    vim.cmd("LspStart " .. arg1)
-  else
-    local lsp_clients = vim.lsp.get_clients()
-    if not empty(lsp_clients) then
-      vim.cmd "LspStop"
-      vim.cmd "LspStart"
-    end
-  end
-end, { nargs = "*" })
 
 vim.api.nvim_create_user_command("LspLog", function()
   local log = vim.lsp.log.get_filename()
