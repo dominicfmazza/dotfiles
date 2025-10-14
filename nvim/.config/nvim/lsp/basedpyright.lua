@@ -14,8 +14,8 @@ return {
   settings = {
     analysis = {
       autoSearchPaths = true,
+      autoImportCompletions = true,
       useLibraryCodeForTypes = true,
-      diagnosticMode = "openFilesOnly",
     },
   },
 }
