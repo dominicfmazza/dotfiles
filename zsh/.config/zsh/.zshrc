@@ -8,6 +8,8 @@ emulate zsh
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
 
+eval "$(~/.local/bin/mise activate zsh)"
+
 [ -f "$HOME/.config/environments/hosts.sh"  ] && . "$HOME/.config/environments/hosts.sh" 
 [ -f "$HOME/.config/environments/paths.sh"  ] && . "$HOME/.config/environments/paths.sh" 
 [ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
@@ -25,7 +27,6 @@ export ZSH_AUTOSUGGEST_USE_ASYNC="true"
 export ZSH_AUTOSUGGEST_MANUAL_REBIND=on
 _zsh_autosuggest_bind_widgets
 
-eval "$(~/.local/bin/mise activate zsh)"
 autoload -Uz compinit && compinit
 
 bindkey '^f' autosuggest-accept
