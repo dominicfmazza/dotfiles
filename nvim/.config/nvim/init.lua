@@ -34,6 +34,8 @@ opt.shortmess:append "sI"
 
 opt.clipboard:append "unnamedplus"
 
+opt.winborder = "rounded"
+
 -- WRAP --
 opt.wrap = true
 opt.linebreak = true
@@ -60,7 +62,6 @@ vim.pack.add {
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/jiaoshijie/undotree",
-  "https://github.com/benomahony/uv.nvim",
   "https://github.com/nvim-neo-tree/neo-tree.nvim",
   "https://github.com/nvim-tree/nvim-web-devicons",
   "https://github.com/MunifTanjim/nui.nvim",
@@ -68,13 +69,14 @@ vim.pack.add {
   "https://github.com/saghen/blink.cmp",
 }
 
+local map = vim.keymap.set
 require "colors"
 
 require("quicker").setup()
-vim.keymap.set("n", "<leader>vq", function() require("quicker").toggle() end, {
+map("n", "<leader>vq", function() require("quicker").toggle() end, {
   desc = "Toggle quickfix",
 })
-vim.keymap.set("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
+map("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
   desc = "Toggle loclist",
 })
 require("gitsigns").setup {
@@ -85,18 +87,16 @@ require("gitsigns").setup {
   },
 }
 
-local set_keymap = function(lhs, rhs, mode) vim.keymap.set(mode or "n", lhs, rhs, { noremap = true }) end
-set_keymap("<leader>gL", function() require("gitsigns").blame_line { full = true } end)
-set_keymap("<leader>gS", function() require("gitsigns").stage_buffer() end)
-set_keymap("<leader>gd", function() require("gitsigns").diffthis() end)
-set_keymap("<leader>gh", function() require("gitsigns").reset_hunk() end)
-set_keymap("<leader>gl", function() require("gitsigns").blame_line() end)
-set_keymap("<leader>gp", function() require("gitsigns").preview_hunk() end)
-set_keymap("<leader>gr", function() require("gitsigns").reset_buffer() end)
-set_keymap("<leader>gs", function() require("gitsigns").stage_hunk() end)
-set_keymap("<leader>gu", function() require("gitsigns").undo_stage_hunk() end)
-set_keymap("]g", function() require("gitsigns").next_hunk() end)
-set_keymap("[g", function() require("gitsigns").prev_hunk() end)
+map("n", "<leader>gS", function() require("gitsigns").stage_buffer() end, { desc = "Stage Buffer", noremap = true })
+map("n", "<leader>gd", function() require("gitsigns").diffthis() end, { desc = "Diff This", noremap = true })
+map("n", "<leader>gh", function() require("gitsigns").reset_hunk() end, { desc = "Reset Hunk", noremap = true })
+map("n", "<leader>gl", function() require("gitsigns").blame_line() end, { desc = "Blame Line", noremap = true })
+map("n", "<leader>gp", function() require("gitsigns").preview_hunk() end, { desc = "Preview Hunk", noremap = true })
+map("n", "<leader>gr", function() require("gitsigns").reset_buffer() end, { desc = "Reset Buffer", noremap = true })
+map("n", "<leader>gs", function() require("gitsigns").stage_hunk() end, { desc = "Stage Hunk", noremap = true })
+map("n", "<leader>gu", function() require("gitsigns").undo_stage_hunk() end, { desc = "Undo Stage Hunk", noremap = true })
+map("n", "]g", function() require("gitsigns").next_hunk() end, { desc = "Next Git Hunk", noremap = true })
+map("n", "[g", function() require("gitsigns").prev_hunk() end, { desc = "Previous Git Hunk", noremap = true })
 
 require("nvim-treesitter.configs").setup {
   ensure_installed = {
@@ -148,7 +148,7 @@ require("tiny-inline-diagnostic").setup {
   },
 }
 
-set_keymap("<leader>u", function() require("undotree").toggle() end)
+map("n", "<leader>u", function() require("undotree").toggle() end)
 
 require("statuscol").setup()
 
@@ -167,12 +167,6 @@ require("conform").setup {
 }
 
 require("guess-indent").setup()
-
-require("uv").setup {
-  keymaps = {
-    prefix = "<leader>p",
-  },
-}
 
 require("neo-tree").setup {
   filesystem = {
@@ -256,7 +250,6 @@ miniclue.setup {
 
 vim.g.tmux_navigator_no_mappings = 1
 vim.g.tmux_navigator_no_wrap = 1
-local map = vim.keymap.set
 map("n", "<M-h>", "<cmd>TmuxNavigateLeft<cr>")
 map("n", "<M-j>", "<cmd>TmuxNavigateDown<cr>")
 map("n", "<M-k>", "<cmd>TmuxNavigateUp<cr>")
