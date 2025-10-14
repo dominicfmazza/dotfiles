@@ -36,9 +36,9 @@ has_session() {
 
 hydrate() {
     if [ -f "$2"/.tsesh ]; then
-        tmux run-shell -t "$1" "$2/.tsesh $2 2>&1"
+        tmux run-shell -t "$1" "$2/.tsesh '$2' 2>&1"
     elif [ -f "$HOME"/.tsesh ]; then
-        tmux run-shell -t "$1" "$HOME/.tsesh $2 2>&1"
+        tmux run-shell -t "$1" "$HOME/.tsesh '$2' 2>&1"
     fi
 }
 
@@ -73,7 +73,7 @@ finder() {
         selected=$(printf "%s\n" "${tsesh_dirs[@]}" | fzf --tmux)
     fi
 
-    if [[ -z $selected ]]; then
+    if [[ -z "$selected" ]]; then
         exit 0
     fi
 
