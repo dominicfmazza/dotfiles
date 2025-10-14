@@ -51,4 +51,4 @@ cmake = "3.31.6"
 
 [env]
 UV_NATIVE_TLS = "true"
-_.file = "~/.env.json"
+_.file = "~/.env"
