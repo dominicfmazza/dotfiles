@@ -8,11 +8,9 @@ end
 require("blink.cmp").setup {
   keymap = {
     preset = "none",
-    ["<C-k>"] = { "show_documentation", "hide_documentation", "fallback" },
     ["<C-s>"] = { "show_signature", "hide_signature", "fallback" },
     ["<C-e>"] = { "hide", "fallback" },
     ["<CR>"] = { "accept", "fallback" },
-
     ["<Tab>"] = {
       function(cmp)
         if cmp.snippet_active() and not cmp.is_visible() then return cmp.accept() end
@@ -76,7 +74,7 @@ local lsp_capabilities = {
 }
 
 vim.lsp.config("*", {
-  capabilities = lsp_capabilities,
+  capabilities = vim.tbl_deep_extend("force", lsp_capabilities, require("blink.cmp").get_lsp_capabilities()),
 })
 
 local lsps = {
@@ -107,6 +105,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, { desc = "Document Diagnostics", noremap = true, buffer = true })
     vim.keymap.set("n", "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, { desc = "Workspace Diagnostics", noremap = true, buffer = true })
     vim.keymap.set("n", "<leader>a", function() vim.lsp.buf.code_action() end, { desc = "Code Actions", noremap = true, buffer = true })
+    vim.keymap.set("n", "<C-k>", function() vim.lsp.buf.hover() end, { desc = "LSP Hover", noremap = true, buffer = true })
   end,
 })
 
