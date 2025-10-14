@@ -1,6 +1,6 @@
-require("fzf-lua").setup { "fzf-tmux" }
+require("fzf-lua").setup { "fzf-native" }
 
-vim.keymap.set("n", "<leader>ff", function() require("fzf-lua").files() end, { desc = "Find Files" })
+vim.keymap.set("n", "<leader>ff", function() require("fzf-lua").global() end, { desc = "Find Files" })
 vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Find TODOs" })
 vim.keymap.set("n", "<leader>fg", function() require("fzf-lua").grep_project { hidden = true } end, { desc = "Live Grep" })
 vim.keymap.set("n", "<leader>fb", function() require("fzf-lua").buffers() end, { desc = "Buffers" })
