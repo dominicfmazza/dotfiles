@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+POSITIONAL_ARGS=()
+OPERATION="view"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -o|--operation)
+      case $2 in
+        edit)
+          OPERATION="update -d -"
+        ;;
+        comment)
+          OPERATION="note"
+        ;;
+      esac
+      shift # past argument
+      shift # past value
+      ;;
+    -r|--repository)
+      REPOSITORY="-R $2"
+      shift # past argument
+      shift # past value
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+echo "OPENING ISSUES IN ${REPOSITORY}"
+
+
+ISSUE_NUMBER=$(glab issue list $REPOSITORY | fzf | cut -f 1 | sed 's/^#//')
+
+glab issue $OPERATION $REPOSITORY $ISSUE_NUMBER

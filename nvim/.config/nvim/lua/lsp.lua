@@ -1,25 +1,11 @@
-local has_words_before = function()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-  if col == 0 then return false end
-  local line = vim.api.nvim_get_current_line()
-  return line:sub(col, col):match "%s" == nil
-end
-
 require("blink.cmp").setup {
   keymap = {
     preset = "none",
     ["<C-s>"] = { "show_signature", "hide_signature", "fallback" },
     ["<C-e>"] = { "hide", "fallback" },
     ["<CR>"] = { "accept", "fallback" },
-    ["<Tab>"] = {
-      function(cmp)
-        if cmp.snippet_active() and not cmp.is_visible() then return cmp.accept() end
-        if has_words_before() and cmp.is_visible() then return cmp.insert_next() end
-      end,
-      "snippet_forward",
-      "fallback",
-    },
-    ["<S-Tab>"] = { "insert_prev", "fallback" },
+    ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+    ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
     ["<Up>"] = { "select_prev", "fallback" },
     ["<Down>"] = { "select_next", "fallback" },
     ["<C-up>"] = { "scroll_documentation_up", "fallback" },
