@@ -67,6 +67,8 @@ vim.pack.add {
   "https://github.com/MunifTanjim/nui.nvim",
   "https://github.com/ibhagwan/fzf-lua",
   "https://github.com/saghen/blink.cmp",
+  "https://github.com/obsidian-nvim/obsidian.nvim",
+  "https://github.com/MeanderingProgrammer/render-markdown.nvim",
 }
 
 local map = vim.keymap.set
@@ -245,6 +247,57 @@ miniclue.setup {
     miniclue.gen_clues.registers(),
     miniclue.gen_clues.windows(),
     miniclue.gen_clues.z(),
+    { mode = "n", keys = "<Leader>l", desc = "+LSP" },
+    { mode = "n", keys = "<Leader>o", desc = "+Obsidian" },
+    { mode = "n", keys = "<Leader>f", desc = "+Picker" },
+    { mode = "n", keys = "<Leader>g", desc = "+Git" },
+    { mode = "n", keys = "<Leader>v", desc = "+Lists" },
+  },
+}
+
+require("obsidian").setup {
+  legacy_commands = false,
+  workspaces = {
+    {
+      name = "work",
+      path = "~/vaults/work",
+    },
+  },
+  completion = {
+    nvim_cmp = false,
+    blink = true,
+  },
+  picker = {
+    name = "fzf-lua",
+  },
+}
+
+map("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "Obsidian: Search" })
+map("n", "<leader>on", "<cmd>Obsidian new<cr>", { desc = "Obsidian: New File" })
+map("n", "<leader>od", "<cmd>Obsidian dailies<cr>", { desc = "Obsidian: Dailies" })
+map("n", "<leader>ot", "<cmd>Obsidian today<cr>", { desc = "Obsidian: Today" })
+map("n", "<leader>oy", "<cmd>Obsidian yesterday<cr>", { desc = "Obsidian: Yesterday" })
+map("n", "<leader>oT", "<cmd>Obsidian tomorrow<cr>", { desc = "Obsidian: Tomorrow" })
+
+require("render-markdown").setup {
+  completions = { blink = { enabled = true } },
+  render_modes = true,
+  heading = {
+    sign = false,
+    position = "inline",
+    width = "block",
+    left_margin = 0.5,
+    left_pad = 0.2,
+    right_pad = 0.2,
+  },
+  checkbox = {
+    unchecked = { icon = " " },
+    checked = { icon = " " },
+    custom = {
+      todo = { raw = "[~]", rendered = " ", highlight = "DiagnosticWarn" },
+      cancelled = { raw = "[!]", rendered = " ", highlight = "DiagnosticUnnecessary" },
+      migrated = { raw = "[>]", rendered = " ", highlight = "DiagnosticInfo" },
+    },
   },
 }
 
@@ -259,9 +312,9 @@ map("n", "<M-\\>", "<cmd>TmuxNavigatePrevious<cr>")
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 
-map("n", "<leader>c", "<cmd>close<cr>")
-map("n", "<leader>q", "<cmd>q<cr>")
-map("n", "<leader>w", "<cmd>w<cr>")
+map("n", "<leader>c", "<cmd>close<cr>", { desc = "Close buffer" })
+map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
+map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<Leader>/", "gcc", { remap = true })
 map("x", "<Leader>/", "gc", { remap = true })
 

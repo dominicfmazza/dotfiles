@@ -3,10 +3,15 @@ if [[ -f /app/share/Profile ]]; then
   . /app/share/Profile 
 fi
 umask 022
+
 stty erase "^?"
 emulate zsh
 export PATH="$PATH:$HOME/.tmux/"
 export XDG_DATA_HOME="$HOME/.local/share/"
+export MANPAGER='nvim +Man!'
+export EDITOR='nvim'
+export NPM_PACKAGES="${HOME}/.npm-packages"
+export PATH="$NPM_PACKAGES/bin:$PATH"
 
 eval "$(~/.local/bin/mise activate zsh)"
 
