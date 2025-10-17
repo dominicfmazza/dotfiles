@@ -68,7 +68,7 @@ vim.pack.add {
   "https://github.com/ibhagwan/fzf-lua",
   "https://github.com/saghen/blink.cmp",
   "https://github.com/obsidian-nvim/obsidian.nvim",
-  "https://github.com/MeanderingProgrammer/render-markdown.nvim",
+  "https://github.com/OXY2DEV/markview.nvim",
 }
 
 local map = vim.keymap.set
@@ -257,19 +257,20 @@ miniclue.setup {
 
 require("obsidian").setup {
   legacy_commands = false,
+  ui = { enable = false },
   workspaces = {
     {
       name = "work",
-      path = "~/vaults/work",
+      path = "~/vaults/personal",
     },
-  },
-  completion = {
-    nvim_cmp = false,
-    blink = true,
   },
   picker = {
     name = "fzf-lua",
   },
+}
+
+require("markview").setup {
+  preview = { hybrid_modes = { "i" }, linewise_hybrid_mode = true },
 }
 
 map("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "Obsidian: Search" })
@@ -278,28 +279,6 @@ map("n", "<leader>od", "<cmd>Obsidian dailies<cr>", { desc = "Obsidian: Dailies"
 map("n", "<leader>ot", "<cmd>Obsidian today<cr>", { desc = "Obsidian: Today" })
 map("n", "<leader>oy", "<cmd>Obsidian yesterday<cr>", { desc = "Obsidian: Yesterday" })
 map("n", "<leader>oT", "<cmd>Obsidian tomorrow<cr>", { desc = "Obsidian: Tomorrow" })
-
-require("render-markdown").setup {
-  completions = { blink = { enabled = true } },
-  render_modes = true,
-  heading = {
-    sign = false,
-    position = "inline",
-    width = "block",
-    left_margin = 0.5,
-    left_pad = 0.2,
-    right_pad = 0.2,
-  },
-  checkbox = {
-    unchecked = { icon = " " },
-    checked = { icon = " " },
-    custom = {
-      todo = { raw = "[~]", rendered = " ", highlight = "DiagnosticWarn" },
-      cancelled = { raw = "[!]", rendered = " ", highlight = "DiagnosticUnnecessary" },
-      migrated = { raw = "[>]", rendered = " ", highlight = "DiagnosticInfo" },
-    },
-  },
-}
 
 vim.g.tmux_navigator_no_mappings = 1
 vim.g.tmux_navigator_no_wrap = 1

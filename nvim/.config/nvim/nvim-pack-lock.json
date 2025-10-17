@@ -1,0 +1,80 @@
+{
+  "plugins": {
+    "blink.cmp": {
+      "rev": "cb87357",
+      "src": "https://github.com/saghen/blink.cmp"
+    },
+    "conform.nvim": {
+      "rev": "fbcb4fa",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "fzf-lua": {
+      "rev": "db45bab",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "gitsigns.nvim": {
+      "rev": "1ee5c1f",
+      "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "guess-indent.nvim": {
+      "rev": "84a4987",
+      "src": "https://github.com/nmac427/guess-indent.nvim"
+    },
+    "markview.nvim": {
+      "rev": "c93ea99",
+      "src": "https://github.com/OXY2DEV/markview.nvim"
+    },
+    "mini.nvim": {
+      "rev": "8a7cf7e",
+      "src": "https://github.com/nvim-mini/mini.nvim"
+    },
+    "neo-tree.nvim": {
+      "rev": "20244be",
+      "src": "https://github.com/nvim-neo-tree/neo-tree.nvim"
+    },
+    "nui.nvim": {
+      "rev": "de74099",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
+    },
+    "nvim-treesitter": {
+      "rev": "42fc28ba",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "nvim-web-devicons": {
+      "rev": "b8221e4",
+      "src": "https://github.com/nvim-tree/nvim-web-devicons"
+    },
+    "obsidian.nvim": {
+      "rev": "6b2a22a",
+      "src": "https://github.com/obsidian-nvim/obsidian.nvim"
+    },
+    "plenary.nvim": {
+      "rev": "b9fd522",
+      "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "quicker.nvim": {
+      "rev": "12a2291",
+      "src": "https://github.com/stevearc/quicker.nvim"
+    },
+    "render-markdown.nvim": {
+      "rev": "ce7af44",
+      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
+    },
+    "statuscol.nvim": {
+      "rev": "c46172d",
+      "src": "https://github.com/luukvbaal/statuscol.nvim"
+    },
+    "tiny-inline-diagnostic.nvim": {
+      "rev": "1cb11cc",
+      "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
+    },
+    "undotree": {
+      "rev": "1c3e753",
+      "src": "https://github.com/jiaoshijie/undotree"
+    },
+    "vim-tmux-navigator": {
+      "rev": "c45243d",
+      "src": "https://github.com/christoomey/vim-tmux-navigator"
+    }
+  }
+}
