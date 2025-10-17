@@ -260,8 +260,12 @@ require("obsidian").setup {
   ui = { enable = false },
   workspaces = {
     {
-      name = "work",
+      name = "personal",
       path = "~/vaults/personal",
+    },
+    {
+      name = "work",
+      path = "~/vaults/work",
     },
   },
   picker = {
