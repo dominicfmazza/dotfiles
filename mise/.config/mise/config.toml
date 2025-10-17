@@ -48,6 +48,7 @@ clang-format = "20.1.8"
 cmake = "3.31.6"
 "pipx:clangd" = "latest"
 "pipx:pylatexenc" = "latest"
+python = "3.12"
 
 [env]
 UV_NATIVE_TLS = "true"

@@ -24,7 +24,9 @@ require("blink.cmp").setup {
       },
     },
   },
-  fuzzy = { implementation = "lua" },
+  fuzzy = {
+    implementation = "prefer_rust_with_warning",
+  },
   cmdline = {
     completion = {
       menu = {
