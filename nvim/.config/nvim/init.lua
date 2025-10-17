@@ -66,7 +66,7 @@ vim.pack.add {
   "https://github.com/nvim-tree/nvim-web-devicons",
   "https://github.com/MunifTanjim/nui.nvim",
   "https://github.com/ibhagwan/fzf-lua",
-  "https://github.com/saghen/blink.cmp",
+  { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
   "https://github.com/OXY2DEV/markview.nvim",
 }
@@ -275,6 +275,7 @@ require("obsidian").setup {
 
 require("markview").setup {
   preview = { hybrid_modes = { "i" }, linewise_hybrid_mode = true },
+  markdown = { list_items = { shift_size = 2, indent_size = 4 } },
 }
 
 map("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "Obsidian: Search" })
