@@ -4,16 +4,16 @@ vim.g.have_nerd_font = true
 local opt = vim.opt
 
 -- global options --
-opt.incsearch = true -- Find the next match as we type the search
-opt.hlsearch = true -- Hilight searches by default
+opt.incsearch = true    -- Find the next match as we type the search
+opt.hlsearch = true     -- Hilight searches by default
 opt.viminfo = "'100,f1" -- Save up to 100 marks, enable capital marks
-opt.ignorecase = true -- Ignore case when searching...
-opt.smartcase = true -- ...unless we type a capital
+opt.ignorecase = true   -- Ignore case when searching...
+opt.smartcase = true    -- ...unless we type a capital
 opt.autoindent = true
 opt.smartindent = true
+opt.expandtab = true
 opt.tabstop = 4
 opt.shiftwidth = 4
-opt.expandtab = true
 opt.termguicolors = true
 opt.cursorline = true
 opt.relativenumber = false
@@ -43,10 +43,6 @@ opt.breakindent = true
 opt.breakat = "\t;:,!? "
 opt.showbreak = "-->"
 
--- COMPLETION --
-opt.completeopt = "menuone,noselect,fuzzy,nosort"
-opt.complete = ".,w,b"
-
 -- GLOBAL STATUSLINE --
 opt.laststatus = 3
 
@@ -66,7 +62,7 @@ vim.pack.add {
   "https://github.com/nvim-tree/nvim-web-devicons",
   "https://github.com/MunifTanjim/nui.nvim",
   "https://github.com/ibhagwan/fzf-lua",
-  { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0" },
+  { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
   "https://github.com/OXY2DEV/markview.nvim",
 }
@@ -255,35 +251,56 @@ miniclue.setup {
   },
 }
 
+
+
+require("markview").setup {
+  preview = { hybrid_modes = { "i" }, linewise_hybrid_mode = true },
+  markdown = { list_items = {
+    marker_minus = { add_padding = false },
+    marker_plus = { add_padding = false },
+    marker_star = { add_padding = false },
+    marker_dot = { add_padding = false },
+    marker_parenthesis = { add_padding = false },
+  } },
+}
+
+local function get_directories(parent_path)
+  -- Get all entries in the directory that are directories
+  local directories = {}
+  vim.fs.find(function(name, path)
+    table.insert(directories, { name = vim.fs.basename(name), path = string.format("%s%s", path, name) })
+  end, { type = "directory", path = parent_path })
+  return directories
+end
+local function determine_obsidian_workspaces()
+  local obsidian_dir = "~/vaults"
+  if vim.env.OBSIDIAN_VAULT_ROOT then
+    obsidian_dir = vim.env.OBSIDIAN_VAULT_ROOT
+  end
+  return get_directories(obsidian_dir)
+end
+
+local workspaces = determine_obsidian_workspaces()
+-- vim.print(workspaces)
 require("obsidian").setup {
   legacy_commands = false,
   ui = { enable = false },
-  workspaces = {
-    {
-      name = "personal",
-      path = "~/vaults/personal",
-    },
-    {
-      name = "work",
-      path = "~/vaults/work",
-    },
-  },
+  workspaces = workspaces,
   picker = {
     name = "fzf-lua",
   },
 }
 
-require("markview").setup {
-  preview = { hybrid_modes = { "i" }, linewise_hybrid_mode = true },
-  markdown = { list_items = { shift_size = 2, indent_size = 4 } },
-}
-
-map("n", "<leader>os", "<cmd>Obsidian search<cr>", { desc = "Obsidian: Search" })
+map("n", "<leader>os", "<cmd>Obsidian quick_switch<cr>", { desc = "Obsidian: Search Files" })
 map("n", "<leader>on", "<cmd>Obsidian new<cr>", { desc = "Obsidian: New File" })
-map("n", "<leader>od", "<cmd>Obsidian dailies<cr>", { desc = "Obsidian: Dailies" })
+map("n", "<leader>od", "<cmd>Obsidian dailies -4 4<cr>", { desc = "Obsidian: Dailies" })
 map("n", "<leader>ot", "<cmd>Obsidian today<cr>", { desc = "Obsidian: Today" })
 map("n", "<leader>oy", "<cmd>Obsidian yesterday<cr>", { desc = "Obsidian: Yesterday" })
 map("n", "<leader>oT", "<cmd>Obsidian tomorrow<cr>", { desc = "Obsidian: Tomorrow" })
+map("n", "<leader>ow", "<cmd>Obsidian workspace<cr>", { desc = "Obsidian: Workspaces" })
+map("n", "<leader>ox", "<cmd>Obsidian extract_note<cr>", { desc = "Obsidian: Extract Note" })
+map("n", "<leader>ol", "<cmd>Obsidian link<cr>", { desc = "Obsidian: Link Note" })
+map("n", "<leader>oL", "<cmd>Obsidian link_new<cr>", { desc = "Obsidian: Create and Link Note" })
 
 vim.g.tmux_navigator_no_mappings = 1
 vim.g.tmux_navigator_no_wrap = 1
@@ -324,3 +341,5 @@ map("n", "<leader>e", "<cmd>Neotree focus filesystem toggle<cr>", { noremap = tr
 require "lsp"
 require "picker"
 require "autocommands"
+
+

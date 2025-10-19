@@ -7,3 +7,5 @@ zsh/.config/zsh/.zsh_plugins.zsh
 glazewm/.glzr/zebar/tmp*
 .zcompdump*
 zsh/.config/zsh/.zsh_history
+scripts/.local/bin/dploy
+scripts/.local/bin/mise

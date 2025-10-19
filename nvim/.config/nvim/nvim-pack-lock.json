@@ -1,15 +1,16 @@
 {
   "plugins": {
     "blink.cmp": {
-      "rev": "cb87357",
-      "src": "https://github.com/saghen/blink.cmp"
+      "rev": "327fff9",
+      "src": "https://github.com/saghen/blink.cmp",
+      "version": ">=1.0.1-0"
     },
     "conform.nvim": {
       "rev": "fbcb4fa",
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "fzf-lua": {
-      "rev": "db45bab",
+      "rev": "d45ce94",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
@@ -45,7 +46,7 @@
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
-      "rev": "6b2a22a",
+      "rev": "2d44b29",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "plenary.nvim": {
@@ -55,10 +56,6 @@
     "quicker.nvim": {
       "rev": "12a2291",
       "src": "https://github.com/stevearc/quicker.nvim"
-    },
-    "render-markdown.nvim": {
-      "rev": "ce7af44",
-      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "statuscol.nvim": {
       "rev": "c46172d",
