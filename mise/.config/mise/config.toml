@@ -4,7 +4,7 @@ experimental = true
 [tools]
 # language support
 go = "latest"
-npm = 'latest'
+node = 'latest'
 rust = 'latest'
 
 # tools

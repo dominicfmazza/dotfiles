@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+width=${2:-90%}
+height=${2:-90%}
+if [ "$(tmux display-message -p -F "#{session_name}")" = "obsidian" ];then
+    tmux detach-client
+else
+    tmux popup -d '#{pane_current_path}' -xC -yC -w$width -h$height -E "tmux attach -t obsidian || tmux new -s obsidian nvim ${OBSIDIAN_VAULT_ROOT:-'~/vaults/'}"
+fi
+
+
