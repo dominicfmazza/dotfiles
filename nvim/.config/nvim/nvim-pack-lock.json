@@ -69,6 +69,10 @@
       "rev": "1c3e753",
       "src": "https://github.com/jiaoshijie/undotree"
     },
+    "vague.nvim": {
+      "rev": "1c3ab30",
+      "src": "https://github.com/vague-theme/vague.nvim"
+    },
     "vim-tmux-navigator": {
       "rev": "c45243d",
       "src": "https://github.com/christoomey/vim-tmux-navigator"
