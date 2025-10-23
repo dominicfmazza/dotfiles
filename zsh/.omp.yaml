@@ -14,24 +14,24 @@ blocks:
     alignment: left
     segments:
       - template: '{{ .UserName }}@{{ .HostName }}'
-        foreground: '#a1a1a1'
+        foreground: '#cdcdcd'
         type: text
         style: plain
       - properties:
           style: folder
         template: ' {{ .PWD }} '
-        foreground: '#f4f4f4'
+        foreground: '#bebeda'
         type: path
         style: plain
       - type: git
         style: plain
-        foreground: "#82afff"
+        foreground: "#6e94b2"
         template: "{{ .HEAD }}"
         properties:
           fetch_status: false
       - type: git
         style: plain
-        foreground: "#c3e88d"
+        foreground: "#99b782"
         template: "{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}"
         properties:
           fetch_status: true
@@ -44,7 +44,7 @@ blocks:
           fetch_status: true
           source: cli
       - template: ' X '
-        foreground: '#f78c6c'
+        foreground: '#d8647e'
         type: status
         style: plain
   - type: prompt
@@ -52,7 +52,7 @@ blocks:
     segments:
       - type: executiontime
         style: text
-        foreground: "#ffcb6b"
+        foreground: "#f5cb96"
         template: " {{ .FormattedMs }} "
         properties:
           threshold: 1
@@ -64,10 +64,10 @@ blocks:
     segments:
       - type: python
         style: plain
-        foreground: "#a1a1a1"
+        foreground: "#cdcdcd"
         template: "  {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} "
       - template: ❯
-        foreground: '#6f6f6f'
+        foreground: '#606079'
         type: text
         style: plain
 version: 3
