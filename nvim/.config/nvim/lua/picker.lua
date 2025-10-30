@@ -1,4 +1,19 @@
-require("fzf-lua").setup { "fzf-native" }
+require("fzf-lua").setup {
+  { "fzf-native" },
+  actions = {
+    files = {
+      ["enter"] = FzfLua.actions.file_edit_or_qf,
+      ["ctrl-s"] = FzfLua.actions.file_split,
+      ["ctrl-v"] = FzfLua.actions.file_vsplit,
+      ["ctrl-t"] = FzfLua.actions.file_tabedit,
+      ["alt-i"] = FzfLua.actions.toggle_ignore,
+      ["alt-h"] = FzfLua.actions.toggle_hidden,
+      ["alt-f"] = FzfLua.actions.toggle_follow,
+      ["ctrl-q"] = FzfLua.actions.file_sel_to_qf,
+      ["ctrl-Q"] = FzfLua.actions.file_sel_to_ll,
+    },
+  },
+}
 
 vim.keymap.set("n", "<leader>ff", function() require("fzf-lua").global() end, { desc = "Find Global" })
 vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Find TODOs" })
