@@ -2,9 +2,9 @@ watch_stylesheet: true
 watch_config: true
 debug: false
 komorebi:
-  start_command: "komorebic start --masir --ahk"
-  stop_command: "komorebic stop --masir --ahk"
-  reload_command: "komorebic stop --masir --ahk && komorebic start --masir --ahk"
+  start_command: "komorebic start --whkd"
+  stop_command: "komorebic stop --whkd"
+  reload_command: "komorebic stop --whkd && komorebic start --whkd"
 bars:
   primary-bar:
     enabled: true
@@ -96,17 +96,6 @@ widgets:
         left: 8
         bottom: 0
         right: 8 
-  glazewm_workspaces:
-    type: "glazewm.workspaces.GlazewmWorkspacesWidget"
-    options:
-      offline_label: "GlazeWM Offline"
-      hide_empty_workspaces: true
-      hide_if_offline: true
-  glazewm_tiling_direction:
-    type: "glazewm.tiling_direction.GlazewmTilingDirectionWidget"
-    options:
-      horizontal_label: "\udb81\udce1"
-      vertical_label: "\udb81\udce2"
   weather:
     type: "yasb.weather.WeatherWidget"
     options:
