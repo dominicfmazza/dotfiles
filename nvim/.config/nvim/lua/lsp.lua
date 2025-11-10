@@ -72,7 +72,6 @@ local lsps = {
   "yamlls",
   "cmake",
   "bashls",
-  "marksman",
   "dockerls",
   "basedpyright",
 }

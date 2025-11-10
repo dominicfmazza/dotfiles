@@ -21,11 +21,10 @@ opt.number = true
 opt.signcolumn = "yes"
 opt.cursorlineopt = "number"
 opt.confirm = true
-opt.updatetime = 750
 opt.splitbelow = true
 opt.splitright = true
 opt.timeoutlen = 400
-opt.updatetime = 250
+opt.updatetime = 60
 opt.undofile = true
 opt.scrolloff = 10
 opt.inccommand = "split"
@@ -64,7 +63,7 @@ vim.pack.add {
   "https://github.com/ibhagwan/fzf-lua",
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
-  "https://github.com/OXY2DEV/markview.nvim",
+  "https://github.com/MeanderingProgrammer/render-markdown.nvim.git"
 }
 
 local map = vim.keymap.set
@@ -124,6 +123,7 @@ require("nvim-treesitter.configs").setup {
 }
 
 vim.diagnostic.config {
+  virtual_text = false,
   signs = {
     text = {
       [vim.diagnostic.severity.ERROR] = "",
@@ -252,17 +252,9 @@ miniclue.setup {
 }
 
 
-
-require("markview").setup {
-  preview = { hybrid_modes = { "i" }, linewise_hybrid_mode = true },
-  markdown = { list_items = {
-    marker_minus = { add_padding = false },
-    marker_plus = { add_padding = false },
-    marker_star = { add_padding = false },
-    marker_dot = { add_padding = false },
-    marker_parenthesis = { add_padding = false },
-  } },
-}
+require('render-markdown').setup({
+      completions = { lsp = { enabled = true } },
+})
 
 
 vim.g.tmux_navigator_no_mappings = 1
