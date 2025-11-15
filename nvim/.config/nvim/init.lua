@@ -4,11 +4,11 @@ vim.g.have_nerd_font = true
 local opt = vim.opt
 
 -- global options --
-opt.incsearch = true    -- Find the next match as we type the search
-opt.hlsearch = true     -- Hilight searches by default
+opt.incsearch = true -- Find the next match as we type the search
+opt.hlsearch = true -- Hilight searches by default
 opt.viminfo = "'100,f1" -- Save up to 100 marks, enable capital marks
-opt.ignorecase = true   -- Ignore case when searching...
-opt.smartcase = true    -- ...unless we type a capital
+opt.ignorecase = true -- Ignore case when searching...
+opt.smartcase = true -- ...unless we type a capital
 opt.autoindent = true
 opt.smartindent = true
 opt.expandtab = true
@@ -30,10 +30,11 @@ opt.scrolloff = 10
 opt.inccommand = "split"
 opt.showmode = false
 opt.shortmess:append "sI"
+opt.winbar = "%f"
 
 opt.clipboard:append "unnamedplus"
 
-opt.winborder = "rounded"
+opt.shell = "/usr/bin/env zsh"
 
 -- WRAP --
 opt.wrap = true
@@ -63,7 +64,9 @@ vim.pack.add {
   "https://github.com/ibhagwan/fzf-lua",
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
-  "https://github.com/MeanderingProgrammer/render-markdown.nvim.git"
+  "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
+  "https://github.com/stevearc/overseer.nvim.git",
+  "https://github.com/sindrets/diffview.nvim",
 }
 
 local map = vim.keymap.set
@@ -251,11 +254,11 @@ miniclue.setup {
   },
 }
 
+require("render-markdown").setup {
+  completions = { lsp = { enabled = true } },
+}
 
-require('render-markdown').setup({
-      completions = { lsp = { enabled = true } },
-})
-
+require("overseer").setup()
 
 vim.g.tmux_navigator_no_mappings = 1
 vim.g.tmux_navigator_no_wrap = 1
@@ -293,9 +296,7 @@ map({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = tr
 
 map("n", "<leader>e", "<cmd>Neotree focus filesystem toggle<cr>", { noremap = true })
 
-
 require "lsp"
 require "picker"
 require "autocommands"
 require "obsidian_setup"
-
