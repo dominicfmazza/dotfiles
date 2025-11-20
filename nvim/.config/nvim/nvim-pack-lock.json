@@ -1,21 +1,21 @@
 {
   "plugins": {
     "blink.cmp": {
-      "rev": "327fff9",
+      "rev": "b19413d",
       "src": "https://github.com/saghen/blink.cmp",
       "version": ">=1.0.1-0"
     },
     "conform.nvim": {
-      "rev": "fbcb4fa",
+      "rev": "1bf8b5b",
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "diffview.nvim": [],
     "fzf-lua": {
-      "rev": "c102a4e",
+      "rev": "6db3677",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
-      "rev": "20ad441",
+      "rev": "cdafc32",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "guess-indent.nvim": {
@@ -23,15 +23,15 @@
       "src": "https://github.com/nmac427/guess-indent.nvim"
     },
     "markview.nvim": {
-      "rev": "c93ea99",
+      "rev": "86fcabc",
       "src": "https://github.com/OXY2DEV/markview.nvim"
     },
     "mini.nvim": {
-      "rev": "e04b5c6",
+      "rev": "b409fd1",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "neo-tree.nvim": {
-      "rev": "20244be",
+      "rev": "0bf326c",
       "src": "https://github.com/nvim-neo-tree/neo-tree.nvim"
     },
     "nui.nvim": {
@@ -47,10 +47,12 @@
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
-      "rev": "ac66c4f",
+      "rev": "31002a2",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
-    "overseer.nvim": [],
+    "overseer.nvim": {
+      "rev": "36298ea"
+    },
     "plenary.nvim": {
       "rev": "b9fd522",
       "src": "https://github.com/nvim-lua/plenary.nvim"
@@ -59,13 +61,19 @@
       "rev": "12a2291",
       "src": "https://github.com/stevearc/quicker.nvim"
     },
-    "render-markdown.nvim": [],
+    "render-markdown.nvim": {
+      "rev": "6e0e890"
+    },
+    "smear-cursor.nvim": {
+      "rev": "a00f547",
+      "src": "https://github.com/sphamba/smear-cursor.nvim"
+    },
     "statuscol.nvim": {
       "rev": "c46172d",
       "src": "https://github.com/luukvbaal/statuscol.nvim"
     },
     "tiny-inline-diagnostic.nvim": {
-      "rev": "1cb11cc",
+      "rev": "71f9986",
       "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
     },
     "undotree": {
