@@ -51,8 +51,18 @@ require("blink.cmp").setup {
   signature = { enabled = true },
 }
 
+local lsp_capabilities = {
+  workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+  textDocument = {
+    foldingRange = {
+      dynamicRegistration = false,
+      lineFoldingOnly = true,
+    },
+  },
+}
+
 vim.lsp.config("*", {
-  capabilities = require("blink.cmp").get_lsp_capabilities(),
+  capabilities = vim.tbl_deep_extend("force", lsp_capabilities, require("blink.cmp").get_lsp_capabilities()),
 })
 
 local lsps = {
