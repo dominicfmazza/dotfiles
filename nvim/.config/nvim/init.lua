@@ -67,12 +67,22 @@ vim.pack.add {
   "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
   "https://github.com/stevearc/overseer.nvim.git",
   "https://github.com/sindrets/diffview.nvim",
+  "https://github.com/sphamba/smear-cursor.nvim",
 }
 
 local map = vim.keymap.set
 require "colors"
 
-require("quicker").setup()
+require("smear_cursor").setup {
+  stiffness = 0.8,
+  trailing_stiffness = 0.5,
+  distance_stop_animating = 0.5,
+  legacy_computing_symbols_support = true
+}
+
+require("quicker").setup {
+  opts = { wrap = true },
+}
 map("n", "<leader>vq", function() require("quicker").toggle() end, {
   desc = "Toggle quickfix",
 })
