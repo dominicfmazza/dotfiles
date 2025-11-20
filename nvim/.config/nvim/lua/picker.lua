@@ -1,5 +1,5 @@
 require("fzf-lua").setup {
-  { "border-fused" },
+  { "fzf-tmux" },
   actions = {
     files = {
       ["enter"] = FzfLua.actions.file_edit_or_qf,
