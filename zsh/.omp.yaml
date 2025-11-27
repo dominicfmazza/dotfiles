@@ -9,6 +9,7 @@ transient_prompt:
   background: transparent
   foreground: "#626262"
   template: "~>"
+  filler: "-"
 blocks:
   - type: prompt
     alignment: left
