@@ -13,13 +13,15 @@ opt.autoindent = true
 opt.smartindent = true
 opt.expandtab = true
 opt.tabstop = 4
+opt.scroll = 5
 opt.shiftwidth = 4
 opt.termguicolors = true
 opt.cursorline = true
-opt.relativenumber = false
+opt.relativenumber = true
 opt.number = true
 opt.signcolumn = "yes"
-opt.cursorlineopt = "number"
+opt.cursorline = true
+-- opt.cursorlineopt = "number"
 opt.confirm = true
 opt.splitbelow = true
 opt.splitright = true
@@ -81,14 +83,7 @@ require("smear_cursor").setup {
 }
 
 require("quicker").setup {
-  opts = { wrap = true },
 }
-map("n", "<leader>vq", function() require("quicker").toggle() end, {
-  desc = "Toggle quickfix",
-})
-map("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
-  desc = "Toggle loclist",
-})
 require("gitsigns").setup {
   signcolumn = true,
   signs = {
@@ -287,8 +282,8 @@ map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<Leader>/", "gcc", { remap = true })
 map("x", "<Leader>/", "gc", { remap = true })
 
-map({ "n", "x" }, "J", "5gj", { noremap = true })
-map({ "n", "x" }, "K", "5gk")
+map({ "n", "x" }, "J", "", { noremap = true })
+map({ "n", "x" }, "K", "")
 
 map({ "n", "v" }, "<C-J>", "<cmd>join<cr>", { noremap = true })
 
@@ -305,6 +300,16 @@ map({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = tr
 map({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })
 
 map("n", "<leader>e", "<cmd>Neotree focus filesystem toggle<cr>", { noremap = true })
+
+map("n", "<leader>vv", function() require("quicker").toggle() end, {
+  desc = "Toggle quickfix",
+})
+map("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
+  desc = "Toggle loclist",
+})
+map("n", "<leader>vn", "<cmd>cnext<cr>", { noremap = true })
+map("n", "<leader>vp", "<cmd>cprevious<cr>", { noremap = true })
+
 
 require "lsp"
 require "picker"
