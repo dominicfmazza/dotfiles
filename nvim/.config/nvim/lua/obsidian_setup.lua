@@ -10,7 +10,7 @@ local function get_directories(parent_path)
   return directories
 end
 local function determine_obsidian_workspaces()
-  local obsidian_dir = vim.fn.expand("$HOME/vaults")
+  local obsidian_dir = vim.fn.expand "$HOME/vaults"
   if vim.env.OBSIDIAN_VAULT_ROOT then obsidian_dir = vim.env.OBSIDIAN_VAULT_ROOT end
   return get_directories(obsidian_dir)
 end
@@ -28,6 +28,22 @@ if vim.tbl_count(workspaces) > 0 then
     picker = {
       name = "fzf-lua",
     },
+    daily_notes = {
+      folder = "notes/dailies",
+    },
+    note_id_func = function(title)
+      local suffix = ""
+      if title ~= nil then
+        -- If title is given, transform it into valid file name.
+        suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+      else
+        -- If title is nil, just add 4 random uppercase letters to the suffix.
+        for _ = 1, 4 do
+          suffix = suffix .. string.char(math.random(65, 90))
+        end
+      end
+      return suffix
+    end,
   }
 
   map("n", "<leader>os", "<cmd>Obsidian quick_switch<cr>", { desc = "Obsidian: Search Files" })

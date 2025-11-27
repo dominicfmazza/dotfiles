@@ -49,6 +49,7 @@ cmake = "3.31.6"
 "pipx:clangd" = "latest"
 "pipx:pylatexenc" = "latest"
 python = "3.12"
+"pipx:compdb" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"

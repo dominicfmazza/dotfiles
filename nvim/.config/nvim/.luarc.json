@@ -3,6 +3,7 @@
     "diagnostics.globals": [
         "vim",
         "MiniPick",
-        "MiniExtra"
+        "MiniExtra",
+        "err"
     ]
 }
