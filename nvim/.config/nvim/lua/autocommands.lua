@@ -4,10 +4,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function() vim.highlight.on_yank() end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "help", "man", "terminal", "qf" },
-  command = "wincmd L",
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "help", "man", "terminal", "qf" },
+--   command = "wincmd L",
+-- })
 
 local function file_exists_in_cwd(filename)
   local cwd = vim.fn.getcwd()

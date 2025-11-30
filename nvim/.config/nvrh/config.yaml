@@ -1,0 +1,7 @@
+default:
+  local-editor:
+    [
+      "neovide",
+      "--no-fork",
+      "--server={{SOCKET_PATH}}",
+    ]

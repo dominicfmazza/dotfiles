@@ -37,7 +37,6 @@ yazi = "latest"
 
 # language servers
 "npm:vscode-json-languageservice" = "latest"
-"ubi:artempyanykh/marksman" = "latest"
 "npm:bash-language-server" = "latest"
 "pipx:basedpyright" = "latest"
 "pipx:cmake-language-server" = "latest"
@@ -48,8 +47,10 @@ clang-format = "20.1.8"
 cmake = "3.31.6"
 "pipx:clangd" = "latest"
 "pipx:pylatexenc" = "latest"
-python = "3.12"
 "pipx:compdb" = "latest"
+"ubi:mikew/nvrh" = "latest"
+"cargo:bob-nvim" = "latest"
+"pipx:neovim-remote" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"
