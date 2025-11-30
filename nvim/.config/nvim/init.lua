@@ -2,7 +2,6 @@ vim.g.mapleader = " "
 vim.g.have_nerd_font = true
 
 local opt = vim.opt
-
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
 opt.hlsearch = true -- Hilight searches by default
@@ -48,6 +47,10 @@ opt.showbreak = "-->"
 -- GLOBAL STATUSLINE --
 opt.laststatus = 3
 
+require "keymaps"
+
+if vim.g.neovide then require "neovide" end
+
 vim.pack.add {
   "https://github.com/nvim-mini/mini.nvim",
   "https://github.com/rachartier/tiny-inline-diagnostic.nvim",
@@ -56,7 +59,6 @@ vim.pack.add {
   "https://github.com/stevearc/conform.nvim",
   "https://github.com/stevearc/quicker.nvim",
   "https://github.com/nmac427/guess-indent.nvim",
-  "https://github.com/christoomey/vim-tmux-navigator",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/jiaoshijie/undotree",
@@ -69,39 +71,13 @@ vim.pack.add {
   "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
   "https://github.com/stevearc/overseer.nvim.git",
   "https://github.com/sindrets/diffview.nvim",
-  "https://github.com/sphamba/smear-cursor.nvim",
+  "https://github.com/waiting-for-dev/ergoterm.nvim",
 }
 
 local map = vim.keymap.set
 require "colors"
 
-require("smear_cursor").setup {
-  stiffness = 0.8,
-  trailing_stiffness = 0.5,
-  distance_stop_animating = 0.5,
-  legacy_computing_symbols_support = true
-}
-
-require("quicker").setup {
-}
-require("gitsigns").setup {
-  signcolumn = true,
-  signs = {
-    delete = { text = "󰍵" },
-    changedelete = { text = "󱕖" },
-  },
-}
-
-map("n", "<leader>gS", function() require("gitsigns").stage_buffer() end, { desc = "Stage Buffer", noremap = true })
-map("n", "<leader>gd", function() require("gitsigns").diffthis() end, { desc = "Diff This", noremap = true })
-map("n", "<leader>gh", function() require("gitsigns").reset_hunk() end, { desc = "Reset Hunk", noremap = true })
-map("n", "<leader>gl", function() require("gitsigns").blame_line() end, { desc = "Blame Line", noremap = true })
-map("n", "<leader>gp", function() require("gitsigns").preview_hunk() end, { desc = "Preview Hunk", noremap = true })
-map("n", "<leader>gr", function() require("gitsigns").reset_buffer() end, { desc = "Reset Buffer", noremap = true })
-map("n", "<leader>gs", function() require("gitsigns").stage_hunk() end, { desc = "Stage Hunk", noremap = true })
-map("n", "<leader>gu", function() require("gitsigns").undo_stage_hunk() end, { desc = "Undo Stage Hunk", noremap = true })
-map("n", "]g", function() require("gitsigns").next_hunk() end, { desc = "Next Git Hunk", noremap = true })
-map("n", "[g", function() require("gitsigns").prev_hunk() end, { desc = "Previous Git Hunk", noremap = true })
+require("quicker").setup {}
 
 require("nvim-treesitter.configs").setup {
   ensure_installed = {
@@ -129,6 +105,7 @@ require("nvim-treesitter.configs").setup {
     enable = true,
   },
 }
+
 
 vim.diagnostic.config {
   virtual_text = false,
@@ -256,6 +233,7 @@ miniclue.setup {
     { mode = "n", keys = "<Leader>f", desc = "+Picker" },
     { mode = "n", keys = "<Leader>g", desc = "+Git" },
     { mode = "n", keys = "<Leader>v", desc = "+Lists" },
+    { mode = "n", keys = "<Leader>t", desc = "+Terminal" },
   },
 }
 
@@ -265,52 +243,9 @@ require("render-markdown").setup {
 
 require("overseer").setup()
 
-vim.g.tmux_navigator_no_mappings = 1
-vim.g.tmux_navigator_no_wrap = 1
-map("n", "<M-h>", "<cmd>TmuxNavigateLeft<cr>")
-map("n", "<M-j>", "<cmd>TmuxNavigateDown<cr>")
-map("n", "<M-k>", "<cmd>TmuxNavigateUp<cr>")
-map("n", "<M-l>", "<cmd>TmuxNavigateRight<cr>")
-map("n", "<M-\\>", "<cmd>TmuxNavigatePrevious<cr>")
-
-map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
-map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
-
-map("n", "<leader>c", "<cmd>close<cr>", { desc = "Close buffer" })
-map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
-map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
-map("n", "<Leader>/", "gcc", { remap = true })
-map("x", "<Leader>/", "gc", { remap = true })
-
-map({ "n", "x" }, "J", "", { noremap = true })
-map({ "n", "x" }, "K", "")
-
-map({ "n", "v" }, "<C-J>", "<cmd>join<cr>", { noremap = true })
-
-map("v", "<S-Tab>", "<gv")
-map("v", "<Tab>", ">gv")
-
-map("n", "\\", "<cmd>split<cr>")
-map("n", "|", "<cmd>vsplit<cr>")
-map("n", "<leader>bq", "<cmd>silent! w <bar> %bd <bar> e# <bar> bd# <CR>", { silent = true })
-
-map({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, noremap = true })
-map({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, noremap = true })
-map({ "n", "v" }, "gk", "v:count == 0 ? 'k' : 'gk'", { expr = true, noremap = true })
-map({ "n", "v" }, "gj", "v:count == 0 ? 'j' : 'gj'", { expr = true, noremap = true })
-
-map("n", "<leader>e", "<cmd>Neotree focus filesystem toggle<cr>", { noremap = true })
-
-map("n", "<leader>vv", function() require("quicker").toggle() end, {
-  desc = "Toggle quickfix",
-})
-map("n", "<leader>vl", function() require("quicker").toggle { loclist = true } end, {
-  desc = "Toggle loclist",
-})
-map("n", "<leader>vn", "<cmd>cnext<cr>", { noremap = true })
-map("n", "<leader>vp", "<cmd>cprevious<cr>", { noremap = true })
-
-
+require "term"
+require "tabline"
+require "git"
 require "lsp"
 require "picker"
 require "autocommands"
