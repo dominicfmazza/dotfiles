@@ -2,6 +2,9 @@ vim.g.mapleader = " "
 vim.g.have_nerd_font = true
 
 local opt = vim.opt
+
+vim.env.NVR_SERVER = vim.v.servername
+
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
 opt.hlsearch = true -- Hilight searches by default
