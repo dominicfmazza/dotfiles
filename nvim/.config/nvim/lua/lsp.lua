@@ -75,7 +75,7 @@ local lsps = {
   "dockerls",
   "basedpyright",
 }
-vim.schedule_wrap(function() vim.lsp.enable(lsps) end)
+vim.lsp.enable(lsps)
 
 vim.keymap.set("n", "<leader>lf", function() require("conform").format { async = true, lsp_fallback = true } end)
 
