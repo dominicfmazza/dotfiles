@@ -1,3 +1,5 @@
 export ZDOTDIR=$HOME/.config/zsh 
 
-. "$HOME/.local/share/bob/env/env.sh"
+if [[ -f "$HOME/.local/share/bob/env/env.sh" ]]; then
+    . "$HOME/.local/share/bob/env/env.sh"
+fi
