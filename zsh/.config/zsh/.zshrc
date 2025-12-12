@@ -7,21 +7,31 @@ umask 022
 stty erase "^?"
 emulate zsh
 export PATH="$PATH:$HOME/.tmux/"
-export XDG_DATA_HOME="$HOME/.local/share/"
-export MANPAGER='nvim +Man!'
-export EDITOR='nvim'
+export MANPAGER='zsh -l -c nvrt +Man!'
+export EDITOR='zsh -l -c nvrt'
 export NPM_PACKAGES="${HOME}/.npm-packages"
 export PATH="$NPM_PACKAGES/bin:$PATH"
-
-eval "$(~/.local/bin/mise activate zsh)"
 
 [ -f "$HOME/.config/environments/hosts.sh"  ] && . "$HOME/.config/environments/hosts.sh" 
 [ -f "$HOME/.config/environments/paths.sh"  ] && . "$HOME/.config/environments/paths.sh" 
 [ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
+
+if [ -d $XDG_BASE_DIRECTORY ]; then 
+	export XDG_DATA_HOME=$XDG_BASE_DIRECTORY/.local/share
+	export XDG_CACHE_HOME=$XDG_BASE_DIRECTORY/.cache
+	export XDG_STATE_HOME=$XDG_BASE_DIRECTORY/.local/state
+	mkdir -p $XDG_DATA_HOME
+	mkdir -p $XDG_CACHE_HOME
+	mkdir -p $XDG_STATE_HOME
+fi
+
+eval "$(~/.local/bin/mise activate zsh)"
+
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 [ -f "$HOME/.aliases" ] && . "$HOME/.aliases"
 [ -f ${ZDOTDIR:-~}/.antidote/antidote.zsh ] && . ${ZDOTDIR:-~}/.antidote/antidote.zsh
+
 
 antidote load
 

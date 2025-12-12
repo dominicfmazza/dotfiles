@@ -1,2 +1,4 @@
 alias ls="eza"
 alias ll="eza -la"
+alias nvr="nvr --servername $NVR_SERVER"
+alias nvrt="nvr --remote-tab"
