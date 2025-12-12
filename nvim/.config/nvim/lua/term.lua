@@ -56,4 +56,4 @@ map({ "x", "n", "t" }, "<M-f>", function()
   end
 end, { noremap = true, silent = true, desc = "Open float" })
 
-map("t", "<C-q>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
+map("t", "<C-e>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
