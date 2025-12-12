@@ -4,10 +4,15 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function() vim.highlight.on_yank() end,
 })
 
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = { "help", "man", "terminal", "qf" },
---   command = "wincmd L",
--- })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "help", "man", "terminal", "qf" },
+  command = "wincmd L",
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "gitcommit", "gitrebase", "gitconfig" },
+  command = "set bufhidden=delete",
+})
 
 local function file_exists_in_cwd(filename)
   local cwd = vim.fn.getcwd()
@@ -45,12 +50,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end,
 })
 
-vim.api.nvim_create_autocmd('LspAttach', {
+vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client.server_capabilities then
-      client.server_capabilities.semanticTokensProvider = nil
-    end
+    if client and client.server_capabilities then client.server_capabilities.semanticTokensProvider = nil end
   end,
 })
 -- Auto resize splits when the terminal's window is resized

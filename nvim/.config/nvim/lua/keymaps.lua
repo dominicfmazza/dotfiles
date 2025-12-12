@@ -1,8 +1,8 @@
 local map = vim.keymap.set
-map({"n", "x", "t"},  "<M-h>", "<C-w>h")
-map({"n", "x", "t"},  "<M-j>", "<C-w>j")
-map({"n", "x", "t"},  "<M-k>", "<C-w>k")
-map({"n", "x", "t"},  "<M-l>", "<C-w>l")
+map({ "i", "n", "x", "t" }, "<M-h>", "<C-w>h")
+map({ "i", "n", "x", "t" }, "<M-j>", "<C-w>j")
+map({ "i", "n", "x", "t" }, "<M-k>", "<C-w>k")
+map({ "i", "n", "x", "t" }, "<M-l>", "<C-w>l")
 
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })

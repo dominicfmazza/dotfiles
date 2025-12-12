@@ -2,6 +2,8 @@ vim.g.mapleader = " "
 vim.g.have_nerd_font = true
 
 local opt = vim.opt
+opt.title = true
+opt.titlestring = vim.fs.basename(vim.fn.getcwd())
 
 vim.env.NVR_SERVER = vim.v.servername
 
