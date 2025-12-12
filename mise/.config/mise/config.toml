@@ -5,7 +5,7 @@ experimental = true
 # language support
 go = "latest"
 node = 'latest'
-rust = 'latest'
+rust = { version = 'latest', profile="minimal", components = 'rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools' }
 
 # tools
 fzf = 'latest'
@@ -19,7 +19,6 @@ jq = "latest"
 usage = "latest"
 eza = "latest"
 "ubi:JanDeDobbeleer/oh-my-posh" = "latest"
-"asdf:aphecetche/asdf-tmux" = "master"
 
 # tuis
 "asdf:neovim" = "ref:nightly"
@@ -51,6 +50,7 @@ cmake = "3.31.6"
 "ubi:mikew/nvrh" = "latest"
 "cargo:bob-nvim" = "latest"
 "pipx:neovim-remote" = "latest"
+trivy = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"
