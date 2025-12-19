@@ -51,6 +51,7 @@ cmake = "3.31.6"
 "cargo:bob-nvim" = "latest"
 "pipx:neovim-remote" = "latest"
 trivy = "latest"
+"cargo:tealdeer" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"
