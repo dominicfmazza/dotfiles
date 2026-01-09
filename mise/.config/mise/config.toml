@@ -52,6 +52,7 @@ cmake = "3.31.6"
 "pipx:neovim-remote" = "latest"
 trivy = "latest"
 "cargo:tealdeer" = "latest"
+"npm:tree-sitter-cli" = "0.25"
 
 [env]
 UV_NATIVE_TLS = "true"

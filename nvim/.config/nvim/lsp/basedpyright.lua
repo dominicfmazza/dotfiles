@@ -12,10 +12,23 @@ return {
   },
   single_file_support = true,
   settings = {
-    analysis = {
-      autoSearchPaths = true,
-      autoImportCompletions = true,
-      useLibraryCodeForTypes = true,
+    basedpyright = {
+      analysis = {
+        autoSearchPaths = true,
+        autoImportCompletions = true,
+        useLibraryCodeForTypes = true,
+        diagnosticSeverityOverrides = {
+          reportAny = false,
+          reportUnusedCallResult = false,
+          reportMissingTypeArgument = false,
+          reportMissingParameterType = false,
+          reportUnknownArgumentType = false,
+          reportUnknownLambdaType = false,
+          reportUnknownMemberType = false,
+          reportUnknownParameterType = false,
+          reportUnknownVariableType = false,
+        },
+      },
     },
   },
 }

@@ -63,7 +63,6 @@ vim.pack.add {
   "https://github.com/luukvbaal/statuscol.nvim",
   "https://github.com/stevearc/conform.nvim",
   "https://github.com/stevearc/quicker.nvim",
-  "https://github.com/nmac427/guess-indent.nvim",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/jiaoshijie/undotree",
@@ -77,39 +76,13 @@ vim.pack.add {
   "https://github.com/stevearc/overseer.nvim.git",
   "https://github.com/sindrets/diffview.nvim",
   "https://github.com/waiting-for-dev/ergoterm.nvim",
+  { src = "https://github.com/mistweaverco/bafa.nvim.git", version = "v1.10.1" },
 }
 
 local map = vim.keymap.set
 require "colors"
 
 require("quicker").setup {}
-
-require("nvim-treesitter.configs").setup {
-  ensure_installed = {
-    "vim",
-    "lua",
-    "vimdoc",
-    "luadoc",
-    "query",
-    "cpp",
-    "cuda",
-    "c",
-    "cmake",
-    "yaml",
-    "python",
-    "markdown",
-    "markdown_inline",
-    "bash",
-    "regex",
-  },
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-    enable = true,
-  },
-}
 
 
 vim.diagnostic.config {
@@ -154,7 +127,6 @@ require("conform").setup {
   },
 }
 
-require("guess-indent").setup()
 
 require("neo-tree").setup {
   filesystem = {
@@ -255,3 +227,4 @@ require "lsp"
 require "picker"
 require "autocommands"
 require "obsidian_setup"
+require "treesitter"
