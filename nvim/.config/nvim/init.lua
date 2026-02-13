@@ -38,8 +38,23 @@ opt.showmode = false
 opt.shortmess:append "sI"
 opt.winbar = "%f"
 
-opt.clipboard:append "unnamedplus"
+local function no_paste(reg)
+  return function(lines)
+  end
+end
 
+vim.g.clipboard = {
+  name = "OSC 52",
+  copy = {
+    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+  },
+  paste = {
+    ["+"] = no_paste("+"), -- Pasting disabled
+    ["*"] = no_paste("*"), -- Pasting disabled
+  }
+}
+vim.opt.clipboard = "" 
 opt.shell = "/usr/bin/env zsh"
 
 -- WRAP --
