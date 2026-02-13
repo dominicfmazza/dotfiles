@@ -17,7 +17,7 @@ local buftypes = {
   end,
 }
 
-local function title(bufnr)
+local function title(bufnr, tabnr)
   local filetype = vim.bo[bufnr].filetype
 
   if filetypes[filetype] then return filetypes[filetype] end
@@ -31,7 +31,7 @@ local function title(bufnr)
     return bt
   end
 
-  local working_directory = vim.fn.getcwd()
+  local working_directory = vim.fn.getcwd(-1, tabnr)
   local project_name = vim.fn.fnamemodify(working_directory, ":t")
   return project_name
 end
@@ -109,7 +109,7 @@ local function cell(index, selected)
 
   local hl = not selected and "TabLineFill" or "TabLineSel"
   local common = "%#" .. hl .. "#"
-  local ret = string.format("%s%%%dT %s%s%s ", common, index, devicon(bufnr, hl), title(bufnr), flags(bufnr))
+  local ret = string.format("%s%%%dT %s%s%s ", common, index, devicon(bufnr, hl), title(bufnr, index), flags(bufnr))
 
   if #bufnrs > 1 then ret = string.format("%s%s(%d) ", ret, common, #bufnrs) end
 
