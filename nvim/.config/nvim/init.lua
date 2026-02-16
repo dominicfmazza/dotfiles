@@ -39,22 +39,21 @@ opt.shortmess:append "sI"
 opt.winbar = "%f"
 
 local function no_paste(reg)
-  return function(lines)
-  end
+  return function(lines) end
 end
 
 vim.g.clipboard = {
   name = "OSC 52",
   copy = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    ["+"] = require("vim.ui.clipboard.osc52").copy "+",
+    ["*"] = require("vim.ui.clipboard.osc52").copy "*",
   },
   paste = {
-    ["+"] = no_paste("+"), -- Pasting disabled
-    ["*"] = no_paste("*"), -- Pasting disabled
-  }
+    ["+"] = no_paste "+", -- Pasting disabled
+    ["*"] = no_paste "*", -- Pasting disabled
+  },
 }
-vim.opt.clipboard = "" 
+vim.opt.clipboard = ""
 opt.shell = "/usr/bin/env zsh"
 
 -- WRAP --
@@ -78,12 +77,13 @@ vim.pack.add {
   "https://github.com/luukvbaal/statuscol.nvim",
   "https://github.com/stevearc/conform.nvim",
   "https://github.com/stevearc/quicker.nvim",
-  "https://github.com/nvim-treesitter/nvim-treesitter",
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/jiaoshijie/undotree",
   "https://github.com/nvim-neo-tree/neo-tree.nvim",
   "https://github.com/nvim-tree/nvim-web-devicons",
   "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/mrcjkb/rustaceanvim.git",
   "https://github.com/ibhagwan/fzf-lua",
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
@@ -98,7 +98,6 @@ local map = vim.keymap.set
 require "colors"
 
 require("quicker").setup {}
-
 
 vim.diagnostic.config {
   virtual_text = false,
@@ -141,7 +140,6 @@ require("conform").setup {
     rust = { "rustfmt" },
   },
 }
-
 
 require("neo-tree").setup {
   filesystem = {
