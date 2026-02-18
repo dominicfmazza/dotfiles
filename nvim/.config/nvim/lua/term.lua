@@ -15,11 +15,6 @@ require("ergoterm").setup {
 local map = vim.keymap.set
 local ergoterm = require "ergoterm"
 
--- Terminal creation with different layouts
-map("n", "<leader>ts", ":TermNew layout=below<CR>", { noremap = true, silent = true, desc = "Open below" })
-map("n", "<leader>tv", ":TermNew layout=right<CR>", { noremap = true, silent = true, desc = "Open right" })
-map("n", "<leader>tt", ":TermNew layout=tab<CR>", { noremap = true, silent = true, desc = "Open tab" })
-
 -- Open terminal picker
 map("n", "<leader>tl", ":TermSelect<CR>", { noremap = true, silent = true, desc = "Terminal picker" })
 
@@ -32,28 +27,44 @@ map({ "n", "x" }, "<leader>tx", ":TermSend! action=open<CR>", { noremap = true, 
 map({ "x", "n", "t" }, "<M-'>", "<cmd>tabNext<CR>", { noremap = true, silent = true, desc = "" })
 map({ "x", "n", "t" }, "<M-;>", "<cmd>tabprevious<CR>", { noremap = true, silent = true, desc = "" })
 map({ "x", "n", "t" }, "<M-g>", function()
-  local server = ergoterm.find(function(term) return term.name == "lazygit" end)
+  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_get_current_tabpage())
+  local project_name = "lg-" .. vim.fn.fnamemodify(working_directory, ":t")
+  local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
     server:toggle()
   else
     ergoterm:new {
       layout = "float",
-      name = "lazygit",
+      name = project_name,
       cmd = "lazygit",
       cleanup_on_success = true,
     }
   end
 end, { noremap = true, silent = true, desc = "" })
+
 map({ "x", "n", "t" }, "<M-f>", function()
-  local server = ergoterm.find(function(term) return term.name == "floating" end)
+  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_get_current_tabpage())
+  local project_name = "shell-" .. vim.fn.fnamemodify(working_directory, ":t")
+  local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
     server:toggle()
   else
     ergoterm:new {
       layout = "float",
-      name = "floating",
+      name = project_name,
     }
   end
 end, { noremap = true, silent = true, desc = "Open float" })
 
+map({ "x", "n", "t" }, "<M-s>", function()
+  local server = ergoterm.find(function(term) return term.name == "scratch" end)
+  if server then
+    server:toggle()
+  else
+    ergoterm:new {
+      layout = "float",
+      name = "scratch",
+    }
+  end
+end, { noremap = true, silent = true, desc = "Open float" })
 map("t", "<C-e>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
