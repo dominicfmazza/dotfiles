@@ -46,6 +46,10 @@
       "rev": "de740991c12411b663994b2860f1a4fd0937c130",
       "src": "https://github.com/MunifTanjim/nui.nvim"
     },
+    "nvim-luxterm": {
+      "rev": "fbcca5be3967d485c5f319b3fbd47b56e16e9451",
+      "src": "https://github.com/luxvim/nvim-luxterm"
+    },
     "nvim-treesitter": {
       "rev": "9f2dad22ef8bb14fd1e0a3aa8859cdc88170668b",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
@@ -76,7 +80,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim.git"
     },
     "rustaceanvim": {
-      "rev": "bb57d9a9c3f547504e38df1fc17dbcc7065a23f3",
+      "rev": "ec517a0d223060b79e040e4a187e031b76b307ea",
       "src": "https://github.com/mrcjkb/rustaceanvim.git"
     },
     "statuscol.nvim": {
@@ -98,10 +102,6 @@
     "vague.nvim": {
       "rev": "c1ab4d4891ff3a27deba6a80222d895ac8ffb2e5",
       "src": "https://github.com/vague-theme/vague.nvim"
-    },
-    "vim-tmux-navigator": {
-      "rev": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432",
-      "src": "https://github.com/christoomey/vim-tmux-navigator"
     }
   }
 }
