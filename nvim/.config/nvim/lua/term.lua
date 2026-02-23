@@ -24,10 +24,10 @@ map({ "n", "x" }, "<leader>ts", ":TermSend! new_line=false<CR>", { noremap = tru
 -- Send and show output without focusing terminal
 map({ "n", "x" }, "<leader>tx", ":TermSend! action=open<CR>", { noremap = true, silent = true, desc = "Send without focusing" })
 
-map({ "x", "n", "t" }, "<M-'>", "<cmd>tabNext<CR>", { noremap = true, silent = true, desc = "" })
+map({ "x", "n", "t" }, "<M-'>", "<cmd>tabnext<CR>", { noremap = true, silent = true, desc = "" })
 map({ "x", "n", "t" }, "<M-;>", "<cmd>tabprevious<CR>", { noremap = true, silent = true, desc = "" })
 map({ "x", "n", "t" }, "<M-g>", function()
-  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_get_current_tabpage())
+  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
   local project_name = "lg-" .. vim.fn.fnamemodify(working_directory, ":t")
   local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
@@ -43,7 +43,7 @@ map({ "x", "n", "t" }, "<M-g>", function()
 end, { noremap = true, silent = true, desc = "" })
 
 map({ "x", "n", "t" }, "<M-f>", function()
-  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_get_current_tabpage())
+  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
   local project_name = "shell-" .. vim.fn.fnamemodify(working_directory, ":t")
   local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
