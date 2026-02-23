@@ -72,6 +72,7 @@ if vim.g.neovide then require "neovide" end
 
 vim.pack.add {
   "https://github.com/nvim-mini/mini.nvim",
+  "https://github.com/Mythos-404/xmake.nvim",
   "https://github.com/rachartier/tiny-inline-diagnostic.nvim",
   "https://github.com/lewis6991/gitsigns.nvim",
   "https://github.com/luukvbaal/statuscol.nvim",

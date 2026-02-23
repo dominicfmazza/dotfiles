@@ -17,13 +17,18 @@ export PATH="$NPM_PACKAGES/bin:$PATH"
 [ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
 
 if [ -d $XDG_BASE_DIRECTORY ]; then 
-	export XDG_DATA_HOME=$XDG_BASE_DIRECTORY/.local/share
-	export XDG_CACHE_HOME=$XDG_BASE_DIRECTORY/.cache
-	export XDG_STATE_HOME=$XDG_BASE_DIRECTORY/.local/state
-	export UV_CACHE_DIR=$XDG_BASE_DIRECTORY/.cache/uv
-	mkdir -p $XDG_DATA_HOME
-	mkdir -p $XDG_CACHE_HOME
-	mkdir -p $XDG_STATE_HOME
+    export XDG_DATA_HOME=$XDG_BASE_DIRECTORY/.local/share
+    export XDG_CACHE_HOME=$XDG_BASE_DIRECTORY/.cache
+    export XDG_STATE_HOME=$XDG_BASE_DIRECTORY/.local/state
+    export UV_CACHE_DIR=$XDG_BASE_DIRECTORY/.cache/uv
+    mkdir -p $XDG_DATA_HOME
+    mkdir -p $XDG_CACHE_HOME
+    mkdir -p $XDG_STATE_HOME
+else 
+    export XDG_DATA_HOME=$HOME/.local/share
+    export XDG_CACHE_HOME=$HOME/.cache
+    export XDG_STATE_HOME=$HOME/.local/state
+    export UV_CACHE_DIR=$HOME/.cache/uv
 fi
 
 eval "$(~/.local/bin/mise activate zsh)"
@@ -34,7 +39,7 @@ eval "$(~/.local/bin/mise activate zsh)"
 [ -f ${ZDOTDIR:-~}/.antidote/antidote.zsh ] && . ${ZDOTDIR:-~}/.antidote/antidote.zsh
 
 
-antidote load
+antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 
 [ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
 
@@ -48,6 +53,5 @@ autoload -Uz compinit && compinit
 bindkey '^f' autosuggest-accept
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
-
 
 eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"

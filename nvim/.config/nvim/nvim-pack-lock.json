@@ -102,6 +102,10 @@
     "vague.nvim": {
       "rev": "c1ab4d4891ff3a27deba6a80222d895ac8ffb2e5",
       "src": "https://github.com/vague-theme/vague.nvim"
+    },
+    "xmake.nvim": {
+      "rev": "32462f8bfbb5022c0772337dbef1efbf8610b392",
+      "src": "https://github.com/Mythos-404/xmake.nvim"
     }
   }
 }
