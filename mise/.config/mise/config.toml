@@ -4,7 +4,7 @@ experimental = true
 [tools]
 # language support
 go = "latest"
-node = 'latest'
+node = "latest"
 rust = { version = 'latest', profile="minimal", components = 'rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools' }
 
 # tools
@@ -53,6 +53,8 @@ cmake = "3.31.6"
 trivy = "latest"
 "cargo:tealdeer" = "latest"
 "npm:tree-sitter-cli" = "0.25"
+"cargo:skim" = "latest"
+"npm:gitlab-ci-local" = "latest"
 
 [env]
 UV_NATIVE_TLS = "true"
