@@ -43,51 +43,6 @@ local function flags(bufnr)
   return table.concat(ret)
 end
 
---- @type table<string,true>
-local devhls = {}
-
---- @param bufnr integer
---- @param hl_base string
---- @return string
-local function devicon(bufnr, hl_base)
-  local file = fn.bufname(bufnr)
-  local buftype = vim.bo[bufnr].buftype
-  local filetype = vim.bo[bufnr].filetype
-  local devicons = require "nvim-web-devicons"
-
-  --- @type string, string
-  local icon, devhl
-  if filetype == "fugitive" then
-    --- @type string, string
-    icon, devhl = devicons.get_icon "git"
-  elseif filetype == "vimwiki" then
-    --- @type string, string
-    icon, devhl = devicons.get_icon "markdown"
-  elseif buftype == "terminal" then
-    --- @type string, string
-    icon, devhl = devicons.get_icon "zsh"
-  else
-    --- @type string, string
-    icon, devhl = devicons.get_icon(file, fn.expand("#" .. bufnr .. ":e"))
-  end
-
-  if icon then
-    local hl = hl_base .. "Dev" .. devhl
-    if not devhls[hl] then
-      devhls[hl] = true
-      api.nvim_set_hl(0, hl, {
-        fg = get_hl(devhl).fg,
-        bg = get_hl(hl_base).bg,
-      })
-    end
-
-    local hl_start = "%#" .. hl .. "#"
-    local hl_end = "%#" .. hl_base .. "#"
-
-    return string.format("%s%s%s ", hl_start, icon, hl_end)
-  end
-  return ""
-end
 
 local function separator(index)
   local selected = fn.tabpagenr()
@@ -109,7 +64,7 @@ local function cell(index, selected)
 
   local hl = not selected and "TabLineFill" or "TabLineSel"
   local common = "%#" .. hl .. "#"
-  local ret = string.format("%s%%%dT %s%s%s ", common, index, devicon(bufnr, hl), title(bufnr, index), flags(bufnr))
+  local ret = string.format("%s%%%dT %s%s ", common, index, title(bufnr, index), flags(bufnr))
 
   if #bufnrs > 1 then ret = string.format("%s%s(%d) ", ret, common, #bufnrs) end
 

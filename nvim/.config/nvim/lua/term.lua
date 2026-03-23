@@ -2,7 +2,7 @@ require("ergoterm").setup {
   terminal_defaults = {
     layout = "right",
     cleanup_on_success = false,
-    auto_scroll = true,
+    auto_scroll = false,
   },
   picker = {
     picker = "fzf-lua",
@@ -11,6 +11,8 @@ require("ergoterm").setup {
     },
   },
 }
+
+vim.opt.scrollback = 10000
 
 local map = vim.keymap.set
 local ergoterm = require "ergoterm"
@@ -56,7 +58,7 @@ map({ "x", "n", "t" }, "<M-f>", function()
   end
 end, { noremap = true, silent = true, desc = "Open float" })
 
-map({ "x", "n", "t" }, "<M-s>", function()
+map({ "x", "n", "t" }, "<M-r>", function()
   local server = ergoterm.find(function(term) return term.name == "scratch" end)
   if server then
     server:toggle()
