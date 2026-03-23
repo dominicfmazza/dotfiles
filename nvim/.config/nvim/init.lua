@@ -38,22 +38,35 @@ opt.showmode = false
 opt.shortmess:append "sI"
 opt.winbar = "%f"
 
-local function no_paste(reg)
-  return function(lines) end
+require("vim._core.ui2").enable {}
+
+-- system clipboard
+vim.opt.clipboard:append "unnamedplus"
+-- Fix "waiting for osc52 response from terminal" message
+-- https://github.com/neovim/neovim/issues/28611
+if vim.env.SSH_TTY ~= nil then
+  -- Set up clipboard for ssh
+  local function my_paste(_)
+    return function(_)
+      local content = vim.fn.getreg '"'
+      return vim.split(content, "\n")
+    end
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy "+",
+      ["*"] = require("vim.ui.clipboard.osc52").copy "*",
+    },
+    paste = {
+      -- No OSC52 paste action since wezterm doesn't support it
+      -- Should still paste from nvim
+      ["+"] = my_paste "+",
+      ["*"] = my_paste "*",
+    },
+  }
 end
 
-vim.g.clipboard = {
-  name = "OSC 52",
-  copy = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy "+",
-    ["*"] = require("vim.ui.clipboard.osc52").copy "*",
-  },
-  paste = {
-    ["+"] = no_paste "+", -- Pasting disabled
-    ["*"] = no_paste "*", -- Pasting disabled
-  },
-}
-vim.opt.clipboard = ""
 opt.shell = "/usr/bin/env zsh"
 
 -- WRAP --
@@ -66,18 +79,15 @@ opt.showbreak = "-->"
 -- GLOBAL STATUSLINE --
 opt.laststatus = 3
 
-require "keymaps"
-
 if vim.g.neovide then require "neovide" end
 
 vim.pack.add {
   "https://github.com/nvim-mini/mini.nvim",
-  "https://github.com/Mythos-404/xmake.nvim",
   "https://github.com/rachartier/tiny-inline-diagnostic.nvim",
   "https://github.com/lewis6991/gitsigns.nvim",
   "https://github.com/luukvbaal/statuscol.nvim",
   "https://github.com/stevearc/conform.nvim",
-  "https://github.com/stevearc/quicker.nvim",
+  "https://github.com/kevinhwang91/nvim-bqf",
   { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/jiaoshijie/undotree",
@@ -89,16 +99,13 @@ vim.pack.add {
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
   "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
-  "https://github.com/stevearc/overseer.nvim.git",
-  "https://github.com/sindrets/diffview.nvim",
   "https://github.com/waiting-for-dev/ergoterm.nvim",
   { src = "https://github.com/mistweaverco/bafa.nvim.git", version = "v1.10.1" },
 }
 
 local map = vim.keymap.set
 require "colors"
-
-require("quicker").setup {}
+require "keymaps"
 
 vim.diagnostic.config {
   virtual_text = false,
@@ -136,6 +143,9 @@ require("conform").setup {
     python = { "black" },
     bash = { "beautysh" },
     markdown = { "prettierd" },
+    html = { "prettierd" },
+    css = { "prettierd" },
+    js = { "prettierd" },
     json = { "jq" },
     yaml = { "yamlfmt" },
     rust = { "rustfmt" },
@@ -177,62 +187,11 @@ local opts = { ERROR = { duration = 10000 } }
 vim.notify = require("mini.notify").make_notify(opts)
 
 require("mini.snippets").setup()
-local miniclue = require "mini.clue"
-miniclue.setup {
-  triggers = {
-    -- Leader triggers
-    { mode = "n", keys = "<Leader>" },
-    { mode = "x", keys = "<Leader>" },
-
-    -- Built-in completion
-    { mode = "i", keys = "<C-x>" },
-
-    -- `g` key
-    { mode = "n", keys = "g" },
-    { mode = "x", keys = "g" },
-
-    -- Marks
-    { mode = "n", keys = "'" },
-    { mode = "n", keys = "`" },
-    { mode = "x", keys = "'" },
-    { mode = "x", keys = "`" },
-
-    -- Registers
-    { mode = "n", keys = '"' },
-    { mode = "x", keys = '"' },
-    { mode = "i", keys = "<C-r>" },
-    { mode = "c", keys = "<C-r>" },
-
-    -- Window commands
-    { mode = "n", keys = "<C-w>" },
-
-    -- `z` key
-    { mode = "n", keys = "z" },
-    { mode = "x", keys = "z" },
-  },
-
-  clues = {
-    -- Enhance this by adding descriptions for <Leader> mapping groups
-    miniclue.gen_clues.builtin_completion(),
-    miniclue.gen_clues.g(),
-    miniclue.gen_clues.marks(),
-    miniclue.gen_clues.registers(),
-    miniclue.gen_clues.windows(),
-    miniclue.gen_clues.z(),
-    { mode = "n", keys = "<Leader>l", desc = "+LSP" },
-    { mode = "n", keys = "<Leader>o", desc = "+Obsidian" },
-    { mode = "n", keys = "<Leader>f", desc = "+Picker" },
-    { mode = "n", keys = "<Leader>g", desc = "+Git" },
-    { mode = "n", keys = "<Leader>v", desc = "+Lists" },
-    { mode = "n", keys = "<Leader>t", desc = "+Terminal" },
-  },
-}
 
 require("render-markdown").setup {
   completions = { lsp = { enabled = true } },
 }
 
-require("overseer").setup()
 
 require "term"
 require "tabline"
@@ -242,3 +201,4 @@ require "picker"
 require "autocommands"
 require "obsidian_setup"
 require "treesitter"
+require "quickfix"

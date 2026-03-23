@@ -1,5 +1,6 @@
 require("fzf-lua").setup {
   { "hide" },
+  fzf_bin = "sk",
   actions = {
     files = {
       ["enter"] = FzfLua.actions.file_edit_or_qf,
