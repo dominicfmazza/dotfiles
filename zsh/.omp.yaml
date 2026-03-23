@@ -8,7 +8,8 @@ final_space: true
 transient_prompt:
   background: transparent
   foreground: "#626262"
-  template: "~>"
+  template: "{{ .HostName }}"
+  newline: true
   filler: "-"
 blocks:
   - type: prompt
@@ -18,7 +19,7 @@ blocks:
         foreground: '#cdcdcd'
         type: text
         style: plain
-      - properties:
+      - options:
           style: folder
         template: ' {{ .PWD }} '
         foreground: '#bebeda'
@@ -28,20 +29,20 @@ blocks:
         style: plain
         foreground: "#6e94b2"
         template: "{{ .HEAD }}"
-        properties:
+        options:
           fetch_status: false
       - type: git
         style: plain
         foreground: "#99b782"
         template: "{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}"
-        properties:
+        options:
           fetch_status: true
           source: cli
       - type: git
         style: plain
         foreground: "#626262"
         template: "{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}"
-        properties:
+        options:
           fetch_status: true
           source: cli
       - template: ' X '
@@ -55,7 +56,7 @@ blocks:
         style: text
         foreground: "#f5cb96"
         template: " {{ .FormattedMs }} "
-        properties:
+        options:
           threshold: 1
           style: austin
           always_enabled: true

@@ -41,7 +41,7 @@ eval "$(~/.local/bin/mise activate zsh)"
 
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 
-[ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
+source =(sk --shell zsh --shell-bindings)
 
 DISABLE_AUTO_TITLE=true
 export ZSH_AUTOSUGGEST_USE_ASYNC="true"
@@ -53,5 +53,6 @@ autoload -Uz compinit && compinit
 bindkey '^f' autosuggest-accept
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
+
 
 eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
