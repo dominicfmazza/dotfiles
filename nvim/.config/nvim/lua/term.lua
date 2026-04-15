@@ -28,9 +28,23 @@ map({ "n", "x" }, "<leader>tx", ":TermSend! action=open<CR>", { noremap = true, 
 
 map({ "x", "n", "t" }, "<M-'>", "<cmd>tabnext<CR>", { noremap = true, silent = true, desc = "" })
 map({ "x", "n", "t" }, "<M-;>", "<cmd>tabprevious<CR>", { noremap = true, silent = true, desc = "" })
+
+local function get_unique_wd_name(cwd)
+  -- Get current directory and split by separator
+  local path_parts = vim.split(cwd, "/", { trimempty = true })
+  local initials = {}
+
+  -- Iterate through path components (skipping last one if needed)
+  for i, part in ipairs(path_parts) do
+    if i < #path_parts then table.insert(initials, part:sub(1, 1)) end
+  end
+
+  return table.concat(initials, "-") .. "-" .. vim.fn.fnamemodify(cwd, ":t")
+end
+
 map({ "x", "n", "t" }, "<M-g>", function()
   local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
-  local project_name = "lg-" .. vim.fn.fnamemodify(working_directory, ":t")
+  local project_name = "lg-" .. get_unique_wd_name(working_directory)
   local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
     server:toggle()
@@ -46,7 +60,7 @@ end, { noremap = true, silent = true, desc = "" })
 
 map({ "x", "n", "t" }, "<M-f>", function()
   local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
-  local project_name = "shell-" .. vim.fn.fnamemodify(working_directory, ":t")
+  local project_name = "shell-" .. get_unique_wd_name(working_directory)
   local server = ergoterm.find(function(term) return term.name == project_name end)
   if server then
     server:toggle()
