@@ -6,7 +6,7 @@
       "version": "'v1.10.1'"
     },
     "blink.cmp": {
-      "rev": "4b18c32adef2898f95cdef6192cbd5796c1a332d",
+      "rev": "451168851e8e2466bc97ee3e026c3dcb9141ce07",
       "src": "https://github.com/saghen/blink.cmp",
       "version": ">=1.0.1-0"
     },
@@ -23,7 +23,7 @@
       "src": "https://github.com/waiting-for-dev/ergoterm.nvim"
     },
     "fzf-lua": {
-      "rev": "30ba09afbc0eac5fc5ec8823418d1e45d0712b9f",
+      "rev": "be79dead8b147acce0daa3fc15cf5f0f4d6f2232",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
@@ -35,11 +35,11 @@
       "src": "https://github.com/nmac427/guess-indent.nvim"
     },
     "mini.nvim": {
-      "rev": "9d359222b3643f1fccbd8f3180445842e1cae00b",
+      "rev": "27a3e747a4e603b4121f5759e74020430ec7b7d5",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "neo-tree.nvim": {
-      "rev": "4597f1e0b928a78d5fe1b3d33d1a5141453ba839",
+      "rev": "1f75801ad71b440d1303c927fc489bc706eeee51",
       "src": "https://github.com/nvim-neo-tree/neo-tree.nvim"
     },
     "neogen": {
@@ -55,7 +55,7 @@
       "src": "https://github.com/kevinhwang91/nvim-bqf"
     },
     "nvim-treesitter": {
-      "rev": "493890b87a81dfe6a7e577dbc364ae33fa482da9",
+      "rev": "6620ae1c44dfa8623b22d0cbf873a9e8d073b849",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -64,7 +64,7 @@
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
-      "rev": "ffb5882b8b3a29acb615f253da96e1da5057f89d",
+      "rev": "6e558fcdc869efcdd018d58b0a2667ed16b13d27",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "overseer.nvim": {
@@ -84,7 +84,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim.git"
     },
     "rustaceanvim": {
-      "rev": "f2f0c1231a5b019dbc1fd6dafac1751c878925a3",
+      "rev": "b25d186481624964523fee34f44c529b101c7435",
       "src": "https://github.com/mrcjkb/rustaceanvim.git"
     },
     "statuscol.nvim": {
