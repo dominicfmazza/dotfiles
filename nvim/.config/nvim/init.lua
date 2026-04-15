@@ -96,6 +96,7 @@ vim.pack.add {
   "https://github.com/MunifTanjim/nui.nvim",
   "https://github.com/mrcjkb/rustaceanvim.git",
   "https://github.com/ibhagwan/fzf-lua",
+  "https://github.com/danymat/neogen",
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
   "https://github.com/obsidian-nvim/obsidian.nvim",
   "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
@@ -192,6 +193,9 @@ require("render-markdown").setup {
   completions = { lsp = { enabled = true } },
 }
 
+require("neogen").setup()
+local ngopts = { noremap = true, silent = true }
+vim.api.nvim_set_keymap("n", "<Leader>nf", ":lua require('neogen').generate()<CR>", ngopts)
 
 require "term"
 require "tabline"
