@@ -36,6 +36,7 @@ bars:
     widgets:
       left:
       - home
+      - komorebi_control
       - komorebi_workspaces
       - active_window
       center:
@@ -178,6 +179,27 @@ widgets:
       label_zero_index: false
       hide_empty_workspaces: false
       hide_if_offline: true
+  komorebi_control:
+      type: "komorebi.control.KomorebiControlWidget"
+      options:
+        label: "<span>\udb80\uddd9</span>"
+        icons:
+          start: "\uead3"
+          stop: "\uead7"
+          reload: "\uead2"
+        run_ahk: false
+        run_whkd: true 
+        run_masir: true
+        show_version: true
+        komorebi_menu:
+          blur: true
+          round_corners: true
+          round_corners_type: 'normal'
+          border_color: 'System'
+          alignment: 'left'
+          direction: 'down'
+          offset_top: 6
+          offset_left: 0
   cpu:
     type: yasb.cpu.CpuWidget
     options:
