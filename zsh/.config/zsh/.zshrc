@@ -21,7 +21,6 @@ export XDG_CACHE_HOME=$HOME/.cache
 export XDG_STATE_HOME=$HOME/.local/state
 export UV_CACHE_DIR=$HOME/.cache/uv
 
-eval "$(~/.local/bin/mise activate zsh)"
 
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
@@ -46,3 +45,4 @@ VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
 
 eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
