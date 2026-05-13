@@ -21,7 +21,6 @@ eza = "latest"
 "ubi:JanDeDobbeleer/oh-my-posh" = "latest"
 
 # tuis
-"asdf:neovim" = "ref:nightly"
 lazygit = 'latest'
 yazi = "latest"
 
@@ -42,7 +41,6 @@ yazi = "latest"
 "npm:yaml-language-server" = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
 "asdf:lua-language-server" = "latest"
-clang-format = "20.1.8"
 cmake = "3.31.6"
 "pipx:clangd" = "latest"
 "pipx:pylatexenc" = "latest"
