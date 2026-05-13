@@ -42,45 +42,44 @@ local function get_unique_wd_name(cwd)
   return table.concat(initials, "-") .. "-" .. vim.fn.fnamemodify(cwd, ":t")
 end
 
-map({ "x", "n", "t" }, "<M-g>", function()
-  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
-  local project_name = "lg-" .. get_unique_wd_name(working_directory)
-  local server = ergoterm.find(function(term) return term.name == project_name end)
-  if server then
-    server:toggle()
-  else
-    ergoterm:new {
-      layout = "float",
-      name = project_name,
-      cmd = "lazygit",
-      cleanup_on_success = true,
-    }
-  end
-end, { noremap = true, silent = true, desc = "" })
+local function current_tab_cwd()
+  local tab = vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage())
+  return vim.fn.getcwd(-1, tab)
+end
 
-map({ "x", "n", "t" }, "<M-f>", function()
-  local working_directory = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(vim.api.nvim_get_current_tabpage()))
-  local project_name = "shell-" .. get_unique_wd_name(working_directory)
-  local server = ergoterm.find(function(term) return term.name == project_name end)
-  if server then
-    server:toggle()
-  else
-    ergoterm:new {
-      layout = "float",
-      name = project_name,
-    }
-  end
-end, { noremap = true, silent = true, desc = "Open float" })
+local function resolve_float_term_name(config)
+  if config.name then return config.name end
+  return config.name_prefix .. get_unique_wd_name(current_tab_cwd())
+end
 
-map({ "x", "n", "t" }, "<M-r>", function()
-  local server = ergoterm.find(function(term) return term.name == "scratch" end)
+local function toggle_float_terminal(config)
+  local name = resolve_float_term_name(config)
+  local server = ergoterm.find(function(term) return term.name == name end)
   if server then
     server:toggle()
-  else
-    ergoterm:new {
-      layout = "float",
-      name = "scratch",
-    }
+    return
   end
-end, { noremap = true, silent = true, desc = "Open float" })
+
+  local term_opts = {
+    layout = "float",
+    name = name,
+  }
+
+  if config.cmd then term_opts.cmd = config.cmd end
+  if config.cleanup_on_success ~= nil then term_opts.cleanup_on_success = config.cleanup_on_success end
+
+  ergoterm:new(term_opts)
+end
+
+local float_terminal_maps = {
+  { lhs = "<M-g>", name_prefix = "lg-", cmd = "lazygit", cleanup_on_success = true, desc = "Open Lazygit window" },
+  { lhs = "<M-c>", name_prefix = "codex-", cmd = "codex", cleanup_on_success = true, desc = "Open Codex window" },
+  { lhs = "<M-f>", name_prefix = "shell-", desc = "Open project shell" },
+  { lhs = "<M-r>", name = "scratch", desc = "Open scratch space" },
+}
+
+for _, config in ipairs(float_terminal_maps) do
+  map({ "x", "n", "t" }, config.lhs, function() toggle_float_terminal(config) end, { noremap = true, silent = true, desc = config.desc })
+end
+
 map("t", "<C-e>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
