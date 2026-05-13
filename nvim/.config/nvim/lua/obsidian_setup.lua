@@ -29,7 +29,8 @@ if vim.tbl_count(workspaces) > 0 then
       name = "fzf-lua",
     },
     daily_notes = {
-      folder = "notes/dailies",
+      folder = "Daily Notes",
+      template = "Templates/Daily Note.md"
     },
     note_id_func = function(title)
       local suffix = ""
