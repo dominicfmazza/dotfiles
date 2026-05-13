@@ -16,20 +16,10 @@ export PATH="$NPM_PACKAGES/bin:$PATH"
 [ -f "$HOME/.config/environments/paths.sh"  ] && . "$HOME/.config/environments/paths.sh" 
 [ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
 
-if [ -d $XDG_BASE_DIRECTORY ]; then 
-    export XDG_DATA_HOME=$XDG_BASE_DIRECTORY/.local/share
-    export XDG_CACHE_HOME=$XDG_BASE_DIRECTORY/.cache
-    export XDG_STATE_HOME=$XDG_BASE_DIRECTORY/.local/state
-    export UV_CACHE_DIR=$XDG_BASE_DIRECTORY/.cache/uv
-    mkdir -p $XDG_DATA_HOME
-    mkdir -p $XDG_CACHE_HOME
-    mkdir -p $XDG_STATE_HOME
-else 
-    export XDG_DATA_HOME=$HOME/.local/share
-    export XDG_CACHE_HOME=$HOME/.cache
-    export XDG_STATE_HOME=$HOME/.local/state
-    export UV_CACHE_DIR=$HOME/.cache/uv
-fi
+export XDG_DATA_HOME=$HOME/.local/share
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_STATE_HOME=$HOME/.local/state
+export UV_CACHE_DIR=$HOME/.cache/uv
 
 eval "$(~/.local/bin/mise activate zsh)"
 
