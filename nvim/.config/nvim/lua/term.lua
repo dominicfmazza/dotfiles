@@ -73,7 +73,7 @@ end
 
 local float_terminal_maps = {
   { lhs = "<M-g>", name_prefix = "lg-", cmd = "lazygit", cleanup_on_success = true, desc = "Open Lazygit window" },
-  { lhs = "<M-c>", name_prefix = "codex-", cmd = "codex", cleanup_on_success = true, desc = "Open Codex window" },
+  { lhs = "<M-c>", name_prefix = "ai-", cmd = "zsh -l -c pi", cleanup_on_success = true, desc = "Open Claude window" },
   { lhs = "<M-f>", name_prefix = "shell-", desc = "Open project shell" },
   { lhs = "<M-r>", name = "scratch", desc = "Open scratch space" },
 }
@@ -82,4 +82,26 @@ for _, config in ipairs(float_terminal_maps) do
   map({ "x", "n", "t" }, config.lhs, function() toggle_float_terminal(config) end, { noremap = true, silent = true, desc = config.desc })
 end
 
-map("t", "<C-e>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
+
+local function move_current_term(layout)
+  local term = ergoterm.identify() or ergoterm.get_focused()
+  if not term then
+    vim.notify("No ergoterm terminal found", vim.log.levels.WARN)
+    return
+  end
+
+  term:close()
+  term:update { layout = layout }
+  term:focus(layout)
+end
+
+local function move_term_bind(keymap, direction)
+  vim.keymap.set("n", "<leader>t" .. keymap, function() move_current_term(direction) end, { desc = "Move terminal left" })
+end
+
+move_term_bind("h", "left")
+move_term_bind("l", "right")
+move_term_bind("j", "below")
+move_term_bind("k", "above")
+move_term_bind("f", "float")
+move_term_bind("t", "tab")
