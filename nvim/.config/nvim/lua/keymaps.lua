@@ -49,10 +49,17 @@ miniclue.setup {
   },
 }
 local map = vim.keymap.set
-map({ "i", "n", "x", "t" }, "<M-h>", "<C-w>h")
-map({ "i", "n", "x", "t" }, "<M-j>", "<C-w>j")
-map({ "i", "n", "x", "t" }, "<M-k>", "<C-w>k")
-map({ "i", "n", "x", "t" }, "<M-l>", "<C-w>l")
+map("t", "<C-e>", [[<C-\><C-n>]], { noremap = true, silent = true, desc = "" })
+
+map({ "i", "n", "x" }, "<M-h>", "<C-w>h", { noremap = true })
+map({ "i", "n", "x" }, "<M-j>", "<C-w>j", { noremap = true })
+map({ "i", "n", "x" }, "<M-k>", "<C-w>k", { noremap = true })
+map({ "i", "n", "x" }, "<M-l>", "<C-w>l", { noremap = true })
+
+map({  "t" }, "<M-h>", "<C-\\><C-n><C-w>h", { noremap = true })
+map({  "t" }, "<M-j>", "<C-\\><C-n><C-w>j", { noremap = true })
+map({  "t" }, "<M-k>", "<C-\\><C-n><C-w>k", { noremap = true })
+map({  "t" }, "<M-l>", "<C-\\><C-n><C-w>l", { noremap = true })
 
 map("n", "<Esc>", "<cmd>noh<CR>", { desc = "General Clear highlights" })
 map("n", "<C-[>", "<cmd>noh<CR>", { desc = "General Clear highlights" })

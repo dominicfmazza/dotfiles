@@ -1,32 +1,10 @@
-emulate sh
-if [[ -f /app/share/Profile ]]; then
-  . /app/share/Profile 
-fi
-umask 022
-
-stty erase "^?"
-emulate zsh
 export PATH="$PATH:$HOME/.tmux/"
 export MANPAGER='zsh -l -c nvrt +Man!'
-export EDITOR='zsh -l -c nvrt'
+export EDITOR='zsh -l -c nvr'
 export NPM_PACKAGES="${HOME}/.npm-packages"
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
-[ -f "$HOME/.config/environments/hosts.sh"  ] && . "$HOME/.config/environments/hosts.sh" 
-[ -f "$HOME/.config/environments/paths.sh"  ] && . "$HOME/.config/environments/paths.sh" 
-[ -f "$HOME/.config/environments/langs.sh"  ] && . "$HOME/.config/environments/langs.sh" 
-
-export XDG_DATA_HOME=$HOME/.local/share
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_STATE_HOME=$HOME/.local/state
-export UV_CACHE_DIR=$HOME/.cache/uv
-
-
-[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
-[ -f "$HOME/.aliases" ] && . "$HOME/.aliases"
 [ -f ${ZDOTDIR:-~}/.antidote/antidote.zsh ] && . ${ZDOTDIR:-~}/.antidote/antidote.zsh
-
 
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 
@@ -42,7 +20,11 @@ autoload -Uz compinit && compinit
 bindkey '^f' autosuggest-accept
 VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
+[[ -f ~/.aliases ]] && source ~/.aliases
 
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+
+eval "$(~/.local/bin/mise activate zsh)"
 
 eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
