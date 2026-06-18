@@ -172,13 +172,16 @@ widgets:
   komorebi_workspaces:
     type: komorebi.workspaces.WorkspaceWidget
     options:
-      label_workspace_btn: ''
-      label_workspace_active_btn: '-'
-      label_workspace_populated_btn: ''
-      label_default_name: ''
+      label_workspace_btn: ''
+      label_workspace_active_btn: ''
+      label_workspace_populated_btn: ''
+      label_default_name: ''
       label_zero_index: false
       hide_empty_workspaces: false
       hide_if_offline: true
+      app_icons:
+        enabled_populated: true
+        enabled_active: true
   komorebi_control:
       type: "komorebi.control.KomorebiControlWidget"
       options:
