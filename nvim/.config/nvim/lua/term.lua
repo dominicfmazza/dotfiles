@@ -3,6 +3,8 @@ require("ergoterm").setup {
     layout = "right",
     cleanup_on_success = false,
     auto_scroll = false,
+    persist_mode = true,
+    persist_size = false
   },
   picker = {
     picker = "fzf-lua",
