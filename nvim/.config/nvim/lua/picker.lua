@@ -22,12 +22,3 @@ vim.keymap.set("n", "<leader>fg", function() require("fzf-lua").grep_project { h
 vim.keymap.set("n", "<leader>f/", function() require("fzf-lua").blines() end, { desc = "Current Buffer" })
 vim.keymap.set("n", "<leader>fw", function() require("fzf-lua").grep_cword() end, { desc = "Find word under cursor" })
 
-require("bafa").setup {
-  ui = {
-    title = {
-      text = "Buffers",
-    },
-  },
-}
-
-vim.keymap.set("n", "<C-b>", function() require("bafa").toggle() end, { desc = "Buffers" })
