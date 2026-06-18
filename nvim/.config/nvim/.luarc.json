@@ -4,6 +4,7 @@
         "vim",
         "MiniPick",
         "MiniExtra",
-        "err"
+        "err",
+        "FzfLua"
     ]
 }
