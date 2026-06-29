@@ -1,7 +1,14 @@
+local highlight_yank_group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
-  group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
-  callback = function() vim.highlight.on_yank() end,
+  group = highlight_yank_group,
+  callback = function() vim.hl.hl_op { timeout = 100 } end,
+})
+
+vim.api.nvim_create_autocmd("TextPutPost", {
+  desc = "Highlight when putting (pasting) text",
+  group = highlight_yank_group,
+  callback = function() vim.hl.hl_op { timeout = 100 } end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -57,6 +64,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 -- Auto resize splits when the terminal's window is resized
-vim.api.nvim_create_autocmd("VimResized", {
+vim.api.nvim_create_autocmd({ "VimResized", "WinClosed" }, {
   command = "wincmd =",
 })
