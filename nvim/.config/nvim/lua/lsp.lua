@@ -1,3 +1,4 @@
+require("tiny-code-action").setup()
 require("blink.cmp").setup {
   keymap = {
     preset = "none",
@@ -73,7 +74,7 @@ local lsps = {
   "cmake",
   "bashls",
   "dockerls",
-  "basedpyright",
+  "ty",
 }
 vim.lsp.enable(lsps)
 
@@ -91,7 +92,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "<leader>ls", function() FzfLua.lsp_workspace_symbols() end, { desc = "Workspace Symbols", noremap = true, buffer = true })
     vim.keymap.set("n", "<leader>lx", function() FzfLua.lsp_document_diagnostics() end, { desc = "Document Diagnostics", noremap = true, buffer = true })
     vim.keymap.set("n", "<leader>lX", function() FzfLua.lsp_workspace_diagnostics() end, { desc = "Workspace Diagnostics", noremap = true, buffer = true })
-    vim.keymap.set("n", "<leader>a", function() vim.lsp.buf.code_action() end, { desc = "Code Actions", noremap = true, buffer = true })
+    vim.keymap.set("n", "<leader>a", function() require("tiny-code-action").code_action() end, { desc = "Code Actions", noremap = true, buffer = true })
     vim.keymap.set("n", "<C-k>", function() vim.lsp.buf.hover() end, { desc = "LSP Hover", noremap = true, buffer = true })
   end,
 })
