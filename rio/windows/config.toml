@@ -1,0 +1,8 @@
+theme="vague"
+
+[cursor]
+shape = "block"
+
+[fonts]
+size = 16 
+family = "Hack Nerd Font"
