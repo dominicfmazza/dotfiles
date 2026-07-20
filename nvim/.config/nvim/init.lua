@@ -37,35 +37,11 @@ opt.inccommand = "split"
 opt.showmode = false
 opt.shortmess:append "sI"
 opt.winbar = "%f"
+opt.exrc = true
 
 require("vim._core.ui2").enable {}
 
 -- system clipboard
-vim.opt.clipboard:append "unnamedplus"
--- Fix "waiting for osc52 response from terminal" message
--- https://github.com/neovim/neovim/issues/28611
-if vim.env.SSH_TTY ~= nil then
-  -- Set up clipboard for ssh
-  local function my_paste(_)
-    return function(_)
-      local content = vim.fn.getreg '"'
-      return vim.split(content, "\n")
-    end
-  end
-  vim.g.clipboard = {
-    name = "OSC 52",
-    copy = {
-      ["+"] = require("vim.ui.clipboard.osc52").copy "+",
-      ["*"] = require("vim.ui.clipboard.osc52").copy "*",
-    },
-    paste = {
-      -- No OSC52 paste action since wezterm doesn't support it
-      -- Should still paste from nvim
-      ["+"] = my_paste "+",
-      ["*"] = my_paste "*",
-    },
-  }
-end
 
 opt.shell = "/usr/bin/env zsh"
 
@@ -79,29 +55,36 @@ opt.showbreak = "-->"
 -- GLOBAL STATUSLINE --
 opt.laststatus = 3
 
-if vim.g.neovide then require "neovide" end
+if vim.g.neovide then
+  vim.o.guifont = "Hack Nerd Font:h12"
+  vim.g.neovide_text_contrast = 0.7
+end
+
+local gh = function(repository) return "https://github.com/" .. repository end
 
 vim.pack.add {
-  "https://github.com/nvim-mini/mini.nvim",
-  "https://github.com/rachartier/tiny-inline-diagnostic.nvim",
-  "https://github.com/lewis6991/gitsigns.nvim",
-  "https://github.com/luukvbaal/statuscol.nvim",
-  "https://github.com/stevearc/conform.nvim",
-  "https://github.com/kevinhwang91/nvim-bqf",
-  { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
-  "https://github.com/nvim-lua/plenary.nvim",
-  "https://github.com/jiaoshijie/undotree",
-  "https://github.com/nvim-neo-tree/neo-tree.nvim",
-  "https://github.com/nvim-tree/nvim-web-devicons",
-  "https://github.com/MunifTanjim/nui.nvim",
-  "https://github.com/mrcjkb/rustaceanvim.git",
-  "https://github.com/ibhagwan/fzf-lua",
-  "https://github.com/danymat/neogen",
-  { src = "https://github.com/saghen/blink.cmp", version = vim.version.range ">1.0.0" },
-  "https://github.com/obsidian-nvim/obsidian.nvim",
-  "https://github.com/MeanderingProgrammer/render-markdown.nvim.git",
-  "https://github.com/waiting-for-dev/ergoterm.nvim",
-  { src = "https://github.com/mistweaverco/bafa.nvim.git", version = "v1.10.1" },
+  gh "nvim-mini/mini.nvim",
+  gh "rachartier/tiny-inline-diagnostic.nvim",
+  gh "rachartier/tiny-code-action.nvim",
+  gh "lewis6991/gitsigns.nvim",
+  gh "luukvbaal/statuscol.nvim",
+  gh "stevearc/conform.nvim",
+  gh "kevinhwang91/nvim-bqf",
+  { src = gh "nvim-treesitter/nvim-treesitter", version = "main" },
+  gh "nvim-lua/plenary.nvim",
+  gh "jiaoshijie/undotree",
+  gh "nvim-neo-tree/neo-tree.nvim",
+  gh "nvim-tree/nvim-web-devicons",
+  gh "MunifTanjim/nui.nvim",
+  gh "mrcjkb/rustaceanvim.git",
+  gh "ibhagwan/fzf-lua",
+  gh "danymat/neogen",
+  { src = gh "saghen/blink.cmp", version = vim.version.range ">1.0.0" },
+  gh "obsidian-nvim/obsidian.nvim",
+  gh "MeanderingProgrammer/render-markdown.nvim.git",
+  gh "waiting-for-dev/ergoterm.nvim",
+  gh "3rd/image.nvim",
+  gh "3rd/diagram.nvim",
 }
 
 local map = vim.keymap.set
@@ -206,4 +189,4 @@ require "autocommands"
 require "obsidian_setup"
 require "treesitter"
 require "quickfix"
-require "ai"
+require "clipboard"
