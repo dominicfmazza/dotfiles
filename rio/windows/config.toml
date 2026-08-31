@@ -6,3 +6,6 @@ shape = "block"
 [fonts]
 size = 16 
 family = "Hack Nerd Font"
+
+[navigation]
+hide-if-single = true
