@@ -1,12 +1,8 @@
-# User specific environment and startup programs
-
-export ZDOTDIR=$HOME/.config/zsh
-
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
-export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
-export UV_CACHE_DIR=$XDG_CACHE_HOME/uv
+# .zprofile runs for a LOGIN shell only.
+#
+# Every zsh file lives in $HOME, and the XDG variables live in .zshenv,
+# because a non-login interactive zsh never reads this file. Keep only login
+# work here: PATH additions, host files, and one-time environment setup.
 
 # Host-specific values. bootstrap.sh seeds these files from
 # install/templates/. They stay out of git.

@@ -2,10 +2,11 @@
 # Run the bootstrap inside a container and check the result.
 #
 # Usage:
-#   install/test/run.sh [link|full|shell] [--keep]
+#   install/test/run.sh [link|full|nfs|all|shell] [--keep]
 #
 #   link   link only. Needs no network beyond the antidote clone. Fast.
 #   full   link plus the whole tool install. Slow. Needs network egress.
+#   nfs    a network home: the cache redirect and the zsh startup order.
 #   shell  drop into a shell in a fresh container. For a manual check.
 #
 # --keep leaves a shell open after the checks finish.
@@ -56,6 +57,16 @@ fi
 case $MODE in
   link) SCRIPT=/home/tester/dotfiles/install/test/case-link.sh ;;
   full) SCRIPT=/home/tester/dotfiles/install/test/case-full.sh ;;
+  nfs) SCRIPT=/home/tester/dotfiles/install/test/case-nfs.sh ;;
+  all)
+    for m in link nfs full; do
+      echo "==> Running the $m case"
+      # shellcheck disable=SC2086
+      docker run --rm $GH_ARGS "$IMAGE" sh "/home/tester/dotfiles/install/test/case-$m.sh" \
+        || exit 1
+    done
+    exit 0
+    ;;
   shell)
     # shellcheck disable=SC2086
     exec docker run --rm -it $GH_ARGS "$IMAGE" bash

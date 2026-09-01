@@ -1,24 +1,44 @@
 # Profile: core. Shell, prompt, and terminal basics.
 # Every entry uses a prebuilt binary. No compiler needed.
+#
+# Versions are pinned, not "latest". A pin means mise resolves a tool from
+# disk and never calls a release API. That matters on an ephemeral host, such
+# as Amazon RES, where the local cache is wiped on every reboot: with "latest"
+# the first command after a boot makes one HTTP call per tool.
+#
+# To move a pin forward, run `mise outdated`, then `mise upgrade --bump`.
 
 [tools]
-usage = "latest"
-fzf = "latest"
-fd = "latest"
-ripgrep = "latest"
-bat = "latest"
-jq = "latest"
-eza = "latest"
-zoxide = "latest"
-lazygit = "latest"
-yazi = "latest"
-"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
+usage = "3.5.5"
+fzf = "0.74.0"
+fd = "10.4.2"
+ripgrep = "15.2.0"
+bat = "0.26.1"
+jq = "1.8.2"
+eza = "0.23.5"
+zoxide = "0.10.0"
+lazygit = "0.63.1"
+yazi = "26.5.6"
+
+# The ubi backend is deprecated for removal in mise 2027.1, and github: is
+# the replacement. Two blockers keep some entries on ubi:
+#   - github: ignores the `exe` hint, so skim would install as `skim` and
+#     tealdeer as `tealdeer`. The real commands are `sk` and `tldr`.
+#   - github: verifies GitHub artifact attestations, and the Sigstore
+#     timestamp check fails behind a TLS-intercepting proxy. oh-my-posh
+#     publishes attestations, so it cannot use github: here.
+# Revisit when github: supports a rename and the proxy trusts Sigstore.
+"ubi:JanDeDobbeleer/oh-my-posh" = "29.32.0"
 # The skim archive holds a binary named sk, not skim, so ubi needs the hint.
-"ubi:skim-rs/skim" = { version = "latest", exe = "sk" }
+"ubi:skim-rs/skim" = { version = "5.6.6", exe = "sk" }
 # The tealdeer release asset is tealdeer-*, but the command is tldr.
-"ubi:tealdeer-rs/tealdeer" = { version = "latest", exe = "tldr" }
+"ubi:tealdeer-rs/tealdeer" = { version = "1.9.0", exe = "tldr" }
 
 # init.lua uses vim.pack and vim._core.ui2, so it needs the 0.13 nightly.
 # mise installs a prebuilt nightly. bob is not used: its release binary
 # needs glibc 2.39, which RHEL 9 does not have.
+#
+# This entry cannot carry a version pin, because "nightly" is a moving tag.
+# mise still resolves it from disk once installed, so a reboot triggers no
+# lookup. Run `mise upgrade neovim` to take a newer nightly.
 neovim = "nightly"

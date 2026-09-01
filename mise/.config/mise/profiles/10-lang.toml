@@ -8,22 +8,25 @@
 # cargo-binstall pulls a prebuilt binary for a crate when one exists, so a
 # `cargo:` tool does not always need a full source build.
 #
-# There is no standalone lua entry. Neovim embeds LuaJIT, lua-language-server
-# ships its own runtime, and the mise lua package builds from source, which
-# needs both a compiler and make. Add `lua = "latest"` to a host file when a
-# lua interpreter is really needed.
-
-[tools]
 # node stays on 24. The node 26 binary links against libatomic.so.1, which
 # RHEL 9 does not ship, and installing it needs root. Node 24 has no such
 # dependency, so every `npm:` tool works on a plain rootless host.
-node = "24"
-pnpm = "latest"
-go = "latest"
-python = "3.13"
-uv = "latest"
-zig = "latest"
-cmake = "latest"
-"aqua:ninja-build/ninja" = "latest"
-"aqua:cargo-bins/cargo-binstall" = "latest"
-rust = { version = "latest", profile = "minimal", components = "rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools" }
+#
+# There is no standalone lua entry. Neovim embeds LuaJIT, lua-language-server
+# ships its own runtime, and the mise lua package builds from source, which
+# needs both a compiler and make. Add `lua = "<version>"` to a host file when
+# a lua interpreter is really needed.
+#
+# Versions are pinned. See 00-core.toml for why.
+
+[tools]
+node = "24.18.0"
+pnpm = "11.13.1"
+go = "1.26.5"
+python = "3.13.15"
+uv = "0.11.29"
+zig = "0.16.0"
+cmake = "3.31.6"
+"aqua:ninja-build/ninja" = "1.13.2"
+"aqua:cargo-bins/cargo-binstall" = "1.22.0"
+rust = { version = "1.97.1", profile = "minimal", components = "rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools" }
