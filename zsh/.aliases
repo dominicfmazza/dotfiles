@@ -1,4 +1,9 @@
 alias ls="eza"
 alias ll="eza -la"
-alias nvr="nvr --servername $NVR_SERVER"
-alias nvrt="nvr --remote-tab"
+
+# nvr talks to a running Neovim server. Skip the aliases when the host has
+# no nvr, so the shell does not shadow a working nvim.
+if command -v nvr >/dev/null 2>&1; then
+  alias nvr="nvr --servername $NVR_SERVER"
+  alias nvrt="nvr --remote-tab"
+fi

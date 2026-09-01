@@ -1,0 +1,26 @@
+# Profile: lang. Language runtimes and the rootless toolchain.
+#
+# rust ships cargo, rustc, and rustfmt. cargo needs a C linker for many
+# crates. zig supplies that linker on a host with no gcc: `zig cc`.
+# scripts/.local/bin/zcc and zxx wrap it. bootstrap.sh points CC and CXX
+# at the wrappers when the host has no compiler.
+#
+# cargo-binstall pulls a prebuilt binary for a crate when one exists, so a
+# `cargo:` tool does not always need a full source build.
+#
+# There is no standalone lua entry. Neovim embeds LuaJIT, lua-language-server
+# ships its own runtime, and the mise lua package builds from source, which
+# needs both a compiler and make. Add `lua = "latest"` to a host file when a
+# lua interpreter is really needed.
+
+[tools]
+node = "latest"
+pnpm = "latest"
+go = "latest"
+python = "3.13"
+uv = "latest"
+zig = "latest"
+cmake = "latest"
+"aqua:ninja-build/ninja" = "latest"
+"aqua:cargo-bins/cargo-binstall" = "latest"
+rust = { version = "latest", profile = "minimal", components = "rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools" }

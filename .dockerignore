@@ -1,0 +1,4 @@
+.git/modules
+**/.zsh_history
+**/.zcompdump*
+**/*.bak.*

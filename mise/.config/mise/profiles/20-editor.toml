@@ -1,0 +1,43 @@
+# Profile: editor. Language servers, formatters, and Neovim helpers.
+
+[tools]
+# formatters
+"aqua:JohnnyMorganz/StyLua" = "latest"
+"aqua:google/yamlfmt" = "latest"
+"aqua:psf/black" = "latest"
+"pipx:gersemi" = "latest"
+"pipx:beautysh" = "latest"
+"pipx:mdformat" = "latest"
+"npm:@fsouza/prettierd" = "latest"
+
+# language servers
+"aqua:LuaLS/lua-language-server" = "latest"
+# vscode-langservers-extracted ships the json, html, css, and eslint servers.
+# The vscode-json-languageservice package is a library with no binary, so
+# jsonls.lua could never find vscode-json-language-server.
+"npm:vscode-langservers-extracted" = "latest"
+"npm:bash-language-server" = "latest"
+"npm:yaml-language-server" = "latest"
+"npm:dockerfile-language-server-nodejs" = "latest"
+"pipx:basedpyright" = "latest"
+"pipx:cmake-language-server" = "latest"
+"pipx:clangd" = "latest"
+ty = "latest"
+
+# treesitter and remote editing
+"aqua:tree-sitter/tree-sitter" = "latest"
+"ubi:mikew/nvrh" = "latest"
+"pipx:neovim-remote" = "latest"
+
+# C and C++ support
+# The clang-format registry entry uses a conda backend, and conda-forge is
+# often unreachable behind a corporate proxy. pipx pulls a wheel instead.
+"pipx:clang-format" = "latest"
+"pipx:compdb" = "latest"
+
+# markdown and LaTeX helpers
+"pipx:pylatexenc" = "latest"
+
+# agents
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:agent-browser" = "latest"

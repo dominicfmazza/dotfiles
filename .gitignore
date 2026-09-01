@@ -1,12 +1,10 @@
 lazygit/.config/lazygit/state.yml
-tmux/.tmux/plugins/tmux
-tmux/.tmux/plugins/tmux-sensible
-tmux/.tmux/plugins/tpm
-tmux/.tmux/plugins/minimal-tmux-status
 zsh/.config/zsh/.zsh_plugins.zsh
-glazewm/.glzr/zebar/tmp*
-.zcompdump*
 zsh/.config/zsh/.zsh_history
+.zcompdump*
+glazewm/.glzr/zebar/tmp*
+komorebi/.config/yasb/yasb.log
 scripts/.local/bin/dploy
 scripts/.local/bin/mise
-komorebi/.config/yasb/yasb.log
+mise/.config/mise/.env.json
+install/test/ca/*.crt
