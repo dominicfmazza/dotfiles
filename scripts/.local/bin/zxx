@@ -1,0 +1,4 @@
+#!/bin/sh
+# zxx: a C++ compiler on a host with no gcc and no clang.
+# Uses the zig toolchain that mise installs. Set CXX=zxx to use it.
+exec mise x zig -- zig c++ "$@"

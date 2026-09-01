@@ -1,0 +1,4 @@
+#!/bin/sh
+# zcc: a C compiler on a host with no gcc and no clang.
+# Uses the zig toolchain that mise installs. Set CC=zcc to use it.
+exec mise x zig -- zig cc "$@"

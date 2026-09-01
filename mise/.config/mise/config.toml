@@ -1,72 +1,15 @@
 [settings]
 experimental = true
 
-[tools]
-# language support
-go = "latest"
-node = "latest"
-rust = { version = 'latest', profile="minimal", components = 'rustc,cargo,rustfmt,rust-std,rust-analyzer,clippy,llvm-tools' }
-
-# tools
-fzf = 'latest'
-fd = 'latest'
-lua = 'latest'
-zoxide = 'latest'
-ripgrep = "latest"
-uv = "latest"
-bat = "latest"
-jq = "latest"
-usage = "latest"
-eza = "latest"
-"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
-
-# tuis
-lazygit = 'latest'
-yazi = "latest"
-
-# formatters
-"cargo:stylua" = "latest"
-"pipx:gersemi" = "latest"
-"pipx:black" = "latest"
-"pipx:beautysh" = "latest"
-"pipx:mdformat" = "latest"
-"go:github.com/google/yamlfmt/cmd/yamlfmt" = "latest"
-"npm:@fsouza/prettierd" = "latest"
-
-# language servers
-"npm:vscode-json-languageservice" = "latest"
-"npm:bash-language-server" = "latest"
-"pipx:basedpyright" = "latest"
-"pipx:cmake-language-server" = "latest"
-"npm:yaml-language-server" = "latest"
-"npm:dockerfile-language-server-nodejs" = "latest"
-"asdf:lua-language-server" = "latest"
-cmake = "3.31.6"
-"pipx:clangd" = "latest"
-"pipx:pylatexenc" = "latest"
-"pipx:compdb" = "latest"
-"ubi:mikew/nvrh" = "latest"
-"cargo:bob-nvim" = "latest"
-"pipx:neovim-remote" = "latest"
-trivy = "latest"
-"cargo:tealdeer" = "latest"
-"cargo:skim" = "latest"
-# "npm:gitlab-ci-local" = "latest"
-"cargo:tree-sitter-cli" = "latest"
-"pipx:jiratui" = "latest"
-"pipx:keyring" = "latest"
-"npm:gitlab-ci-local" = "latest"
-glab = "1.97.0"
-"npm:@earendil-works/pi-coding-agent" = "latest"
-terraform = "latest"
-aws = { version = "latest", symlink_bins = "true" }
-"pipx:aws-sso-util" = "latest"
-conan = "latest"
-pnpm = "latest"
-ty = "latest"
-"npm:agent-browser" = "latest"
+# Tools live in conf.d. mise merges every file in that directory.
+#   00-core.toml    shell and terminal basics
+#   10-lang.toml    language runtimes and the rootless compiler
+#   20-editor.toml  language servers and formatters for Neovim
+#   30-work.toml    employer-specific tools
+#
+# bootstrap.sh --profile core|editor|full|work decides which files it links.
 
 [env]
 UV_NATIVE_TLS = "true"
-NODE_OPTIONS= "--use-system-ca"
-_.file = ".env.json"
+NODE_OPTIONS = "--use-system-ca"
+_.file = "~/.env.json"

@@ -1,0 +1,24 @@
+# Profile: core. Shell, prompt, and terminal basics.
+# Every entry uses a prebuilt binary. No compiler needed.
+
+[tools]
+usage = "latest"
+fzf = "latest"
+fd = "latest"
+ripgrep = "latest"
+bat = "latest"
+jq = "latest"
+eza = "latest"
+zoxide = "latest"
+lazygit = "latest"
+yazi = "latest"
+"ubi:JanDeDobbeleer/oh-my-posh" = "latest"
+# The skim archive holds a binary named sk, not skim, so ubi needs the hint.
+"ubi:skim-rs/skim" = { version = "latest", exe = "sk" }
+# The tealdeer release asset is tealdeer-*, but the command is tldr.
+"ubi:tealdeer-rs/tealdeer" = { version = "latest", exe = "tldr" }
+
+# init.lua uses vim.pack and vim._core.ui2, so it needs the 0.13 nightly.
+# mise installs a prebuilt nightly. bob is not used: its release binary
+# needs glibc 2.39, which RHEL 9 does not have.
+neovim = "nightly"
