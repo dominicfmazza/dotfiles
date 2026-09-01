@@ -9,11 +9,15 @@ local function get_directories(parent_path)
   end
   return directories
 end
-local function determine_obsidian_workspaces()
+local function get_obsidian_root()
   local obsidian_dir = vim.fn.expand "$HOME/vaults"
   if vim.env.OBSIDIAN_VAULT_ROOT then obsidian_dir = vim.env.OBSIDIAN_VAULT_ROOT end
-  return get_directories(obsidian_dir)
+  return obsidian_dir
 end
+local function determine_obsidian_workspaces()
+  return get_directories(get_obsidian_root())
+end
+
 
 local workspaces = determine_obsidian_workspaces()
 
@@ -30,7 +34,7 @@ if vim.tbl_count(workspaces) > 0 then
     },
     daily_notes = {
       folder = "Daily Notes",
-      template = "Templates/Daily Note.md"
+      template = get_obsidian_root() .. "/Templates/Daily Note.md",
     },
     note_id_func = function(title)
       local suffix = ""
@@ -57,6 +61,8 @@ if vim.tbl_count(workspaces) > 0 then
   map("n", "<leader>ox", "<cmd>Obsidian extract_note<cr>", { desc = "Obsidian: Extract Note" })
   map("n", "<leader>ol", "<cmd>Obsidian link<cr>", { desc = "Obsidian: Link Note" })
   map("n", "<leader>oL", "<cmd>Obsidian link_new<cr>", { desc = "Obsidian: Create and Link Note" })
+
+  require("tasks").setup()
 else
   vim.notify("Workspace directory not specified", vim.log.levels.WARN, { title = "obsidian.lua" })
 end
