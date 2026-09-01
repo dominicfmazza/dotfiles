@@ -1,0 +1,4 @@
+{
+  "_comment": "MCP servers for this host. bootstrap.sh seeds this file and never overwrites it. An employer endpoint belongs here, not in the repo.",
+  "mcpServers": {}
+}

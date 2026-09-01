@@ -33,7 +33,6 @@ The host must supply these. A rootless install cannot create them.
 | `curl` or `wget` | any | The mise installer and every download. |
 | `tar`, `gzip`, `xz`, `unzip` | any | Archive extraction. |
 | `zsh` | 5.8 | The interactive shell. mise has no zsh package. |
-| `libatomic.so.1` | any | The node binary links against it. |
 | Writable `$HOME` | — | Every install target. |
 | Network to github.com and mise.jdx.dev | — | Tool downloads. |
 | A true-color terminal | — | `termguicolors` and the prompt. |
@@ -47,7 +46,7 @@ A C compiler is optional. When the host has no `gcc` and no `clang`, the
 bootstrap points `CC` and `CXX` at `zcc` and `zxx`. Both wrap `zig cc`, and
 mise installs zig. Treesitter parsers and `cargo:` crates build with it.
 
-On a RHEL 9 host, `dnf install zsh libatomic git tar gzip xz unzip` covers
+On a RHEL 9 host, `dnf install zsh git tar gzip xz unzip` covers
 every requirement. Ask the host owner for that one command.
 
 ## Commands
@@ -57,6 +56,7 @@ every requirement. Ask the host owner for that one command.
 ./bootstrap.sh --profile core     # a smaller tool set
 ./bootstrap.sh link               # link only, no tool install
 ./bootstrap.sh doctor             # check an existing install
+./bootstrap.sh scan               # check the repo for a leaked credential
 ./bootstrap.sh uninstall          # remove every link this repo owns
 ./bootstrap.sh --help             # every flag
 ```
@@ -86,17 +86,37 @@ moves on. Pick a policy to resolve it:
 
 ## Host-specific values
 
-Two files hold anything specific to one machine. Neither is in git.
+These files hold anything specific to one machine. None is in git.
 
-- `~/.config/environments/hosts.sh` holds paths and identities. zsh sources
-  it at login.
-- `~/.env.json` holds tokens. mise loads it into the environment.
+| File | Holds |
+|---|---|
+| `~/.config/environments/hosts.sh` | Paths and identities. zsh sources it at login. |
+| `~/.env.json` | Tokens. mise loads it into the environment. |
+| `~/.pi/agent/settings.json` | pi settings. pi rewrites it, so it is a copy. |
+| `~/.pi/agent/models.json` | Custom LLM providers and their endpoints. |
+| `~/.pi/agent/auth.json` | pi credentials. Run `pi` and use `/login`. |
+| `~/.config/mcp/mcp.json` | MCP server endpoints. |
 
-The bootstrap seeds both from `install/templates/`, and never overwrites an
-existing one.
+The bootstrap seeds each one from `install/templates/`, and never overwrites
+an existing file.
 
 Add `GITHUB_TOKEN` to `~/.env.json` on a shared network. The GitHub API
 allows 60 calls per hour per address, and mise reads release lists from it.
+
+## Secrets
+
+This repo is public. `install/scan-secrets.sh` blocks a commit that adds a
+token, an internal hostname, or a pi runtime file. The bootstrap installs it
+as a `pre-commit` hook, and `doctor` runs it too.
+
+```sh
+./bootstrap.sh scan          # scan by hand
+```
+
+The scan looks for GitHub, GitLab, OpenAI, Anthropic, AWS, Slack, and pi
+provider tokens, private key blocks, a literal value in an `apiKey` field, an
+internal hostname, and any pi file that carries state. An `$ENV_VAR` or a
+`!command` reference is a safe value and never triggers it.
 
 ## Tests
 
@@ -124,6 +144,7 @@ developer mode on, or run `tools/symlinkwsl.ps1` from PowerShell.
 bootstrap.sh              the installer
 install/lib.sh            shared shell helpers
 install/manifest.conf     package -> platform -> target map
+install/scan-secrets.sh   the pre-commit credential scan
 install/templates/        seeds for the host files
 install/test/             container tests
 <package>/                a tree that mirrors $HOME

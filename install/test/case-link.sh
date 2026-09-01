@@ -71,6 +71,93 @@ check "no conf.d inside the repo" test ! -e "$HOME/dotfiles/mise/.config/mise/co
 check "conf.d links point at profiles" is_link_to "$HOME/.config/mise/conf.d/00-core.toml" profiles/00-core.toml
 
 echo
+echo "=== 4c. the pi package links, but never its secrets"
+check "AGENTS.md" is_link_to "$HOME/.pi/agent/AGENTS.md" pi/.pi/agent/AGENTS.md
+check "keybindings.json" is_link_to "$HOME/.pi/agent/keybindings.json" pi/.pi/agent/keybindings.json
+check "package.json" is_link_to "$HOME/.pi/agent/package.json" pi/.pi/agent/package.json
+check "the subagent extension" is_link_to "$HOME/.pi/agent/extensions/subagent/index.ts" subagent/index.ts
+check "the implementer agent" is_link_to "$HOME/.pi/agent/agents/implementer.md" agents/implementer.md
+check "the commit prompt" is_link_to "$HOME/.pi/agent/prompts/commit.md" prompts/commit.md
+check "~/.pi/agent is a real directory" sh -c '[ -d "$HOME/.pi/agent" ] && [ ! -L "$HOME/.pi/agent" ]'
+
+# settings.json must be a copy. pi rewrites it, and a link would dirty the repo.
+check "settings.json is a real file" sh -c '[ -f "$HOME/.pi/agent/settings.json" ] && [ ! -L "$HOME/.pi/agent/settings.json" ]'
+check "models.json is a real file" sh -c '[ -f "$HOME/.pi/agent/models.json" ] && [ ! -L "$HOME/.pi/agent/models.json" ]'
+check "mcp.json is a real file" sh -c '[ -f "$HOME/.config/mcp/mcp.json" ] && [ ! -L "$HOME/.config/mcp/mcp.json" ]'
+check "no auth.json is created" test ! -e "$HOME/.pi/agent/auth.json"
+check "no agent model is pinned to a provider" sh -c '! grep -rq "^model:" "$HOME/dotfiles/pi/.pi/agent/agents/"'
+
+echo
+echo "=== 4d. the secret scan works"
+# Every `sh -c` below keeps single quotes on purpose: $HOME must expand in the
+# inner shell, not here.
+# shellcheck disable=SC2016
+check "a clean repo passes" sh -c 'cd "$HOME/dotfiles" && ./install/scan-secrets.sh >/dev/null'
+
+# Plant a token and prove the scan catches it. The literal is assembled at
+# run time, so this test file itself never holds a token pattern.
+probe_token="gh${probe_p:-p}_0123456789abcdefghij"
+printf 'key = "%s"\n' "$probe_token" >"$HOME/dotfiles/leak-probe.txt"
+check "a planted token fails the scan" sh -c 'cd "$HOME/dotfiles" && ! ./install/scan-secrets.sh >/dev/null 2>&1'
+rm -f "$HOME/dotfiles/leak-probe.txt"
+
+# Plant a pi runtime file and prove the scan catches it.
+printf '{}\n' >"$HOME/dotfiles/pi/.pi/agent/auth.json"
+check "a planted auth.json fails the scan" sh -c 'cd "$HOME/dotfiles" && ! ./install/scan-secrets.sh >/dev/null 2>&1'
+rm -f "$HOME/dotfiles/pi/.pi/agent/auth.json"
+
+# An environment reference and a command reference are safe values.
+printf '{ "apiKey": "$SOME_ENV_VAR", "token": "!op read op://v/i" }\n' \
+  >"$HOME/dotfiles/safe-probe.json"
+check "an env reference does not false-alarm" sh -c 'cd "$HOME/dotfiles" && ./install/scan-secrets.sh >/dev/null'
+rm -f "$HOME/dotfiles/safe-probe.json"
+
+echo
+echo "=== 4e. the pre-commit hook blocks a real commit"
+# The image copy has no .git, so build a throwaway repo and prove that git
+# refuses the commit. This is the check that matters: a scan that passes by
+# hand but never runs during a commit protects nothing.
+HOOKREPO=/tmp/hooktest
+rm -rf "$HOOKREPO"
+mkdir -p "$HOOKREPO"
+cp -r "$HOME/dotfiles/." "$HOOKREPO/" 2>/dev/null || true
+rm -rf "$HOOKREPO/.git"
+(
+  cd "$HOOKREPO"
+  git init -q
+  git config user.email test@example.invalid
+  git config user.name Test
+  ./bootstrap.sh link -o pi >/dev/null 2>&1 || true
+) >/dev/null 2>&1
+
+check "the hook is a link into the repo" test -L "$HOOKREPO/.git/hooks/pre-commit"
+
+(
+  cd "$HOOKREPO"
+  git add -A >/dev/null 2>&1
+  git commit -qm "initial" >/dev/null 2>&1
+) || true
+check "a clean commit succeeds" sh -c "cd $HOOKREPO && git log --oneline -1 >/dev/null 2>&1"
+
+# Stage a credential and prove git refuses.
+printf '{ "key": "bg%s-5y3c3h25zWavqcPHzUJuH9CV" }\n' "pat" \
+  >"$HOOKREPO/pi/.pi/agent/auth.json"
+(
+  cd "$HOOKREPO"
+  git add -f pi/.pi/agent/auth.json >/dev/null 2>&1
+)
+if (cd "$HOOKREPO" && git commit -qm "must be blocked" >/dev/null 2>&1); then
+  printf 'FAIL  the hook let a token through\n'
+  FAILED=$((FAILED + 1))
+else
+  printf 'PASS  the hook blocks a staged token\n'
+fi
+check "nothing was committed" sh -c "cd $HOOKREPO && [ \"\$(git log --oneline | wc -l)\" = 1 ]"
+check "--no-verify still works as the escape hatch" sh -c "cd $HOOKREPO && git commit -qm bypass --no-verify"
+rm -rf "$HOOKREPO"
+rm -f "$HOME/dotfiles/safe-probe.json"
+
+echo
 echo "=== 5. windows packages stay off a linux host"
 check "no ~/.glzr" test ! -e "$HOME/.glzr"
 check "no ~/komorebi.json" test ! -e "$HOME/komorebi.json"

@@ -7,8 +7,8 @@
 # corporate CA the host trusts into the image.
 #
 # The image holds only the hard requirements from the README:
-# git, curl, tar, gzip, xz, unzip, zsh, libatomic, and ca-certificates.
-# It has no gcc, no stow, and no sudo. mise must supply the rest.
+# git, curl, tar, gzip, xz, unzip, zsh, and ca-certificates.
+# It has no gcc, no libatomic, no stow, and no sudo. mise supplies the rest.
 
 ARG BASE=registry.access.redhat.com/ubi9/ubi:latest
 FROM ${BASE}
@@ -16,16 +16,19 @@ FROM ${BASE}
 # One layer for both package managers, so DOTFILES_TEST_BASE can point at a
 # Debian image as well. UBI 9 already ships curl-minimal, so the list must
 # not name curl: the full package conflicts with the minimal one.
+#
+# The list holds ONLY the README host requirements. It has no libatomic and
+# no compiler on purpose, so a test proves a plain rootless host works.
 RUN set -eux; \
     if command -v dnf >/dev/null 2>&1; then \
     dnf -q -y install ca-certificates git gzip tar unzip xz zsh \
-    libatomic glibc-langpack-en shadow-utils findutils; \
+    glibc-langpack-en shadow-utils findutils; \
     dnf -q clean all; \
     else \
     export DEBIAN_FRONTEND=noninteractive; \
     apt-get update -qq; \
     apt-get install -y --no-install-recommends \
-    ca-certificates curl git gzip tar unzip xz-utils zsh locales libatomic1; \
+    ca-certificates curl git gzip tar unzip xz-utils zsh locales; \
     locale-gen en_US.UTF-8; \
     rm -rf /var/lib/apt/lists/*; \
     fi

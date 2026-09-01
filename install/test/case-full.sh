@@ -84,6 +84,17 @@ for t in lua-language-server bash-language-server yaml-language-server \
 done
 
 echo
+echo "=== 10. the pi agent runs"
+PI="$HOME/.local/share/mise/shims/pi"
+check "the pi binary" test -x "$PI"
+if [ -x "$PI" ]; then
+  check "pi loads its config" sh -c "\"$PI\" --version >/dev/null 2>&1"
+  # A bad extension or prompt makes pi print a load error on startup.
+  "$PI" --list-models >/tmp/pi.log 2>&1 || true
+  check "no extension load error" sh -c '! grep -qiE "failed to load|extension error" /tmp/pi.log'
+fi
+
+echo
 if [ "$FAILED" -gt 0 ]; then
   echo "RESULT: $FAILED check(s) failed"
   exit 1
