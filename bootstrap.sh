@@ -147,6 +147,24 @@ phase_preflight() {
 
   tls_probe && ok "HTTPS to github.com works"
 
+  # A network home breaks any tool that locks a cache file. zsh redirects the
+  # caches to local disk, but report the state here so a surprise is visible
+  # before the first install.
+  _fs=$(home_fstype)
+  if home_is_remote; then
+    ok "\$HOME is on $_fs. The caches go to local disk."
+    for _base in /var/tmp /tmp; do
+      if [ -d "$_base" ] && [ -w "$_base" ]; then
+        say "  ${C_DIM}cache root: $_base/${USER:-$(id -u)}-cache$C_OFF"
+        break
+      fi
+    done
+    say "  ${C_DIM}Tool installs stay on \$HOME and survive a reboot.$C_OFF"
+  else
+    ok "\$HOME is on $_fs. The caches stay on \$HOME."
+  fi
+  unset _fs _base
+
   [ "$FAIL_COUNT" -gt 0 ] \
     && die "$FAIL_COUNT requirement(s) failed. Fix them and run again."
   return 0
@@ -181,7 +199,7 @@ phase_hooks() {
 
 phase_submodules() {
   info "Submodules"
-  sm_dir="$REPO_ROOT/zsh/.config/zsh/.antidote"
+  sm_dir="$REPO_ROOT/zsh/.antidote"
 
   if [ -f "$sm_dir/antidote.zsh" ]; then
     ok "antidote is present"
@@ -612,6 +630,35 @@ phase_doctor() {
       warn "$(pretty "$f") is missing"
     fi
   done
+
+  say "  ${C_DIM}filesystem$C_OFF"
+  fs=$(home_fstype)
+  if home_is_remote; then
+    ok "\$HOME is on $fs"
+    # An interactive zsh exports the cache root. Read it back to prove the
+    # redirect is live, rather than assuming the file was sourced.
+    croot=$(zsh -c 'printf %s "${DOTFILES_CACHE_ROOT:-}"' 2>/dev/null)
+    if [ -n "$croot" ]; then
+      ok "cache root $croot"
+      if [ -d "$croot" ]; then
+        ok "the cache root exists"
+      else
+        warn "$croot does not exist yet. It is created on the first zsh start."
+      fi
+    else
+      fail "the home is remote but zsh set no cache root. Check ~/.zshenv."
+    fi
+    mise_data=$(zsh -c 'printf %s "${MISE_DATA_DIR:-}"' 2>/dev/null)
+    case "$mise_data" in
+      "$HOME"/*) ok "mise installs stay on \$HOME" ;;
+      '') warn "MISE_DATA_DIR is unset. mise uses its default." ;;
+      *) fail "MISE_DATA_DIR is $mise_data. Installs must stay on \$HOME." ;;
+    esac
+    unset croot mise_data
+  else
+    ok "\$HOME is on $fs. No cache redirect is needed."
+  fi
+  unset fs
 
   say "  ${C_DIM}secrets$C_OFF"
   if [ -x "$REPO_ROOT/install/scan-secrets.sh" ]; then

@@ -1,4 +1,6 @@
 # Profile: work. Employer-specific tools. Skip this file on a personal host.
+#
+# Versions are pinned. See 00-core.toml for why.
 
 [tools]
 # The default glab backend reads the gitlab.com release API, and mise sends
@@ -6,12 +8,12 @@
 # gitlab.com answer 401, so the install fails on exactly the hosts that
 # need glab. The asdf plugin downloads the release asset instead and needs
 # no token.
-"asdf:mise-plugins/mise-glab" = "latest"
-terraform = "latest"
-trivy = "latest"
-conan = "latest"
-aws = { version = "latest", symlink_bins = "true" }
-"pipx:aws-sso-util" = "latest"
-"pipx:jiratui" = "latest"
-"pipx:keyring" = "latest"
-"npm:gitlab-ci-local" = "latest"
+"asdf:mise-plugins/mise-glab" = "1.116.0"
+terraform = "1.15.8"
+trivy = "0.72.0"
+conan = "2.30.0"
+aws = { version = "2.36.1", symlink_bins = "true" }
+"pipx:aws-sso-util" = "4.33.0"
+"pipx:jiratui" = "1.10.1"
+"pipx:keyring" = "25.7.0"
+"npm:gitlab-ci-local" = "4.73.0"

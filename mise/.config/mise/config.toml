@@ -9,6 +9,19 @@ experimental = true
 #
 # bootstrap.sh --profile core|editor|full|work decides which files it links.
 
+# Every tool carries an exact version, so mise resolves from disk and makes no
+# release API call. Keep the pins when changing this.
+lockfile = true
+
+# "auto" lets mise pick a package manager, and it may pick one that takes an
+# exclusive flock on its store. A network home without a lock daemon rejects
+# that lock, and every npm install fails with
+# "Bad file descriptor (os error 9)". npm itself does not need the lock.
+#
+# A dotted key opens a table, so every plain setting must come before this
+# line. TOML would otherwise read the next key as npm.<key>.
+npm.package_manager = "npm"
+
 [env]
 UV_NATIVE_TLS = "true"
 NODE_OPTIONS = "--use-system-ca"

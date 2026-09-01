@@ -155,6 +155,40 @@ owned_by_repo() {
 
 # ------------------------------------------------------------------ links ----
 
+same_content() {
+  # True when two files hold identical bytes. cmp is absent on a minimal
+  # image such as RHEL UBI, so fall back to a checksum.
+  if have cmp; then
+    cmp -s "$1" "$2" 2>/dev/null
+    return $?
+  fi
+  for _sc_sum in md5sum sha256sum shasum; do
+    if have "$_sc_sum"; then
+      _sc_a=$("$_sc_sum" <"$1" 2>/dev/null) || return 1
+      _sc_b=$("$_sc_sum" <"$2" 2>/dev/null) || return 1
+      [ "$_sc_a" = "$_sc_b" ]
+      return $?
+    fi
+  done
+  return 1
+}
+
+is_distro_default() {
+  # True when $1 is a pristine copy of the distribution skeleton file.
+  # A new account gets /etc/skel copied into it, so RHEL puts a default
+  # .zshrc and .bashrc in every home. Those are not user content: replacing
+  # one loses nothing, and refusing to link over it blocks the install.
+  _dd_name=$(basename "$1")
+  for _dd_skel in /etc/skel "${DOTFILES_SKEL_DIR:-}"; do
+    [ -n "$_dd_skel" ] || continue
+    [ -f "$_dd_skel/$_dd_name" ] || continue
+    if same_content "$1" "$_dd_skel/$_dd_name"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 make_link() {
   # make_link SRC DST. Applies the conflict policy in $CONFLICT.
   _ml_src=$1
@@ -168,6 +202,14 @@ make_link() {
     act rm -f "$_ml_dst"
     act ln -s "$_ml_src" "$_ml_dst"
     ok "$(pretty "$_ml_dst") relinked"
+    return 0
+  fi
+
+  # A pristine /etc/skel copy is not user content. Replace it silently.
+  if [ -f "$_ml_dst" ] && [ ! -L "$_ml_dst" ] && is_distro_default "$_ml_dst"; then
+    act rm -f "$_ml_dst"
+    act ln -s "$_ml_src" "$_ml_dst"
+    ok "$(pretty "$_ml_dst") linked (replaced the distribution default)"
     return 0
   fi
 
@@ -287,6 +329,17 @@ unlink_tree() {
 }
 
 # ---------------------------------------------------------------- fetch -----
+
+home_fstype() {
+  stat -f -c %T "$HOME" 2>/dev/null || echo unknown
+}
+
+home_is_remote() {
+  case "$(home_fstype)" in
+    nfs | nfs4 | smb2 | smb | cifs | fuseblk | afs | 9p | lustre | gpfs) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 
 fetch() {
   # fetch URL OUT

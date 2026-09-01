@@ -1,43 +1,45 @@
 # Profile: editor. Language servers, formatters, and Neovim helpers.
+#
+# Versions are pinned. See 00-core.toml for why.
 
 [tools]
 # formatters
-"aqua:JohnnyMorganz/StyLua" = "latest"
-"aqua:google/yamlfmt" = "latest"
-"aqua:psf/black" = "latest"
-"pipx:gersemi" = "latest"
-"pipx:beautysh" = "latest"
-"pipx:mdformat" = "latest"
-"npm:@fsouza/prettierd" = "latest"
+"aqua:JohnnyMorganz/StyLua" = "2.5.2"
+"aqua:google/yamlfmt" = "0.21.0"
+"aqua:psf/black" = "26.5.1"
+"pipx:gersemi" = "0.27.7"
+"pipx:beautysh" = "6.4.3"
+"pipx:mdformat" = "1.0.0"
+"npm:@fsouza/prettierd" = "0.28.0"
 
 # language servers
-"aqua:LuaLS/lua-language-server" = "latest"
+"aqua:LuaLS/lua-language-server" = "3.19.1"
 # vscode-langservers-extracted ships the json, html, css, and eslint servers.
 # The vscode-json-languageservice package is a library with no binary, so
 # jsonls.lua could never find vscode-json-language-server.
-"npm:vscode-langservers-extracted" = "latest"
-"npm:bash-language-server" = "latest"
-"npm:yaml-language-server" = "latest"
-"npm:dockerfile-language-server-nodejs" = "latest"
-"pipx:basedpyright" = "latest"
-"pipx:cmake-language-server" = "latest"
-"pipx:clangd" = "latest"
-ty = "latest"
+"npm:vscode-langservers-extracted" = "4.10.0"
+"npm:bash-language-server" = "5.6.0"
+"npm:yaml-language-server" = "1.24.0"
+"npm:dockerfile-language-server-nodejs" = "0.15.0"
+"pipx:basedpyright" = "1.39.9"
+"pipx:cmake-language-server" = "0.1.11"
+ty = "0.0.60"
 
 # treesitter and remote editing
-"aqua:tree-sitter/tree-sitter" = "latest"
-"ubi:mikew/nvrh" = "latest"
-"pipx:neovim-remote" = "latest"
+"aqua:tree-sitter/tree-sitter" = "0.27.0"
+"github:mikew/nvrh" = "0.9.1"
+"pipx:neovim-remote" = "2.5.1"
 
 # C and C++ support
 # The clang-format registry entry uses a conda backend, and conda-forge is
 # often unreachable behind a corporate proxy. pipx pulls a wheel instead.
-"pipx:clang-format" = "latest"
-"pipx:compdb" = "latest"
+"pipx:clang-format" = "23.1.0"
+"pipx:clangd" = "22.1.1"
+"pipx:compdb" = "0.2.0"
 
 # markdown and LaTeX helpers
-"pipx:pylatexenc" = "latest"
+"pipx:pylatexenc" = "2.10"
 
 # agents
-"npm:@earendil-works/pi-coding-agent" = "latest"
-"npm:agent-browser" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "0.80.10"
+"npm:agent-browser" = "0.33.1"

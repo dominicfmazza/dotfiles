@@ -38,7 +38,9 @@ check "~/.zshenv" is_link_to "$HOME/.zshenv" dotfiles/zsh/.zshenv
 check "~/.zprofile" is_link_to "$HOME/.zprofile" dotfiles/zsh/.zprofile
 check "~/.aliases" is_link_to "$HOME/.aliases" dotfiles/zsh/.aliases
 check "~/.omp.yaml" is_link_to "$HOME/.omp.yaml" dotfiles/zsh/.omp.yaml
-check "~/.config/zsh" is_link_to "$HOME/.config/zsh" dotfiles/zsh/.config/zsh
+check "~/.zshrc" is_link_to "$HOME/.zshrc" dotfiles/zsh/.zshrc
+check "~/.zsh_plugins.txt" is_link_to "$HOME/.zsh_plugins.txt" dotfiles/zsh/.zsh_plugins.txt
+check "~/.antidote" test -e "$HOME/.antidote/antidote.zsh"
 check "~/.config/nvim" is_link_to "$HOME/.config/nvim" dotfiles/nvim/.config/nvim
 check "~/.config/yazi" is_link_to "$HOME/.config/yazi" dotfiles/yazi/.config/yazi
 check "~/.config/lazygit" is_link_to "$HOME/.config/lazygit" dotfiles/lazygit/.config/lazygit

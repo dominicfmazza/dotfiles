@@ -118,6 +118,38 @@ provider tokens, private key blocks, a literal value in an `apiKey` field, an
 internal hostname, and any pi file that carries state. An `$ENV_VAR` or a
 `!command` reference is a safe value and never triggers it.
 
+## A network home
+
+On a host where `$HOME` is NFS, such as an Amazon RES desktop, a tool that
+locks a cache file fails. NFS without a lock daemon rejects `flock`, and the
+kernel returns `EBADF`, which a tool reports as
+`Bad file descriptor (os error 9)`.
+
+`~/.zshenv` detects that case and splits the two kinds of data:
+
+| Data | Location | Reason |
+|---|---|---|
+| mise tool installs, 3.4 G | `$HOME` | Large. Must survive a reboot. |
+| Caches: mise, npm, uv, pip, go | `/var/tmp/$USER-cache` | Locks work. Rebuildable. |
+
+Detection uses the filesystem name first, then a real `flock` attempt for an
+unusual filesystem. The probe result is cached against the boot id, so only
+the first shell after a reboot pays for it.
+
+RES replaces the instance often, so the local cache is empty after each boot.
+That costs nothing: every tool carries an exact version, so mise resolves from
+disk and makes no release API call. `latest` would cost one HTTP call per tool
+per boot.
+
+To move a pin forward:
+
+```sh
+mise outdated
+mise upgrade --bump
+```
+
+Set `DOTFILES_CACHE_ROOT` to override the cache location.
+
 ## Tests
 
 The tests run the bootstrap in a container as a user with no root. The
@@ -125,7 +157,9 @@ default image is RHEL 9 (UBI), which matches the target fleet.
 
 ```sh
 install/test/run.sh link     # link layer only. Fast.
+install/test/run.sh nfs      # a network home: cache redirect, zsh order.
 install/test/run.sh full     # every tool, Neovim, and the plugins. Slow.
+install/test/run.sh all      # link, then nfs, then full.
 install/test/run.sh shell    # a shell in a fresh container.
 ```
 
