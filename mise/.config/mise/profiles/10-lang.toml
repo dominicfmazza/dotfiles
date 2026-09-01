@@ -14,7 +14,10 @@
 # lua interpreter is really needed.
 
 [tools]
-node = "latest"
+# node stays on 24. The node 26 binary links against libatomic.so.1, which
+# RHEL 9 does not ship, and installing it needs root. Node 24 has no such
+# dependency, so every `npm:` tool works on a plain rootless host.
+node = "24"
 pnpm = "latest"
 go = "latest"
 python = "3.13"

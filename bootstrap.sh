@@ -8,6 +8,7 @@
 #   install     link the packages and install the tools. The default.
 #   link        link the packages only.
 #   doctor      check an existing install and report.
+#   scan        check the repo for a leaked credential.
 #   uninstall   remove every link this repo owns.
 #
 # Options:
@@ -56,7 +57,7 @@ trap cleanup EXIT INT TERM
 
 while [ $# -gt 0 ]; do
   case $1 in
-    install | link | doctor | uninstall) COMMAND=$1 ;;
+    install | link | doctor | uninstall | scan) COMMAND=$1 ;;
     -p | --profile)
       shift
       PROFILE=${1:?--profile needs a name}
@@ -152,6 +153,31 @@ phase_preflight() {
 }
 
 # ------------------------------------------------------------- submodules ----
+
+# ------------------------------------------------------------------- hooks ----
+
+phase_hooks() {
+  # Install the secret scan as a pre-commit hook. This repo is public, so a
+  # token or an internal hostname must never reach a commit.
+  info "Git hooks"
+  if [ ! -d "$REPO_ROOT/.git" ]; then
+    skip "not a git checkout"
+    return 0
+  fi
+
+  hook="$REPO_ROOT/.git/hooks/pre-commit"
+  if [ -e "$hook" ] && [ ! -L "$hook" ]; then
+    warn "$(pretty "$hook") exists and is not a link. Leaving it alone."
+    return 0
+  fi
+  if [ -L "$hook" ] && [ "$(readlink "$hook")" = "../../install/scan-secrets.sh" ]; then
+    skip "the pre-commit scan hook is installed"
+    return 0
+  fi
+  act mkdir -p "$REPO_ROOT/.git/hooks"
+  act ln -sf ../../install/scan-secrets.sh "$hook"
+  ok "the pre-commit scan hook is installed"
+}
 
 phase_submodules() {
   info "Submodules"
@@ -338,6 +364,20 @@ phase_seed() {
   seed_file "$tpl/paths.sh" "$XDG_CONFIG_HOME/environments/paths.sh"
   seed_file "$tpl/langs.sh" "$XDG_CONFIG_HOME/environments/langs.sh"
   seed_file "$tpl/env.json" "$HOME/.env.json"
+
+  # pi files that hold a secret or a host endpoint. The repo never carries
+  # them. settings.json is a seed and not a link, because pi rewrites it at
+  # runtime and a link would make every /model change dirty the checkout.
+  if want_package pi "linux,wsl,darwin"; then
+    seed_file "$tpl/pi/settings.json" "$HOME/.pi/agent/settings.json"
+    seed_file "$tpl/pi/models.json" "$HOME/.pi/agent/models.json"
+    seed_file "$tpl/pi/mcp.json" "$XDG_CONFIG_HOME/mcp/mcp.json"
+    if [ -f "$HOME/.pi/agent/auth.json" ]; then
+      skip "~/.pi/agent/auth.json (kept)"
+    else
+      say "  ${C_DIM}No pi credential yet. Run 'pi' and use /login.$C_OFF"
+    fi
+  fi
 
   have cc && return 0
   have gcc && return 0
@@ -573,6 +613,21 @@ phase_doctor() {
     fi
   done
 
+  say "  ${C_DIM}secrets$C_OFF"
+  if [ -x "$REPO_ROOT/install/scan-secrets.sh" ]; then
+    if scan_out=$("$REPO_ROOT/install/scan-secrets.sh" 2>&1); then
+      ok "no credential in the repo"
+    else
+      fail "the repo holds a credential or an internal hostname"
+      printf '%s\n' "$scan_out" | sed 's/^/    /' >&2
+    fi
+  fi
+  if [ -e "$REPO_ROOT/.git/hooks/pre-commit" ]; then
+    ok "the pre-commit scan hook is installed"
+  else
+    warn "no pre-commit hook. Run: ./bootstrap.sh link"
+  fi
+
   say "  ${C_DIM}binaries$C_OFF"
   check_bin zsh
   check_bin git
@@ -634,12 +689,14 @@ case $COMMAND in
   link)
     phase_preflight
     phase_submodules
+    phase_hooks
     phase_link
     phase_seed
     ;;
   install)
     phase_preflight
     phase_submodules
+    phase_hooks
     phase_link
     phase_seed
     if [ "$SKIP_TOOLS" = 1 ]; then
@@ -656,4 +713,5 @@ case $COMMAND in
     ;;
   doctor) phase_doctor ;;
   uninstall) phase_uninstall ;;
+  scan) exec "$REPO_ROOT/install/scan-secrets.sh" ;;
 esac

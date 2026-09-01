@@ -8,3 +8,22 @@ scripts/.local/bin/dploy
 scripts/.local/bin/mise
 mise/.config/mise/.env.json
 install/test/ca/*.crt
+
+# pi runtime state. Every entry holds a credential, a host endpoint, or
+# machine state. install/scan-secrets.sh fails the commit when one appears.
+pi/.pi/agent/auth.json
+pi/.pi/agent/models.json
+pi/.pi/agent/models-store.json
+pi/.pi/agent/settings.json
+pi/.pi/agent/trust.json
+pi/.pi/agent/mcp-cache.json
+pi/.pi/agent/mcp-onboarding.json
+pi/.pi/agent/sessions/
+pi/.pi/agent/mcp-auth/
+pi/.pi/agent/mcp-oauth/
+pi/.pi/agent/npm/
+pi/.pi/agent/git/
+pi/.pi/agent/bin/
+pi/.pi/agent/plans/
+pi/.pi/agent/.worktrees/
+pi/.pi/agent/node_modules/

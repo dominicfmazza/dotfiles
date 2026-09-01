@@ -1,0 +1,10 @@
+{
+  "defaultThinkingLevel": "off",
+  "theme": "dark",
+  "packages": [
+    "npm:pi-lens",
+    "npm:pi-mcp-adapter",
+    "npm:@juicesharp/rpiv-todo",
+    "git:github.com/dominicfmazza/pi-ste"
+  ]
+}

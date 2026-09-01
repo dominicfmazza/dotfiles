@@ -1,0 +1,20 @@
+{
+  "name": "pi-config",
+  "version": "1.0.0",
+  "description": "pi coding agent configuration: subagent dispatch extension, review agents, and prompt templates",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "private": true,
+  "peerDependencies": {
+    "@earendil-works/pi-agent-core": "*",
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*",
+    "@sinclair/typebox": "*"
+  },
+  "pi": {
+    "extensions": ["./extensions/subagent"],
+    "prompts": ["./prompts"]
+  }
+}
