@@ -197,6 +197,69 @@ phase_hooks() {
   ok "the pre-commit scan hook is installed"
 }
 
+# ------------------------------------------------------------------ prune ----
+
+phase_prune() {
+  # Remove a link this repo owns whose target no longer exists.
+  #
+  # An earlier layout put the zsh files under ~/.config/zsh. After the move
+  # those links dangle. A dangling ~/.config/zsh is worse than untidy: an
+  # older shell session still exports ZDOTDIR=~/.config/zsh, zsh then finds
+  # no startup file there, and it runs zsh-newuser-install. The user gets a
+  # configurator menu instead of a shell.
+  info "Stale links"
+  removed=0
+
+  for dir in "$HOME" "$XDG_CONFIG_HOME" "$HOME/.local/bin" \
+    "$XDG_CONFIG_HOME/mise/conf.d" "$HOME/.pi/agent"; do
+    [ -d "$dir" ] || continue
+    for l in "$dir"/* "$dir"/.[!.]*; do
+      [ -L "$l" ] || continue
+      [ -e "$l" ] && continue
+      owned_by_repo "$l" || continue
+      act rm -f "$l"
+      ok "removed the stale link $(pretty "$l")"
+      removed=$((removed + 1))
+    done
+  done
+
+  # An empty leftover directory triggers the same configurator, because zsh
+  # judges the ZDOTDIR contents, not whether the directory exists.
+  zdir="$XDG_CONFIG_HOME/zsh"
+  if [ -d "$zdir" ] && [ ! -L "$zdir" ]; then
+    zdir_has_rc=0
+    for f in .zshrc .zprofile .zlogin; do
+      [ -e "$zdir/$f" ] && zdir_has_rc=1
+    done
+    if [ "$zdir_has_rc" = 0 ]; then
+      if act rmdir "$zdir" 2>/dev/null; then
+        ok "removed the empty $(pretty "$zdir")"
+        removed=$((removed + 1))
+      else
+        # The directory holds something else, such as the zfunctions folder,
+        # so it cannot go. A session that still exports ZDOTDIR would find no
+        # startup file here and run the configurator. Leave a .zshenv that
+        # forwards to the real files: zsh reads that one before it decides.
+        shim_src="$REPO_ROOT/install/templates/zdotdir-shim.zshenv"
+        shim_dst="$zdir/.zshenv"
+        if [ -e "$shim_dst" ] \
+          && ! grep -q 'bootstrap.sh: ZDOTDIR shim' "$shim_dst" 2>/dev/null; then
+          warn "$(pretty "$shim_dst") is not a shim. Leaving it alone."
+        elif [ "$DRY_RUN" = 1 ]; then
+          skip "would forward $(pretty "$shim_dst") to \$HOME"
+        else
+          cp "$shim_src" "$shim_dst"
+          ok "$(pretty "$shim_dst") now forwards to \$HOME"
+          removed=$((removed + 1))
+        fi
+      fi
+    fi
+  fi
+
+  [ "$removed" = 0 ] && skip "no stale link"
+  return 0
+}
+
 phase_submodules() {
   info "Submodules"
   sm_dir="$REPO_ROOT/zsh/.antidote"
@@ -492,6 +555,41 @@ phase_tools() {
     fi
   fi
   "$MISE_BIN" reshim >/dev/null 2>&1 || true
+
+  verify_shell_tools
+}
+
+verify_shell_tools() {
+  # Check the tools the interactive shell needs, one by one.
+  #
+  # `mise install` reports one aggregate result, so a single failed tool is
+  # easy to miss in a long log. .zshrc guards every optional tool, so a
+  # missing one is silent: the prompt falls back to the zsh default and the
+  # shell looks broken with no message. Name the missing tool instead.
+  #
+  # oh-my-posh draws the prompt, so its absence is the most visible failure.
+  _vt_missing=''
+  for _vt in oh-my-posh sk zoxide fzf eza rg; do
+    "$MISE_BIN" which "$_vt" >/dev/null 2>&1 && continue
+    command -v "$_vt" >/dev/null 2>&1 && continue
+    _vt_missing="$_vt_missing $_vt"
+  done
+
+  if [ -z "$_vt_missing" ]; then
+    ok "every shell tool resolves"
+    return 0
+  fi
+
+  fail "the shell needs these tools, and they are missing:$_vt_missing"
+  case "$_vt_missing" in
+    *oh-my-posh*)
+      say "  ${C_DIM}Without oh-my-posh the prompt falls back to the zsh default.$C_OFF"
+      say "  ${C_DIM}Retry with: mise install -y ubi:JanDeDobbeleer/oh-my-posh$C_OFF"
+      ;;
+  esac
+  say "  ${C_DIM}A proxy that intercepts TLS is the usual cause. See the README.$C_OFF"
+  unset _vt _vt_missing
+  return 1
 }
 
 # ------------------------------------------------------------------ neovim ----
@@ -737,6 +835,7 @@ case $COMMAND in
     phase_preflight
     phase_submodules
     phase_hooks
+    phase_prune
     phase_link
     phase_seed
     ;;
@@ -744,6 +843,7 @@ case $COMMAND in
     phase_preflight
     phase_submodules
     phase_hooks
+    phase_prune
     phase_link
     phase_seed
     if [ "$SKIP_TOOLS" = 1 ]; then

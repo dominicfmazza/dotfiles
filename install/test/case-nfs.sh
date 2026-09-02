@@ -99,6 +99,18 @@ chmod 700 "$HOME/.cache"
 check "zsh survives an unwritable home cache" test "$out" = "ALIVE"
 
 echo
+echo "=== 7b. a missing oh-my-posh reports itself and keeps a usable prompt"
+# .zshrc guards every optional tool, so a missing one used to be silent: the
+# prompt fell back to the bare zsh default and the shell looked broken.
+msg=$(env -i HOME="$HOME" TERM=xterm PATH=/usr/bin:/bin \
+  zsh -i -c true 2>&1 >/dev/null | grep -c oh-my-posh || true)
+check "the shell names the missing oh-my-posh" test "$msg" -ge 1
+prompt=$(env -i HOME="$HOME" TERM=xterm PATH=/usr/bin:/bin \
+  zsh -i -c 'print -r -- "$PROMPT"' 2>/dev/null | tail -1)
+check "the fallback prompt shows the directory" sh -c "case '$prompt' in *'%~'*) exit 0 ;; esac; exit 1"
+check "the fallback prompt is not the zsh default" test "$prompt" != '%m%# '
+
+echo
 echo "=== 8. every mise tool carries an exact version"
 # A pin means mise resolves from disk and calls no release API. On an
 # ephemeral host the cache is empty after every boot, so an unpinned tool

@@ -18,7 +18,7 @@ check() {
 }
 
 echo "=== 1. install with the editor profile"
-./bootstrap.sh install --profile editor
+./bootstrap.sh install --profile editor 2>&1 | tee /tmp/install.log
 
 echo
 echo "=== 2. mise is present and its config parses"
@@ -34,6 +34,17 @@ done
 echo
 echo "=== 3b. every tool in the profile installed"
 check "mise install reports no failure" sh -c '"$HOME/.local/bin/mise" install --yes 2>&1 | grep -viq "^mise ERROR Failed to install tools"'
+# The bootstrap must fail loudly when a shell tool is missing, not warn once
+# in a long log. oh-my-posh draws the prompt, so its absence is the worst case.
+check "the install verified the shell tools" grep -q "every shell tool resolves" /tmp/install.log
+check "oh-my-posh is present" sh -c '"$HOME/.local/bin/mise" which oh-my-posh >/dev/null'
+
+echo
+echo "=== 3c. the prompt actually renders"
+# A guarded init line hides a failure. Prove the prompt hook is registered.
+hooks=$(zsh -i -c 'print -r -- "${precmd_functions[*]}"' 2>/dev/null | tail -1)
+check "oh-my-posh registered its precmd hook" sh -c "case '$hooks' in *_omp_precmd*) exit 0 ;; esac; exit 1"
+check "no fallback-prompt warning" sh -c '! zsh -i -c true 2>&1 >/dev/null | grep -q "oh-my-posh is missing"'
 
 echo
 echo "=== 4. zig supplies a compiler on a host with no gcc"
