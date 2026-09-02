@@ -1,4 +1,12 @@
 #!/bin/sh
 # zcc: a C compiler on a host with no gcc and no clang.
 # Uses the zig toolchain that mise installs. Set CC=zcc to use it.
-exec mise x zig -- zig cc "$@"
+#
+# It pins the target glibc to the host glibc, so a .so it builds loads on an
+# old host such as RHEL 9. See zig-target.sh for the reason.
+_zcc_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=zig-target.sh
+. "$_zcc_dir/zig-target.sh"
+_zcc_target=$(zig_target_flags)
+# shellcheck disable=SC2086
+exec mise x zig -- zig cc $_zcc_target "$@"

@@ -634,6 +634,149 @@ phase_neovim() {
   fi
 }
 
+# ------------------------------------------------------------------- fonts ----
+
+# The pinned Nerd Fonts release. A tag keeps a rerun on the same files.
+NERD_FONTS_TAG=v3.2.1
+
+phase_fonts() {
+  info "Fonts"
+
+  # Fonts matter on the terminal host only. WSL renders in the Windows
+  # terminal, so install the font on Windows, not in the Linux tree.
+  if [ "$PLATFORM" = wsl ]; then
+    skip "WSL renders in Windows. Install Hack Nerd Font on the Windows host."
+    return 0
+  fi
+
+  # The user font directory. No root needed.
+  case "$PLATFORM" in
+    darwin) _font_dir="$HOME/Library/Fonts" ;;
+    *) _font_dir="$XDG_DATA_HOME/fonts" ;;
+  esac
+
+  # A present font family is enough. Skip the download on a rerun.
+  if have fc-list && fc-list 2>/dev/null | grep -qi 'Hack Nerd Font'; then
+    ok "Hack Nerd Font is installed"
+    return 0
+  fi
+  if ls "$_font_dir"/HackNerdFont-*.ttf >/dev/null 2>&1; then
+    ok "Hack Nerd Font is present in $(pretty "$_font_dir")"
+    return 0
+  fi
+
+  if ! have unzip; then
+    warn "no unzip. Cannot unpack the font archive. Skipping the font."
+    return 0
+  fi
+
+  if [ "$DRY_RUN" = 1 ]; then
+    skip "would download Hack Nerd Font $NERD_FONTS_TAG into $(pretty "$_font_dir")"
+    return 0
+  fi
+
+  _font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/$NERD_FONTS_TAG/Hack.zip"
+  _font_zip=$(mktemp "${TMPDIR:-/tmp}/hack-nerd-font.XXXXXX.zip") || {
+    warn "cannot make a temp file for the font download. Skipping."
+    return 0
+  }
+
+  if ! fetch "$_font_url" "$_font_zip"; then
+    warn "the font download failed. Skipping. URL: $_font_url"
+    rm -f "$_font_zip"
+    return 0
+  fi
+
+  act mkdir -p "$_font_dir"
+  # -o overwrites, -j drops any archive path, -q stays quiet.
+  if unzip -oj "$_font_zip" '*.ttf' -d "$_font_dir" >/dev/null 2>&1; then
+    ok "Hack Nerd Font is installed in $(pretty "$_font_dir")"
+  else
+    warn "the font archive did not unpack. Skipping."
+  fi
+  rm -f "$_font_zip"
+
+  # Refresh the font cache so the terminal finds the family at once.
+  if have fc-cache; then
+    act fc-cache -f "$_font_dir" >/dev/null 2>&1 || true
+  fi
+
+  unset _font_dir _font_url _font_zip
+}
+
+# ------------------------------------------------------------------- kitty ----
+
+phase_kitty() {
+  info "kitty"
+
+  # kitty is a Linux and macOS terminal. WSL renders in Windows, so install
+  # kitty on the Windows host in that case. This matches the manifest, which
+  # links the kitty config on linux and darwin only.
+  if [ "$PLATFORM" = wsl ]; then
+    skip "WSL renders in Windows. Install kitty on the Windows host."
+    return 0
+  fi
+  case "$PLATFORM" in
+    linux | darwin) ;;
+    *)
+      skip "kitty targets linux and macOS only."
+      return 0
+      ;;
+  esac
+
+  # A present binary is enough. Skip the install on a rerun.
+  if have kitty; then
+    ok "kitty $(tool_version kitty --version)"
+    return 0
+  fi
+  if [ -x "$HOME/.local/kitty.app/bin/kitty" ]; then
+    ok "kitty is present in $(pretty "$HOME/.local/kitty.app")"
+    return 0
+  fi
+
+  if [ "$DRY_RUN" = 1 ]; then
+    skip "would install kitty into $(pretty "$HOME/.local/kitty.app")"
+    return 0
+  fi
+
+  # The official installer needs tar and xz. It has no root need: it unpacks
+  # into ~/.local/kitty.app and links the binary into ~/.local/bin.
+  if ! have tar || ! have xz; then
+    warn "kitty needs tar and xz to unpack. Skipping."
+    return 0
+  fi
+
+  _kitty_sh=$(mktemp "${TMPDIR:-/tmp}/kitty-install.XXXXXX.sh") || {
+    warn "cannot make a temp file for the kitty installer. Skipping."
+    return 0
+  }
+  if ! fetch https://sw.kovidgoyal.net/kitty/installer.sh "$_kitty_sh"; then
+    warn "the kitty installer download failed. Skipping."
+    rm -f "$_kitty_sh"
+    return 0
+  fi
+
+  # launch=n stops the installer from starting kitty. dest keeps the default
+  # ~/.local/kitty.app. The installer links kitty into ~/.local/bin itself.
+  if sh "$_kitty_sh" launch=n >/dev/null 2>&1; then
+    act mkdir -p "$HOME/.local/bin"
+    for _b in kitty kitten; do
+      [ -e "$HOME/.local/kitty.app/bin/$_b" ] || continue
+      act ln -sf "$HOME/.local/kitty.app/bin/$_b" "$HOME/.local/bin/$_b"
+    done
+    if have kitty || [ -x "$HOME/.local/kitty.app/bin/kitty" ]; then
+      ok "kitty is installed in $(pretty "$HOME/.local/kitty.app")"
+    else
+      warn "the kitty installer ran but no binary appeared. Check the log."
+    fi
+  else
+    warn "the kitty install failed. Run the installer by hand to see why."
+    say "  ${C_DIM}curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh$C_OFF"
+  fi
+  rm -f "$_kitty_sh"
+  unset _kitty_sh _b
+}
+
 # ------------------------------------------------------------------- shell ----
 
 phase_shell() {
@@ -810,6 +953,29 @@ phase_doctor() {
     fi
   fi
 
+  say "  ${C_DIM}fonts$C_OFF"
+  if [ "$PLATFORM" = wsl ]; then
+    skip "WSL renders in Windows. Install Hack Nerd Font on the Windows host."
+  elif have fc-list && fc-list 2>/dev/null | grep -qi 'Hack Nerd Font'; then
+    ok "Hack Nerd Font is installed"
+  elif ls "$XDG_DATA_HOME/fonts"/HackNerdFont-*.ttf >/dev/null 2>&1 \
+    || ls "$HOME/Library/Fonts"/HackNerdFont-*.ttf >/dev/null 2>&1; then
+    ok "Hack Nerd Font is present"
+  else
+    warn "Hack Nerd Font is missing. Run: ./bootstrap.sh install"
+  fi
+
+  say "  ${C_DIM}terminal$C_OFF"
+  if [ "$PLATFORM" = wsl ]; then
+    skip "WSL renders in Windows. Install kitty on the Windows host."
+  elif have kitty; then
+    ok "kitty $(tool_version kitty --version)"
+  elif [ -x "$HOME/.local/kitty.app/bin/kitty" ]; then
+    ok "kitty is present in $(pretty "$HOME/.local/kitty.app")"
+  else
+    warn "kitty is missing. Run: ./bootstrap.sh install"
+  fi
+
   say ''
   if [ "$FAIL_COUNT" -gt 0 ]; then
     say "${C_RED}$FAIL_COUNT problem(s)${C_OFF}, ${C_YEL}$WARN_COUNT warning(s)${C_OFF}"
@@ -852,6 +1018,8 @@ case $COMMAND in
       phase_mise
       phase_tools
       phase_neovim
+      phase_fonts
+      phase_kitty
     fi
     phase_shell
     say ''
