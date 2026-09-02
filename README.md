@@ -18,7 +18,8 @@ cd ~/dotfiles
 5. Installs `mise` into `~/.local/bin/mise`.
 6. Installs every tool in the selected profile.
 7. Pulls the Neovim nightly and syncs the plugins from the lock file.
-8. Warms the zsh plugin cache and makes zsh the interactive shell.
+8. Installs Hack Nerd Font and the kitty terminal on Linux and macOS.
+9. Warms the zsh plugin cache and makes zsh the interactive shell.
 
 Run it again at any time. Every phase is idempotent.
 
@@ -38,6 +39,10 @@ The host must supply these. A rootless install cannot create them.
 | A true-color terminal | — | `termguicolors` and the prompt. |
 | A Nerd Font on the terminal host | — | Glyphs in the prompt, Neovim, and yazi. |
 
+On Linux and macOS the bootstrap installs Hack Nerd Font into the user font
+directory, so no root is needed. On WSL the terminal runs on Windows. Install
+the font on the Windows host in that case.
+
 mise supplies everything else: node, go, rust, python, uv, zig, cmake, fzf,
 fd, ripgrep, bat, jq, eza, zoxide, skim, lazygit, yazi, Neovim, every
 language server, and every formatter.
@@ -45,6 +50,10 @@ language server, and every formatter.
 A C compiler is optional. When the host has no `gcc` and no `clang`, the
 bootstrap points `CC` and `CXX` at `zcc` and `zxx`. Both wrap `zig cc`, and
 mise installs zig. Treesitter parsers and `cargo:` crates build with it.
+
+`zcc` and `zxx` pin the target glibc to the host glibc. A `.so` they build
+then loads on an old host such as RHEL 9. Set `ZIG_GLIBC_TARGET` to override
+the version, for example `2.34`, or to `none` to use the zig default.
 
 On a RHEL 9 host, `dnf install zsh git tar gzip xz unzip` covers
 every requirement. Ask the host owner for that one command.
@@ -173,6 +182,23 @@ file there.
 Set `GITHUB_TOKEN` before a full run. Set `DOTFILES_TEST_BASE` to test
 another distribution, for example `ubuntu:24.04`.
 
+## Terminals
+
+Three terminal configs share one look: the vague palette and Hack Nerd Font.
+
+| Terminal | Config | Platforms |
+| --- | --- | --- |
+| kitty | `~/.config/kitty/kitty.conf` | Linux, macOS |
+| rio | `~/.config/rio` (Linux), Windows profile | Linux, WSL, Windows |
+| wezterm | `~/.wezterm.lua` | Linux, WSL, macOS |
+
+The kitty config hides the tab bar for a single tab, uses a block cursor, and
+opens a 120x28 window. This matches the rio and wezterm setup.
+
+On Linux and macOS the bootstrap installs the kitty binary into
+`~/.local/kitty.app` with the official installer, and links `kitty` into
+`~/.local/bin`. No root is needed. On WSL, install kitty on the Windows host.
+
 ## Windows
 
 `komorebi`, `glazewm`, and `rio/windows` target Windows. On WSL, the
@@ -207,6 +233,23 @@ missing, so this should not appear after a clean run.
 ### An npm install reports a bad file descriptor
 
 See "A network home" above. The cache must not sit on NFS.
+
+### A treesitter parser fails to load with a GLIBC error
+
+Neovim reports a parser `.so` that needs a `GLIBC_2.xx` the host lacks, for
+example on RHEL 9. This happens when `zig cc` builds the parser against a
+glibc newer than the host.
+
+`zcc` and `zxx` pin the target glibc to the host glibc, so a fresh build loads.
+Rebuild the parsers after an upgrade:
+
+```sh
+rm -rf ~/.local/share/nvim/site/parser
+nvim --headless '+qa'
+```
+
+Override the target glibc with `ZIG_GLIBC_TARGET` when detection is wrong, for
+example `export ZIG_GLIBC_TARGET=2.34`.
 
 ## Layout
 

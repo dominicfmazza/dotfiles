@@ -1,4 +1,12 @@
 #!/bin/sh
 # zxx: a C++ compiler on a host with no gcc and no clang.
 # Uses the zig toolchain that mise installs. Set CXX=zxx to use it.
-exec mise x zig -- zig c++ "$@"
+#
+# It pins the target glibc to the host glibc, so a .so it builds loads on an
+# old host such as RHEL 9. See zig-target.sh for the reason.
+_zxx_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=zig-target.sh
+. "$_zxx_dir/zig-target.sh"
+_zxx_target=$(zig_target_flags)
+# shellcheck disable=SC2086
+exec mise x zig -- zig c++ $_zxx_target "$@"

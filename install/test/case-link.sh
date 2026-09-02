@@ -45,6 +45,7 @@ check "~/.config/nvim" is_link_to "$HOME/.config/nvim" dotfiles/nvim/.config/nvi
 check "~/.config/yazi" is_link_to "$HOME/.config/yazi" dotfiles/yazi/.config/yazi
 check "~/.config/lazygit" is_link_to "$HOME/.config/lazygit" dotfiles/lazygit/.config/lazygit
 check "~/.local/bin/zcc" is_link_to "$HOME/.local/bin/zcc" scripts/.local/bin/zcc
+check "~/.local/bin/zig-target.sh" is_link_to "$HOME/.local/bin/zig-target.sh" scripts/.local/bin/zig-target.sh
 check "~/.wezterm.lua" is_link_to "$HOME/.wezterm.lua" dotfiles/wezterm/.wezterm.lua
 
 echo
