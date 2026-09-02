@@ -125,9 +125,20 @@ tool_version() {
 
 canon() {
   # Absolute path with every '..' and symlinked parent resolved.
+  #
+  # The parent may not exist. That happens for a broken link left by a layout
+  # change, and pruning such a link is exactly when this has to work. Fall
+  # back to a lexical join, so the caller still gets an absolute path.
   _cn_dir=$(dirname -- "$1")
   _cn_base=$(basename -- "$1")
-  _cn_dir=$(cd -P -- "$_cn_dir" 2>/dev/null && pwd -P) || return 1
+  if _cn_real=$(cd -P -- "$_cn_dir" 2>/dev/null && pwd -P); then
+    _cn_dir=$_cn_real
+  else
+    case "$_cn_dir" in
+      /*) ;;
+      *) _cn_dir="$PWD/$_cn_dir" ;;
+    esac
+  fi
   case "$_cn_base" in
     /) printf '/\n' ;;
     *) printf '%s/%s\n' "${_cn_dir%/}" "$_cn_base" ;;

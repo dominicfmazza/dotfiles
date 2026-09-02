@@ -2,12 +2,13 @@
 # Run the bootstrap inside a container and check the result.
 #
 # Usage:
-#   install/test/run.sh [link|full|nfs|all|shell] [--keep]
+#   install/test/run.sh [link|full|nfs|upgrade|all|shell] [--keep]
 #
-#   link   link only. Needs no network beyond the antidote clone. Fast.
-#   full   link plus the whole tool install. Slow. Needs network egress.
-#   nfs    a network home: the cache redirect and the zsh startup order.
-#   shell  drop into a shell in a fresh container. For a manual check.
+#   link    link only. Needs no network beyond the antidote clone. Fast.
+#   full    link plus the whole tool install. Slow. Needs network egress.
+#   nfs     a network home: the cache redirect and the zsh startup order.
+#   upgrade an older install, then an upgrade to HEAD. Catches a stale link.
+#   shell   drop into a shell in a fresh container. For a manual check.
 #
 # --keep leaves a shell open after the checks finish.
 #
@@ -58,9 +59,17 @@ case $MODE in
   link) SCRIPT=/home/tester/dotfiles/install/test/case-link.sh ;;
   full) SCRIPT=/home/tester/dotfiles/install/test/case-full.sh ;;
   nfs) SCRIPT=/home/tester/dotfiles/install/test/case-nfs.sh ;;
+  upgrade)
+    # A different image and flow, so hand off to its own script.
+    exec "$(dirname "$0")/upgrade-test.sh" "${UPGRADE_FROM:-417d42f}"
+    ;;
   all)
-    for m in link nfs full; do
+    for m in link nfs upgrade full; do
       echo "==> Running the $m case"
+      if [ "$m" = upgrade ]; then
+        "$(dirname "$0")/upgrade-test.sh" "${UPGRADE_FROM:-417d42f}" || exit 1
+        continue
+      fi
       # shellcheck disable=SC2086
       docker run --rm $GH_ARGS "$IMAGE" sh "/home/tester/dotfiles/install/test/case-$m.sh" \
         || exit 1

@@ -55,4 +55,17 @@ VI_MODE_SET_CURSOR=true
 VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 [[ -f ~/.aliases ]] && source ~/.aliases
 
-(( $+commands[oh-my-posh] )) && eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
+# oh-my-posh draws the prompt. Report a miss rather than falling back to the
+# bare zsh default with no explanation, which looks like a broken shell.
+if (( $+commands[oh-my-posh] )); then
+  eval "$(oh-my-posh init zsh --config ~/.omp.yaml)"
+else
+  print -u2 "zsh: oh-my-posh is missing, so the prompt is a fallback."
+  print -u2 "     Fix it with: mise install -y ubi:JanDeDobbeleer/oh-my-posh"
+  # A readable prompt in the meantime: user, host, directory, and git branch.
+  autoload -Uz vcs_info
+  zstyle ':vcs_info:git:*' formats ' %b'
+  precmd_functions+=(vcs_info)
+  setopt prompt_subst
+  PROMPT='%F{blue}%n@%m%f %F{cyan}%~%f%F{green}${vcs_info_msg_0_}%f %# '
+fi

@@ -158,10 +158,17 @@ default image is RHEL 9 (UBI), which matches the target fleet.
 ```sh
 install/test/run.sh link     # link layer only. Fast.
 install/test/run.sh nfs      # a network home: cache redirect, zsh order.
+install/test/run.sh upgrade  # an older install, then an upgrade to HEAD.
 install/test/run.sh full     # every tool, Neovim, and the plugins. Slow.
-install/test/run.sh all      # link, then nfs, then full.
+install/test/run.sh all      # every case in order.
 install/test/run.sh shell    # a shell in a fresh container.
 ```
+
+The `upgrade` case matters most after a layout change. It installs an older
+ref, upgrades to HEAD, and checks that no stale link survives. A dangling
+`~/.config/zsh` makes zsh run its new-user configurator instead of giving a
+prompt, because an older session still exports `ZDOTDIR` and finds no startup
+file there.
 
 Set `GITHUB_TOKEN` before a full run. Set `DOTFILES_TEST_BASE` to test
 another distribution, for example `ubuntu:24.04`.
@@ -172,6 +179,35 @@ another distribution, for example `ubuntu:24.04`.
 bootstrap links them into the Windows user profile. Run it from WSL with
 developer mode on, or run `tools/symlinkwsl.ps1` from PowerShell.
 
+## Troubleshooting
+
+### zsh shows a configuration menu
+
+zsh runs `zsh-newuser-install` when it finds none of `.zshenv`, `.zprofile`,
+`.zshrc`, or `.zlogin` in its startup directory. The message names the
+directory it checked.
+
+An older version of these dotfiles exported `ZDOTDIR=~/.config/zsh`. After the
+move to `$HOME`, a session that still carries that variable finds nothing
+there. Run the bootstrap again: it removes the stale link, and it writes a
+forwarding `.zshenv` when the directory has to stay.
+
+### The prompt looks bare
+
+oh-my-posh draws the prompt. When it is missing, the shell says so and falls
+back to a plain prompt with the directory and git branch. Fix it with:
+
+```sh
+mise install -y ubi:JanDeDobbeleer/oh-my-posh
+```
+
+`./bootstrap.sh install` verifies each shell tool and fails when one is
+missing, so this should not appear after a clean run.
+
+### An npm install reports a bad file descriptor
+
+See "A network home" above. The cache must not sit on NFS.
+
 ## Layout
 
 ```text
@@ -180,6 +216,6 @@ install/lib.sh            shared shell helpers
 install/manifest.conf     package -> platform -> target map
 install/scan-secrets.sh   the pre-commit credential scan
 install/templates/        seeds for the host files
-install/test/             container tests
+install/test/             container tests, including an upgrade case
 <package>/                a tree that mirrors $HOME
 ```

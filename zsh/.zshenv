@@ -6,6 +6,11 @@
 # else. An earlier version set ZDOTDIR in .zprofile, which a non-login
 # interactive shell never reads, so that shell loaded no .zshrc at all.
 #
+# A stale ZDOTDIR from an older install cannot be repaired from here: zsh
+# reads $ZDOTDIR/.zshenv, so this file never runs in that case. bootstrap.sh
+# handles it instead, by removing the leftover directory and by leaving a
+# forwarding .zshenv in it when the directory must stay.
+#
 # Keep this file cheap. Every `zsh -c` pays for it.
 
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
