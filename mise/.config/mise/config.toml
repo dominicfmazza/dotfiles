@@ -26,3 +26,6 @@ npm.package_manager = "npm"
 UV_NATIVE_TLS = "true"
 NODE_OPTIONS = "--use-system-ca"
 _.file = "~/.env.json"
+
+[tools]
+gh = "latest"

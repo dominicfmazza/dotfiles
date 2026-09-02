@@ -42,6 +42,9 @@ export DRY_RUN CONFLICT RUN_STAMP SHARED_MAP
 
 MISE_BIN="$HOME/.local/bin/mise"
 NVIM_MIN=0.13
+# nvim-treesitter/health.lua sets this floor. An older CLI cannot build a
+# parser for the current ABI.
+TREE_SITTER_MIN=0.26.1
 
 usage() {
   sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
@@ -57,32 +60,32 @@ trap cleanup EXIT INT TERM
 
 while [ $# -gt 0 ]; do
   case $1 in
-    install | link | doctor | uninstall | scan) COMMAND=$1 ;;
-    -p | --profile)
-      shift
-      PROFILE=${1:?--profile needs a name}
-      ;;
-    -o | --only)
-      shift
-      ONLY="$ONLY ${1:?--only needs a package}"
-      ;;
-    -n | --dry-run) DRY_RUN=1 ;;
-    --skip-tools) SKIP_TOOLS=1 ;;
-    --backup) CONFLICT=backup ;;
-    --adopt) CONFLICT=adopt ;;
-    --force) CONFLICT=force ;;
-    -h | --help)
-      usage
-      exit 0
-      ;;
-    *) die "unknown argument: $1" ;;
+  install | link | doctor | uninstall | scan) COMMAND=$1 ;;
+  -p | --profile)
+    shift
+    PROFILE=${1:?--profile needs a name}
+    ;;
+  -o | --only)
+    shift
+    ONLY="$ONLY ${1:?--only needs a package}"
+    ;;
+  -n | --dry-run) DRY_RUN=1 ;;
+  --skip-tools) SKIP_TOOLS=1 ;;
+  --backup) CONFLICT=backup ;;
+  --adopt) CONFLICT=adopt ;;
+  --force) CONFLICT=force ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *) die "unknown argument: $1" ;;
   esac
   shift
 done
 
 case $PROFILE in
-  core | lang | editor | full | work) ;;
-  *) die "unknown profile: $PROFILE" ;;
+core | lang | editor | full | work) ;;
+*) die "unknown profile: $PROFILE" ;;
 esac
 
 PLATFORM=$(detect_platform)
@@ -165,8 +168,8 @@ phase_preflight() {
   fi
   unset _fs _base
 
-  [ "$FAIL_COUNT" -gt 0 ] \
-    && die "$FAIL_COUNT requirement(s) failed. Fix them and run again."
+  [ "$FAIL_COUNT" -gt 0 ] &&
+    die "$FAIL_COUNT requirement(s) failed. Fix them and run again."
   return 0
 }
 
@@ -242,8 +245,8 @@ phase_prune() {
         # forwards to the real files: zsh reads that one before it decides.
         shim_src="$REPO_ROOT/install/templates/zdotdir-shim.zshenv"
         shim_dst="$zdir/.zshenv"
-        if [ -e "$shim_dst" ] \
-          && ! grep -q 'bootstrap.sh: ZDOTDIR shim' "$shim_dst" 2>/dev/null; then
+        if [ -e "$shim_dst" ] &&
+          ! grep -q 'bootstrap.sh: ZDOTDIR shim' "$shim_dst" 2>/dev/null; then
           warn "$(pretty "$shim_dst") is not a shim. Leaving it alone."
         elif [ "$DRY_RUN" = 1 ]; then
           skip "would forward $(pretty "$shim_dst") to \$HOME"
@@ -269,8 +272,8 @@ phase_submodules() {
     return 0
   fi
 
-  if [ -e "$REPO_ROOT/.git" ] \
-    && act git -C "$REPO_ROOT" submodule update --init --recursive 2>/dev/null; then
+  if [ -e "$REPO_ROOT/.git" ] &&
+    act git -C "$REPO_ROOT" submodule update --init --recursive 2>/dev/null; then
     ok "antidote is checked out"
     return 0
   fi
@@ -298,8 +301,8 @@ want_package() {
   fi
   [ "$2" = all ] && return 0
   case ",$2," in
-    *",$PLATFORM,"*) return 0 ;;
-    *) return 1 ;;
+  *",$PLATFORM,"*) return 0 ;;
+  *) return 1 ;;
   esac
 }
 
@@ -307,18 +310,18 @@ resolve_target() {
   # resolve_target SPEC. Prints the destination root. Fails when this
   # platform has no such root.
   case $1 in
-    home) printf '%s\n' "$HOME" ;;
-    xdg:*) printf '%s/%s\n' "$XDG_CONFIG_HOME" "${1#xdg:}" ;;
-    win:*)
-      wh=$(win_home) || return 1
-      sub=${1#win:}
-      if [ "$sub" = . ]; then
-        printf '%s\n' "$wh"
-      else
-        printf '%s/%s\n' "$wh" "$sub"
-      fi
-      ;;
-    *) return 1 ;;
+  home) printf '%s\n' "$HOME" ;;
+  xdg:*) printf '%s/%s\n' "$XDG_CONFIG_HOME" "${1#xdg:}" ;;
+  win:*)
+    wh=$(win_home) || return 1
+    sub=${1#win:}
+    if [ "$sub" = . ]; then
+      printf '%s\n' "$wh"
+    else
+      printf '%s/%s\n' "$wh" "$sub"
+    fi
+    ;;
+  *) return 1 ;;
   esac
 }
 
@@ -342,8 +345,8 @@ scan_shared_dirs() {
     [ -d "$REPO_ROOT/$pkg" ] || continue
 
     find "$REPO_ROOT/$pkg" -mindepth 1 -type d \
-      -not -path '*/.git*' -not -name profiles 2>/dev/null \
-      | sed -e "s|^$REPO_ROOT/$pkg|$dst|" >>"$all"
+      -not -path '*/.git*' -not -name profiles 2>/dev/null |
+      sed -e "s|^$REPO_ROOT/$pkg|$dst|" >>"$all"
   done 3<"$MANIFEST"
 
   sort "$all" | uniq -d >"$SHARED_MAP"
@@ -406,10 +409,10 @@ link_mise_profiles() {
   fi
 
   case $PROFILE in
-    core) files='00-core.toml' ;;
-    lang) files='00-core.toml 10-lang.toml' ;;
-    editor | full) files='00-core.toml 10-lang.toml 20-editor.toml' ;;
-    work) files='00-core.toml 10-lang.toml 20-editor.toml 30-work.toml' ;;
+  core) files='00-core.toml' ;;
+  lang) files='00-core.toml 10-lang.toml' ;;
+  editor | full) files='00-core.toml 10-lang.toml 20-editor.toml' ;;
+  work) files='00-core.toml 10-lang.toml 20-editor.toml 30-work.toml' ;;
   esac
 
   say "  ${C_DIM}mise profile: $PROFILE$C_OFF"
@@ -517,9 +520,9 @@ phase_tools() {
   # gets 60 requests per hour, shared with every host behind the same NAT.
   # A token raises that to 5000.
   if [ -z "${GITHUB_TOKEN:-}" ] && [ -z "${GITHUB_API_TOKEN:-}" ]; then
-    if [ -f "$HOME/.env.json" ] \
-      && gh_tok=$(sed -n 's/.*"GITHUB_TOKEN"[[:space:]]*:[[:space:]]*"\([^"]\{1,\}\)".*/\1/p' "$HOME/.env.json" | head -1) \
-      && [ -n "$gh_tok" ]; then
+    if [ -f "$HOME/.env.json" ] &&
+      gh_tok=$(sed -n 's/.*"GITHUB_TOKEN"[[:space:]]*:[[:space:]]*"\([^"]\{1,\}\)".*/\1/p' "$HOME/.env.json" | head -1) &&
+      [ -n "$gh_tok" ]; then
       GITHUB_TOKEN=$gh_tok
       export GITHUB_TOKEN
       ok "a GitHub token from ~/.env.json raises the API limit"
@@ -582,10 +585,10 @@ verify_shell_tools() {
 
   fail "the shell needs these tools, and they are missing:$_vt_missing"
   case "$_vt_missing" in
-    *oh-my-posh*)
-      say "  ${C_DIM}Without oh-my-posh the prompt falls back to the zsh default.$C_OFF"
-      say "  ${C_DIM}Retry with: mise install -y ubi:JanDeDobbeleer/oh-my-posh$C_OFF"
-      ;;
+  *oh-my-posh*)
+    say "  ${C_DIM}Without oh-my-posh the prompt falls back to the zsh default.$C_OFF"
+    say "  ${C_DIM}Retry with: mise install -y ubi:JanDeDobbeleer/oh-my-posh$C_OFF"
+    ;;
   esac
   say "  ${C_DIM}A proxy that intercepts TLS is the usual cause. See the README.$C_OFF"
   unset _vt _vt_missing
@@ -651,8 +654,8 @@ phase_fonts() {
 
   # The user font directory. No root needed.
   case "$PLATFORM" in
-    darwin) _font_dir="$HOME/Library/Fonts" ;;
-    *) _font_dir="$XDG_DATA_HOME/fonts" ;;
+  darwin) _font_dir="$HOME/Library/Fonts" ;;
+  *) _font_dir="$XDG_DATA_HOME/fonts" ;;
   esac
 
   # A present font family is enough. Skip the download on a rerun.
@@ -717,11 +720,11 @@ phase_kitty() {
     return 0
   fi
   case "$PLATFORM" in
-    linux | darwin) ;;
-    *)
-      skip "kitty targets linux and macOS only."
-      return 0
-      ;;
+  linux | darwin) ;;
+  *)
+    skip "kitty targets linux and macOS only."
+    return 0
+    ;;
   esac
 
   # A present binary is enough. Skip the install on a rerun.
@@ -795,10 +798,10 @@ phase_shell() {
   fi
 
   case "${SHELL:-}" in
-    */zsh)
-      ok "zsh is the login shell"
-      return 0
-      ;;
+  */zsh)
+    ok "zsh is the login shell"
+    return 0
+    ;;
   esac
 
   zpath=$(command -v zsh)
@@ -838,6 +841,50 @@ check_bin() {
   else
     warn "$1 is missing"
   fi
+}
+
+check_tree_sitter() {
+  # The tree-sitter CLI builds every Neovim parser. check_bin cannot report
+  # it, because a broken binary still resolves on PATH: the loader rejects it
+  # only at run time. The upstream release binary needs glibc 2.39, and RHEL 9
+  # has 2.34, so `tree-sitter --version` stops with a GLIBC error. nvim then
+  # reports "Error during tree-sitter build" for every language.
+  #
+  # Run the binary and read the result. That catches a missing CLI, a CLI the
+  # loader rejects, and a CLI below the nvim-treesitter floor.
+  # Every path returns 0. The caller runs under `set -e`, and fail already
+  # counts the problem for the doctor summary.
+  _ts=$(command -v tree-sitter 2>/dev/null || true)
+  if [ -z "$_ts" ] && [ -x "$XDG_DATA_HOME/mise/shims/tree-sitter" ]; then
+    _ts="$XDG_DATA_HOME/mise/shims/tree-sitter"
+  fi
+
+  if [ -z "$_ts" ]; then
+    warn "the tree-sitter CLI is missing. Treesitter parsers will not build."
+    say "  ${C_DIM}Run: mise install -y cargo:tree-sitter-cli$C_OFF"
+    return 0
+  fi
+
+  if ! _out=$("$_ts" --version 2>&1); then
+    fail "the tree-sitter CLI does not run: $(printf '%s' "$_out" | head -1)"
+    case "$_out" in
+    *GLIBC*)
+      say "  ${C_DIM}The release binary needs a newer glibc than this host.$C_OFF"
+      say "  ${C_DIM}20-editor.toml pins cargo:tree-sitter-cli, which builds"
+      say "  from source. Run: mise install -y cargo:tree-sitter-cli$C_OFF"
+      ;;
+    esac
+    return 0
+  fi
+
+  _tsv=$(printf '%s' "$_out" | tr ' ' '\n' | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
+  if [ -n "$_tsv" ] && ! version_ge "$_tsv" "$TREE_SITTER_MIN"; then
+    fail "tree-sitter $_tsv is below the $TREE_SITTER_MIN floor"
+    say "  ${C_DIM}nvim-treesitter needs $TREE_SITTER_MIN or later to build a parser.$C_OFF"
+    return 0
+  fi
+  ok "tree-sitter $_tsv builds parsers ($_ts)"
+  unset _ts _out _tsv
 }
 
 phase_doctor() {
@@ -891,9 +938,9 @@ phase_doctor() {
     fi
     mise_data=$(zsh -c 'printf %s "${MISE_DATA_DIR:-}"' 2>/dev/null)
     case "$mise_data" in
-      "$HOME"/*) ok "mise installs stay on \$HOME" ;;
-      '') warn "MISE_DATA_DIR is unset. mise uses its default." ;;
-      *) fail "MISE_DATA_DIR is $mise_data. Installs must stay on \$HOME." ;;
+    "$HOME"/*) ok "mise installs stay on \$HOME" ;;
+    '') warn "MISE_DATA_DIR is unset. mise uses its default." ;;
+    *) fail "MISE_DATA_DIR is $mise_data. Installs must stay on \$HOME." ;;
     esac
     unset croot mise_data
   else
@@ -936,6 +983,8 @@ phase_doctor() {
     warn "no C compiler. Treesitter parsers will not build."
   fi
 
+  check_tree_sitter
+
   if have nvim; then
     nvv=$(tool_version nvim --version)
   elif [ -x "$XDG_DATA_HOME/mise/shims/nvim" ]; then
@@ -958,8 +1007,8 @@ phase_doctor() {
     skip "WSL renders in Windows. Install Hack Nerd Font on the Windows host."
   elif have fc-list && fc-list 2>/dev/null | grep -qi 'Hack Nerd Font'; then
     ok "Hack Nerd Font is installed"
-  elif ls "$XDG_DATA_HOME/fonts"/HackNerdFont-*.ttf >/dev/null 2>&1 \
-    || ls "$HOME/Library/Fonts"/HackNerdFont-*.ttf >/dev/null 2>&1; then
+  elif ls "$XDG_DATA_HOME/fonts"/HackNerdFont-*.ttf >/dev/null 2>&1 ||
+    ls "$HOME/Library/Fonts"/HackNerdFont-*.ttf >/dev/null 2>&1; then
     ok "Hack Nerd Font is present"
   else
     warn "Hack Nerd Font is missing. Run: ./bootstrap.sh install"
@@ -997,36 +1046,36 @@ phase_uninstall() {
 # -------------------------------------------------------------------- main ----
 
 case $COMMAND in
-  link)
-    phase_preflight
-    phase_submodules
-    phase_hooks
-    phase_prune
-    phase_link
-    phase_seed
-    ;;
-  install)
-    phase_preflight
-    phase_submodules
-    phase_hooks
-    phase_prune
-    phase_link
-    phase_seed
-    if [ "$SKIP_TOOLS" = 1 ]; then
-      info "Tools skipped"
-    else
-      phase_mise
-      phase_tools
-      phase_neovim
-      phase_fonts
-      phase_kitty
-    fi
-    phase_shell
-    say ''
-    info "Done. Open a new shell."
-    [ "$WARN_COUNT" -gt 0 ] && say "${C_YEL}$WARN_COUNT warning(s) above.${C_OFF}"
-    ;;
-  doctor) phase_doctor ;;
-  uninstall) phase_uninstall ;;
-  scan) exec "$REPO_ROOT/install/scan-secrets.sh" ;;
+link)
+  phase_preflight
+  phase_submodules
+  phase_hooks
+  phase_prune
+  phase_link
+  phase_seed
+  ;;
+install)
+  phase_preflight
+  phase_submodules
+  phase_hooks
+  phase_prune
+  phase_link
+  phase_seed
+  if [ "$SKIP_TOOLS" = 1 ]; then
+    info "Tools skipped"
+  else
+    phase_mise
+    phase_tools
+    phase_neovim
+    phase_fonts
+    phase_kitty
+  fi
+  phase_shell
+  say ''
+  info "Done. Open a new shell."
+  [ "$WARN_COUNT" -gt 0 ] && say "${C_YEL}$WARN_COUNT warning(s) above.${C_OFF}"
+  ;;
+doctor) phase_doctor ;;
+uninstall) phase_uninstall ;;
+scan) exec "$REPO_ROOT/install/scan-secrets.sh" ;;
 esac
