@@ -26,7 +26,21 @@
 ty = "0.0.60"
 
 # treesitter and remote editing
-"aqua:tree-sitter/tree-sitter" = "0.27.0"
+#
+# The tree-sitter CLI builds every Neovim parser, so nvim-treesitter fails
+# without it. The upstream release binary links against glibc 2.39, and RHEL 9
+# has 2.34. That binary stops with "version `GLIBC_2.39' not found", so the
+# aqua backend does not work here. The cargo backend builds from source against
+# the host glibc.
+#
+# default-features = false drops the qjs-rt feature. That feature embeds a
+# QuickJS runtime to read a grammar.js file. Every parser in treesitter.lua
+# ships a grammar.json, so the build needs no JavaScript runtime. The flag
+# also cuts the build to about 25 seconds and skips all C++ compilation.
+#
+# The flag makes mise skip cargo-binstall too. binstall would fetch the same
+# glibc 2.39 binary from the upstream release and reintroduce the failure.
+"cargo:tree-sitter-cli" = { version = "0.27.0", default-features = false }
 "github:mikew/nvrh" = "0.9.1"
 "pipx:neovim-remote" = "2.5.1"
 
