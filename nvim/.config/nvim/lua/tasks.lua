@@ -143,6 +143,10 @@ M.config = {
       menu = "<CR>",
       open = "o",
       add = "a",
+      edit = "e",
+      cut = "x",
+      --- Shifted, so plain `p` keeps the project key.
+      paste = "P",
       group = "g",
       filter = "f",
       search = "/",
@@ -928,6 +932,82 @@ end
 ---@param line string new line
 local function write_line(abs, lnum, line) write_lines(abs, { [lnum] = line }) end
 
+--- Drop whole lines from a file, or from the loaded buffer.
+---
+--- The lines go in falling order, so an earlier delete never moves a later
+--- line number.
+---@param abs string absolute path
+---@param lnums integer[] 1-based line numbers
+---@return integer count lines dropped
+local function delete_lines(abs, lnums)
+  if #lnums == 0 then return 0 end
+  parse_cache[abs] = nil
+
+  local rows = vim.deepcopy(lnums)
+  table.sort(rows, function(a, b) return a > b end)
+
+  local bufnr = buffer_for(abs)
+  if bufnr then
+    local count = 0
+    for _, lnum in ipairs(rows) do
+      if lnum <= vim.api.nvim_buf_line_count(bufnr) then
+        vim.api.nvim_buf_set_lines(bufnr, lnum - 1, lnum, false, {})
+        count = count + 1
+      end
+    end
+    if count > 0 and vim.bo[bufnr].modified then vim.api.nvim_buf_call(bufnr, function() vim.cmd "silent noautocmd write" end) end
+    return count
+  end
+
+  local lines = vim.fn.readfile(abs)
+  local count = 0
+  for _, lnum in ipairs(rows) do
+    if lines[lnum] then
+      table.remove(lines, lnum)
+      count = count + 1
+    end
+  end
+  if count > 0 then vim.fn.writefile(lines, abs) end
+  return count
+end
+
+--- Replace the text of one task, keeping its indent, bullet, and status.
+---@param abs string absolute path
+---@param lnum integer 1-based line number
+---@param text string new task text
+---@return boolean written
+function M.set_text(abs, lnum, text)
+  text = vim.trim(text or "")
+  if #text == 0 then return false end
+  local line = read_lines(abs)[lnum]
+  if not line then return false end
+  local indent, marker, status = parse_line(line)
+  if not indent or not marker or not status then return false end
+  write_line(abs, lnum, build_line(indent, marker, status, text))
+  return true
+end
+
+--- Remove tasks from their notes. Groups the work by file, so each note takes
+--- one read and one write.
+---@param tasks Task[]
+---@return integer count tasks removed
+function M.delete_many(tasks)
+  local root = vault_root()
+
+  local by_file = {}
+  for _, task in ipairs(tasks) do
+    local abs = vim.fs.joinpath(root, task.file)
+    by_file[abs] = by_file[abs] or {}
+    table.insert(by_file[abs], task.lnum)
+  end
+
+  local count = 0
+  for abs, lnums in pairs(by_file) do
+    count = count + delete_lines(abs, lnums)
+  end
+  return count
+end
+
 --- Set the status of one task.
 ---@param abs string absolute path
 ---@param lnum integer 1-based line number
@@ -1125,13 +1205,13 @@ end
 --- Add a task to any note.
 ---@param abs string absolute path of the note
 ---@param text string task text
----@param opts { status?: string, section?: string }?
+---@param opts { status?: string, section?: string, raw?: boolean, quiet?: boolean }?
 ---@return boolean added
 function M.add_to(abs, text, opts)
   opts = opts or {}
   text = vim.trim(text or "")
   if #text == 0 then return false end
-  if M.config.created_date and not text:find(CREATED_FIELD, 1, true) then text = text .. " " .. CREATED_FIELD .. " " .. today() end
+  if M.config.created_date and not opts.raw and not text:find(CREATED_FIELD, 1, true) then text = text .. " " .. CREATED_FIELD .. " " .. today() end
 
   local ok, Note = pcall(require, "obsidian.note")
   if not ok then
@@ -1150,19 +1230,65 @@ function M.add_to(abs, text, opts)
     placement = "bot",
   })
   parse_cache[abs] = nil
-  vim.notify("Added: " .. text, vim.log.levels.INFO, { title = "tasks.lua" })
+  if not opts.quiet then vim.notify("Added: " .. text, vim.log.levels.INFO, { title = "tasks.lua" }) end
   return true
 end
 
---- Set the note status field, so the board hides or shows the note.
+--------------------------------------------------------------------------------
+-- cut and paste
+--------------------------------------------------------------------------------
+
+--- Tasks held by the last cut, as plain status and text pairs.
 ---
---- Rewrites the field in place when it exists, else adds it to the
---- frontmatter. Adds a frontmatter block when the note has none.
+--- The board writes the note at once, so a line number goes stale. Only the
+--- status and the text survive a cut.
+---@type { status: string, text: string }[]
+local clipboard = {}
+
+--- The tasks held by the last cut.
+---@return { status: string, text: string }[] tasks
+function M.clipboard() return clipboard end
+
+--- Remove tasks from their notes, and hold them for a paste.
+---@param tasks Task[]
+---@return integer count tasks cut
+function M.cut(tasks)
+  if #tasks == 0 then return 0 end
+  clipboard = vim.tbl_map(function(task) return { status = task.status, text = task.text } end, tasks)
+  local count = M.delete_many(tasks)
+  if count == 0 then clipboard = {} end
+  return count
+end
+
+--- Write the held tasks into a note, in cut order.
+---
+--- The status and the text carry over as they were, so a paste never stamps a
+--- new created date and never drops a due date.
 ---@param abs string absolute path of the note
----@param value string new value, for example "project" or "finished_project"
+---@param opts { section?: string, keep?: boolean }? `keep` holds the clipboard
+---@return integer count tasks pasted
+function M.paste(abs, opts)
+  opts = opts or {}
+  if #clipboard == 0 then return 0 end
+
+  local count = 0
+  for _, item in ipairs(clipboard) do
+    if M.add_to(abs, item.text, { status = item.status, section = opts.section, raw = true, quiet = true }) then count = count + 1 end
+  end
+  -- A failed write keeps the clipboard, so a cut task never gets lost.
+  if count > 0 and not opts.keep then clipboard = {} end
+  return count
+end
+
+--- Set one frontmatter field of a note.
+---
+--- Rewrites the field in place when it exists, else adds it above the closing
+--- fence. Adds a frontmatter block when the note has none.
+---@param abs string absolute path of the note
+---@param field string field name, for example "status" or "title"
+---@param value string new value
 ---@return boolean written
-function M.set_note_status(abs, value)
-  local field = M.config.note.field
+function M.set_front_field(abs, field, value)
   local lines = read_lines(abs)
   if #lines == 0 then return false end
 
@@ -1188,9 +1314,33 @@ function M.set_note_status(abs, value)
     table.insert(lines, 4, "")
   end
 
-  vim.fn.writefile(lines, abs)
+  local bufnr = buffer_for(abs)
+  if bufnr then
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+    vim.api.nvim_buf_call(bufnr, function() vim.cmd "silent noautocmd write" end)
+  else
+    vim.fn.writefile(lines, abs)
+  end
   parse_cache[abs] = nil
   return true
+end
+
+--- Set the note status field, so the board hides or shows the note.
+---@param abs string absolute path of the note
+---@param value string new value, for example "project" or "finished_project"
+---@return boolean written
+function M.set_note_status(abs, value) return M.set_front_field(abs, M.config.note.field, value) end
+
+--- Set the note title field, so the board shows the new name.
+---
+--- The file name never changes, so every link into the note keeps working.
+---@param abs string absolute path of the note
+---@param title string new title
+---@return boolean written
+function M.set_note_title(abs, title)
+  title = vim.trim(title or "")
+  if #title == 0 then return false end
+  return M.set_front_field(abs, "title", title)
 end
 
 --- Create a project note that holds tasks.
@@ -1905,6 +2055,81 @@ function M.board_toggle(opts)
     end)
   end)
 
+  -- Edit the row under the cursor. A task row edits the raw task text, fields
+  -- and all. A project heading edits the note title, which lives in the
+  -- frontmatter, so the file name and every link into it stay as they are.
+  map(keys.edit, function()
+    local entry, row = board_entry()
+    if not entry then return end
+    board_remember(entry, row)
+
+    if entry.task then
+      local task = entry.task
+      vim.ui.input({ prompt = "Task: ", default = task.text }, function(input)
+        if not input or vim.trim(input) == vim.trim(task.text) then return end
+        if M.set_text(vim.fs.joinpath(vault_root(), task.file), task.lnum, input) then board_render() end
+      end)
+      return
+    end
+
+    local group = entry.group
+    if group.kind == "daily" then
+      vim.notify("A daily note keeps the date as its title", vim.log.levels.WARN, { title = "tasks.lua" })
+      return
+    end
+
+    local abs = ensure_group_note(group)
+    if not abs then return end
+    vim.ui.input({ prompt = "Project title: ", default = group.label }, function(input)
+      if not input or vim.trim(input) == vim.trim(group.label) then return end
+      if M.set_note_title(abs, input) then board_render() end
+    end)
+  end)
+
+  -- Cut the task under the cursor, or every task of the group under a heading.
+  map(keys.cut, function()
+    local entry, row = board_entry()
+    if not entry then return end
+    board_remember(entry, row)
+    board.focus = nil
+
+    local tasks = entry.task and { entry.task } or entry.group.tasks
+    local count = M.cut(tasks)
+    if count == 0 then return end
+    vim.notify(string.format("Cut %d task%s", count, count == 1 and "" or "s"), vim.log.levels.INFO, { title = "tasks.lua" })
+    board_render()
+  end)
+
+  map(keys.cut, function()
+    local tasks, row = selected_tasks()
+    if #tasks == 0 then return end
+    board.row, board.focus = row, nil
+    local count = M.cut(tasks)
+    if count == 0 then return end
+    vim.notify(string.format("Cut %d task%s", count, count == 1 and "" or "s"), vim.log.levels.INFO, { title = "tasks.lua" })
+    board_render()
+  end, "x")
+
+  -- Paste the cut tasks into the group under the cursor. The status and the
+  -- text carry over as they were, so a move never restamps a date.
+  map(keys.paste, function()
+    local entry, row = board_entry()
+    if not entry then return end
+    if #M.clipboard() == 0 then
+      vim.notify("Nothing to paste", vim.log.levels.WARN, { title = "tasks.lua" })
+      return
+    end
+    board_remember(entry, row)
+    board.focus = nil
+
+    local abs = ensure_group_note(entry.group)
+    if not abs then return end
+    local count = M.paste(abs)
+    if count == 0 then return end
+    vim.notify(string.format("Pasted %d task%s into %s", count, count == 1 and "" or "s", entry.group.label), vim.log.levels.INFO, { title = "tasks.lua" })
+    board_render()
+  end)
+
   -- Create a project note. The board gains the group at once, and the note
   -- stays closed.
   map(keys.project, function()
@@ -1994,6 +2219,9 @@ local function help_sections(context)
         binds = {
           { key_label(keys.toggle), "cycle status: " .. order },
           { key_label(keys.menu), "open the status menu" },
+          { key_label(keys.edit), "edit the task text" },
+          { key_label(keys.cut), "cut the task" },
+          { key_label(keys.paste), "paste the cut tasks here" },
           { key_label(keys.add), "add a task to the same group" },
           { key_label(keys.open), "open the note at the task" },
         },
@@ -2005,6 +2233,9 @@ local function help_sections(context)
           { key_label(keys.toggle), "cycle every task in the group" },
           { key_label(keys.add), "add a task to the group" },
           { key_label(keys.note_kind), "step the project kind" },
+          { key_label(keys.edit), "rename the project, keeping the file name" },
+          { key_label(keys.cut), "cut every task in the group" },
+          { key_label(keys.paste), "paste the cut tasks into the group" },
           { key_label(keys.open), "open the note, creating it when absent" },
         },
       },
@@ -2014,6 +2245,7 @@ local function help_sections(context)
           { "V", "start a line selection" },
           { key_label(keys.toggle), "cycle every task in the selection" },
           { key_label(keys.menu), "set one status for the selection" },
+          { key_label(keys.cut), "cut every task in the selection" },
         },
       },
       {
