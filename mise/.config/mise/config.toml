@@ -29,3 +29,5 @@ _.file = "~/.env.json"
 
 [tools]
 gh = "latest"
+dua = "latest"
+rclone = "latest"
