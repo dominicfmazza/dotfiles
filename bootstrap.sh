@@ -780,6 +780,80 @@ phase_kitty() {
   unset _kitty_sh _b
 }
 
+# ---------------------------------------------------------------------- wm ----
+
+phase_wm() {
+  # AeroSpace is the macOS tiling window manager, matched to the komorebi
+  # and whkd setup on Windows. simple-bar (an Übersicht widget) is the status
+  # bar, matched to YASB. Both target macOS only.
+  [ "$PLATFORM" = darwin ] || {
+    skip "AeroSpace targets macOS only."
+    return 0
+  }
+
+  info "AeroSpace"
+
+  # These are GUI apps or a source build. mise has no package for them, and
+  # none is a rootless install, so this needs Homebrew. The bootstrap never
+  # installs Homebrew itself: it uses brew when present and prints the manual
+  # step otherwise.
+  if ! have brew; then
+    warn "no Homebrew. Cannot install the macOS window manager stack."
+    say "  ${C_DIM}brew install --cask nikitabobko/tap/aerospace$C_OFF"
+    say "  ${C_DIM}brew install --cask ubersicht$C_OFF"
+    return 0
+  fi
+
+  wm_install_cask aerospace "AeroSpace" nikitabobko/tap/aerospace /Applications/AeroSpace.app
+  wm_install_simplebar
+}
+
+wm_install_cask() {
+  # wm_install_cask BIN LABEL CASK APPPATH. Installs a cask when the app is
+  # absent. BIN is a command to probe, or empty. APPPATH is an .app to probe.
+  _wc_bin=$1
+  _wc_label=$2
+  _wc_cask=$3
+  _wc_app=$4
+
+  if { [ -n "$_wc_bin" ] && have "$_wc_bin"; } || [ -d "$_wc_app" ]; then
+    ok "$_wc_label is installed"
+    return 0
+  fi
+  if [ "$DRY_RUN" = 1 ]; then
+    skip "would run brew install --cask $_wc_cask"
+    return 0
+  fi
+  if brew install --cask "$_wc_cask" >/dev/null 2>&1; then
+    ok "$_wc_label is installed"
+  else
+    warn "the $_wc_label install failed. Run the brew command by hand to see why."
+    say "  ${C_DIM}brew install --cask $_wc_cask$C_OFF"
+  fi
+}
+
+wm_install_simplebar() {
+  # simple-bar is an Übersicht widget, matched to the YASB bar. Übersicht is a
+  # cask; simple-bar is a git clone into the Übersicht widgets directory, the
+  # way the antidote submodule is cloned rather than vendored. The look lives
+  # in ~/.simplebarrc, which this repo links.
+  wm_install_cask '' "Übersicht" ubersicht "/Applications/Übersicht.app"
+
+  _sb_dir="$HOME/Library/Application Support/Übersicht/widgets/simple-bar"
+  if [ -d "$_sb_dir/.git" ]; then
+    ok "simple-bar is present"
+  elif [ "$DRY_RUN" = 1 ]; then
+    skip "would clone simple-bar into the Übersicht widgets directory"
+  elif act mkdir -p "$(dirname "$_sb_dir")" &&
+    git clone --depth 1 https://github.com/Jean-Tinland/simple-bar "$_sb_dir" >/dev/null 2>&1; then
+    ok "simple-bar is cloned"
+  else
+    warn "the simple-bar clone failed. Clone it by hand into the widgets directory."
+    say "  ${C_DIM}git clone --depth 1 https://github.com/Jean-Tinland/simple-bar \"$_sb_dir\"$C_OFF"
+  fi
+  unset _sb_dir
+}
+
 # ------------------------------------------------------------------- shell ----
 
 phase_shell() {
@@ -1025,6 +1099,36 @@ phase_doctor() {
     warn "kitty is missing. Run: ./bootstrap.sh install"
   fi
 
+  if [ "$PLATFORM" = darwin ]; then
+    say "  ${C_DIM}window manager$C_OFF"
+    if have aerospace || [ -d /Applications/AeroSpace.app ]; then
+      ok "AeroSpace is installed"
+    else
+      warn "AeroSpace is missing. Run: ./bootstrap.sh install"
+    fi
+    # The config link may sit at the directory level (folded) or on the file
+    # itself. Check that the file resolves and its real path is in the repo.
+    _asdir="$XDG_CONFIG_HOME/aerospace"
+    if [ -f "$_asdir/aerospace.toml" ] &&
+      { owned_by_repo "$_asdir" || owned_by_repo "$_asdir/aerospace.toml"; }; then
+      ok "$(pretty "$_asdir/aerospace.toml")"
+    else
+      warn "the AeroSpace config link is missing. Run: ./bootstrap.sh link"
+    fi
+    unset _asdir
+
+    if [ -d /Applications/Übersicht.app ]; then
+      ok "Übersicht is installed"
+    else
+      warn "Übersicht is missing. Run: ./bootstrap.sh install"
+    fi
+    if [ -d "$HOME/Library/Application Support/Übersicht/widgets/simple-bar/.git" ]; then
+      ok "simple-bar is present"
+    else
+      warn "simple-bar is missing. Run: ./bootstrap.sh install"
+    fi
+  fi
+
   say ''
   if [ "$FAIL_COUNT" -gt 0 ]; then
     say "${C_RED}$FAIL_COUNT problem(s)${C_OFF}, ${C_YEL}$WARN_COUNT warning(s)${C_OFF}"
@@ -1069,6 +1173,7 @@ install)
     phase_neovim
     phase_fonts
     phase_kitty
+    phase_wm
   fi
   phase_shell
   say ''

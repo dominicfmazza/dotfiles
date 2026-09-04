@@ -1,0 +1,232 @@
+# aerospace.toml: a macOS tiling window manager, matched to the komorebi and
+# whkd setup on Windows. komorebi.json and whkdrc are the source of truth.
+#
+# Modifier map. whkd uses two modifiers. macOS has no free "win" key, so the
+# move chords move to cmd+ctrl.
+#
+#   whkd            aerospace       job
+#   alt + shift     alt + shift     focus a direction, go to a workspace
+#   win + shift     cmd + ctrl      move a window, send a window to a workspace
+#
+# alt + <letter> stays as-is, except every alt key that Neovim owns. The
+# nvim config binds alt+h/j/k/l (window move), alt+' and alt+; (tabs), and
+# alt+g/c/f/r/n/? (terminal floats and the task board). aerospace binds
+# globally, so it must never claim one of those. None of the whkd binds
+# below use them.
+
+config-version = 2
+
+# Start at login, and reload the config on save.
+start-at-login = true
+auto-reload-config = true
+
+# simple-bar is the macOS status bar. It runs as an Übersicht widget and
+# reads AeroSpace state through the aerospace CLI. A hook makes the bar redraw
+# at once on a workspace or focus change.
+#
+# Both hooks call scripts/.local/bin/simple-bar-refresh. That script sends a
+# WIDGET_WANTS_REFRESH message to the Übersicht websocket bus through bash
+# /dev/tcp, so it needs no child process and costs about 0.01 s. A direct
+# osascript call cost 0.19 s, and a workspace switch fires both hooks, so the
+# space icons lagged.
+#
+# The path is absolute. AeroSpace runs a hook with a bare environment, so
+# ~/.local/bin is not on PATH.
+after-startup-command = []
+
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  '$HOME/.local/bin/simple-bar-refresh',
+]
+
+# whkd has no equivalent. Keep the macOS default off, so a stray cmd-h does
+# not hide a window out of the tree.
+automatically-unhide-macos-hidden-apps = false
+
+# Normalization. Keep the tree flat, the way komorebi's BSP does.
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# komorebi uses BSP. The nearest aerospace root layout is tiles, and 'auto'
+# picks the orientation from the monitor shape, like BSP's first split.
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# accordion-padding shows the depth of a stacked (accordion) column. komorebi
+# stacks have no padding, but a small value keeps a stack readable.
+accordion-padding = 30
+
+# Mouse follows focus. When focus moves to a window, jump the pointer to its
+# center. focus-follows-mouse is the reverse (the mouse drives focus), so keep
+# it off. window-lazy-center only moves the pointer when it is not already
+# inside the focused window.
+focus-follows-mouse.enabled = true
+# One on-focus-changed key holds every command. A second key is a duplicate,
+# and AeroSpace rejects the config.
+on-focus-changed = [
+  'move-mouse window-lazy-center',
+  'exec-and-forget $HOME/.local/bin/simple-bar-refresh',
+]
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+key-mapping.preset = 'qwerty'
+
+# Gaps match komorebi.json: default_workspace_padding 5, container padding 5.
+# The top outer gap clears the simple-bar status bar, the way glazewm used
+# outer_gap.top 45px for yasb.
+#
+# The bar height is fixed (34px in the theme), but the space above it is not.
+# An external Dell puts the whole bar below the top edge, so the gap must hold
+# the bar plus a margin. The built-in Retina display keeps the bar inside the
+# menu bar strip, which macOS already excludes from the usable frame, so the
+# same value leaves a wide empty band. A per-monitor value fixes both.
+#
+# A monitor pattern is a case-insensitive regex on the display name. The last
+# entry is the default for a monitor that matches nothing.
+gaps.inner.horizontal = 5
+gaps.inner.vertical =   5
+gaps.outer.left =       5
+gaps.outer.right =      5
+gaps.outer.top = [
+  { monitor."built-in" = 8 },
+  { monitor."dell" = 40 },
+  40,
+]
+gaps.outer.bottom =     5
+
+# --------------------------------------------------------------- workspaces ----
+# komorebi.json defines one named workspace, "I". whkd binds eight, index 0-7,
+# on alt+shift+1..8. aerospace workspaces are named, so 1..8 map to the whkd
+# indices one-to-one.
+#
+# persistent-workspaces is deliberately absent. It held all eight workspaces
+# open, and simple-bar runs one `aerospace list-windows` call per workspace on
+# every redraw. Eight workspaces cost eleven subprocess calls per focus change,
+# where three used workspaces cost six.
+#
+# Nothing is lost. AeroSpace creates a workspace on demand, so alt+shift+5 still
+# switches to workspace 5, and cmd+ctrl+5 still sends a window there. An empty
+# workspace stops appearing in the list, and in the bar, until it holds a window
+# again.
+
+# ------------------------------------------------------------------- main ----
+[mode.main.binding]
+
+    # Launch a terminal. whkd has no launcher (glazewm is not authoritative),
+    # so this fills the alt+enter slot with the promote-equivalent below.
+    # whkd alt+shift+return is promote. aerospace has no promote; the closest
+    # is a swap with the primary node, so bind that.
+    alt-shift-enter = 'swap --swap-focus dfs-next'   # whkd: promote
+
+    # Focus. whkd: alt+shift+h/j/k/l. Same chord here. This leaves alt+h/j/k/l
+    # free for the nvim window-move maps. The boundary flags let focus cross a
+    # monitor edge: all monitors act as one plane, so focus left from the
+    # left-most window jumps to the monitor on the left, and wraps around.
+    alt-shift-h = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors left'
+    alt-shift-j = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors down'
+    alt-shift-k = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors up'
+    alt-shift-l = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors right'
+
+    # Cycle focus. whkd: alt+shift+[ and alt+shift+] (oem_4 / oem_6).
+    alt-shift-leftSquareBracket  = 'focus dfs-prev'  # whkd: cycle-focus previous
+    alt-shift-rightSquareBracket = 'focus dfs-next'  # whkd: cycle-focus next
+
+    # Move a window. whkd: win+shift+h/j/k/l. cmd+ctrl replaces win+shift.
+    cmd-ctrl-h = 'move left'
+    cmd-ctrl-j = 'move down'
+    cmd-ctrl-k = 'move up'
+    cmd-ctrl-l = 'move right'
+
+    # Stack. komorebi stacks windows in place; aerospace has no direct stack.
+    # join-with pulls the neighbor into a shared container, and the accordion
+    # layout shows it as a stack. whkd: alt+left/down/up/right (stack).
+    alt-left  = 'join-with left'
+    alt-down  = 'join-with down'
+    alt-up    = 'join-with up'
+    alt-right = 'join-with right'
+
+    # Cycle a stack. whkd: alt+[ and alt+] (cycle-stack). Map to accordion
+    # navigation within the container.
+    alt-leftSquareBracket  = 'focus dfs-prev'   # whkd: cycle-stack previous
+    alt-rightSquareBracket = 'focus dfs-next'   # whkd: cycle-stack next
+
+    # Resize. whkd: alt+shift+u increase width, alt+shift+p decrease width.
+    alt-shift-u = 'resize width +50'   # whkd: resize-axis horizontal increase
+    alt-shift-p = 'resize width -50'   # whkd: resize-axis horizontal decrease
+
+    # Close. whkd: alt+q.
+    alt-q = 'close'
+
+    # Minimize. whkd: alt+m. A minimized window leaves the aerospace tree; the
+    # Dock or cmd+tab restores it.
+    alt-m = 'macos-native-minimize'
+
+    # Toggle float. whkd: alt+t. aerospace toggles between the tiling and
+    # floating layout for the focused window.
+    alt-t = 'layout floating tiling'
+
+    # Toggle monocle (one window fills the workspace). whkd: alt+shift+f
+    # (toggle-monocle). aerospace fullscreen is the match.
+    alt-shift-f = 'fullscreen'
+
+    # Cycle workspace. whkd: alt+s next, alt+a previous.
+    alt-s = 'workspace next'       # whkd: cycle-workspace next
+    alt-a = 'workspace prev'       # whkd: cycle-workspace previous
+
+    # Retile / redraw. whkd: alt+shift+r (retile). aerospace flattens and
+    # re-lays the workspace tree.
+    alt-shift-r = 'flatten-workspace-tree'
+
+    # Pause management. whkd: alt+p (toggle-pause). aerospace uses a service
+    # mode; the service-mode 'esc' below re-enables it.
+    alt-p = 'mode service'
+
+    # Flip layout. whkd: alt+x horizontal, alt+y vertical. aerospace has no
+    # flip, so map to the layout orientation toggles.
+    alt-x = 'layout tiles horizontal vertical'     # whkd: flip-layout horizontal
+    alt-y = 'layout accordion horizontal vertical' # whkd: flip-layout vertical
+
+    # Go to a workspace. whkd: alt+shift+1..8 -> focus-workspace 0..7.
+    alt-shift-1 = 'workspace 1'
+    alt-shift-2 = 'workspace 2'
+    alt-shift-3 = 'workspace 3'
+    alt-shift-4 = 'workspace 4'
+    alt-shift-5 = 'workspace 5'
+    alt-shift-6 = 'workspace 6'
+    alt-shift-7 = 'workspace 7'
+    alt-shift-8 = 'workspace 8'
+
+    # Send a window to a workspace. whkd: win+shift+1..8 -> move-to-workspace
+    # 0..7. cmd+ctrl replaces win+shift.
+    cmd-ctrl-1 = 'move-node-to-workspace 1'
+    cmd-ctrl-2 = 'move-node-to-workspace 2'
+    cmd-ctrl-3 = 'move-node-to-workspace 3'
+    cmd-ctrl-4 = 'move-node-to-workspace 4'
+    cmd-ctrl-5 = 'move-node-to-workspace 5'
+    cmd-ctrl-6 = 'move-node-to-workspace 6'
+    cmd-ctrl-7 = 'move-node-to-workspace 7'
+    cmd-ctrl-8 = 'move-node-to-workspace 8'
+
+# ---------------------------------------------------------------- service ----
+# whkd toggle-pause (alt+p) enters this mode. esc restores management and the
+# default binding mode, the way alt+p a second time unpauses komorebi.
+[mode.service.binding]
+    esc = ['reload-config', 'mode main']
+    alt-p = 'mode main'
+    r = ['flatten-workspace-tree', 'mode main']
+    f = ['layout floating tiling', 'mode main']
+    backspace = ['close-all-windows-but-current', 'mode main']
+
+    alt-shift-h = ['join-with left', 'mode main']
+    alt-shift-j = ['join-with down', 'mode main']
+    alt-shift-k = ['join-with up', 'mode main']
+    alt-shift-l = ['join-with right', 'mode main']
+
+    # Move the focused window to a monitor, then return to main. Focus
+    # follows the window. whkd binds no monitor motion, so this is macOS
+    # only.
+    h = ['move-node-to-monitor --focus-follows-window left', 'mode main']
+    j = ['move-node-to-monitor --focus-follows-window down', 'mode main']
+    k = ['move-node-to-monitor --focus-follows-window up', 'mode main']
+    l = ['move-node-to-monitor --focus-follows-window right', 'mode main']
