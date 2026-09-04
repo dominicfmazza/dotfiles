@@ -1,0 +1,289 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Jean-Tinland/simple-bar/refs/heads/master/lib/schemas/config.json",
+  "global": {
+    "theme": "auto",
+    "compactMode": false,
+    "floatingBar": false,
+    "noBarBg": false,
+    "noColorInData": false,
+    "bottomBar": false,
+    "sideDecoration": false,
+    "inlineSpacesOptions": false,
+    "disableAnimations": false,
+    "spacesBackgroundColorAsForeground": false,
+    "widgetsBackgroundColorAsForeground": false,
+    "widgetMaxWidth": "160px",
+    "slidingAnimationPace": 4,
+    "font": "Hack Nerd Font, JetBrains Mono, Menlo, monospace",
+    "fontSize": "12px",
+    "yabaiPath": "/opt/homebrew/bin/yabai",
+    "aerospacePath": "/opt/homebrew/bin/aerospace",
+    "windowManager": "aerospace",
+    "shell": "sh",
+    "terminal": "kitty",
+    "disableNotifications": false,
+    "enableMissives": false,
+    "enableServer": false,
+    "serverSocketPort": 7777,
+    "yabaiServerRefresh": false,
+    "aerospaceServerRefresh": false
+  },
+  "themes": {
+    "lightTheme": "MacOSLight",
+    "darkTheme": "MacOSDark",
+    "colorMain": "#cdcdcd",
+    "colorMainAlt": "#868686",
+    "colorMinor": "#3d3d3d",
+    "colorAccent": "#4cc2ff",
+    "colorRed": "#ff5f5f",
+    "colorGreen": "#a3be8c",
+    "colorYellow": "#c9be48",
+    "colorOrange": "#f6e3b4",
+    "colorBlue": "#4cc2ff",
+    "colorMagenta": "#b48ead",
+    "colorCyan": "#8eaee8",
+    "colorBlack": "#242424",
+    "colorWhite": "#ffffff",
+    "colorForeground": "#e6e6e6",
+    "colorBackground": "#242424"
+  },
+  "process": {
+    "showOnDisplay": "",
+    "displayForFocusedSpace": false,
+    "displayOnlyCurrent": true,
+    "centered": false,
+    "showCurrentSpaceMode": false,
+    "hideWindowTitle": false,
+    "displayOnlyIcon": false,
+    "expandAllProcesses": false,
+    "displaySkhdMode": false,
+    "displayStackIndex": true,
+    "displayOnlyCurrentStack": false
+  },
+  "spacesDisplay": {
+    "showOnDisplay": "",
+    "exclusions": "",
+    "titleExclusions": "",
+    "spacesExclusions": "",
+    "exclusionsAsRegex": true,
+    "displayAllSpacesOnAllScreens": true,
+    "hideDuplicateAppsInSpaces": true,
+    "displayStickyWindowsSeparately": false,
+    "hideCreateSpaceButton": false,
+    "hideEmptySpaces": true,
+    "showOptionsOnHover": false,
+    "switchSpacesWithoutYabai": false,
+    "customAeroSpaceDisplayIndexes": {}
+  },
+  "widgets": {
+    "processWidget": true,
+    "githubWidget": false,
+    "weatherWidget": false,
+    "netstatsWidget": false,
+    "cpuWidget": true,
+    "gpuWidget": false,
+    "memoryWidget": true,
+    "batteryWidget": true,
+    "wifiWidget": true,
+    "vpnWidget": false,
+    "zoomWidget": false,
+    "soundWidget": true,
+    "micWidget": false,
+    "dateWidget": true,
+    "timeWidget": true,
+    "keyboardWidget": false,
+    "spotifyWidget": false,
+    "cryptoWidget": false,
+    "stockWidget": false,
+    "youtubeMusicWidget": false,
+    "musicWidget": false,
+    "mpdWidget": false,
+    "browserTrackWidget": false,
+    "notificationsWidget": false,
+    "nextMeetingWidget": false
+  },
+  "githubWidgetOptions": {
+    "refreshFrequency": 600000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "hideWhenNoNotification": false,
+    "notificationUrl": "https://github.com/notifications",
+    "ghBinaryPath": "/opt/homebrew/bin/gh"
+  },
+  "weatherWidgetOptions": {
+    "refreshFrequency": 1800000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "unit": "C",
+    "hideLocation": false,
+    "hideGradient": false,
+    "customLocation": ""
+  },
+  "netstatsWidgetOptions": {
+    "refreshFrequency": 2000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "displayAsGraph": false,
+    "netstatsThreshold": 0
+  },
+  "cpuWidgetOptions": {
+    "refreshFrequency": 2000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "displayAsGraph": false,
+    "cpuUsageThreshold": 0,
+    "cpuMonitorApp": "Activity Monitor"
+  },
+  "gpuWidgetOptions": {
+    "refreshFrequency": 3000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "displayAsGraph": false,
+    "gpuMacmonBinaryPath": "/opt/homebrew/bin/macmon"
+  },
+  "memoryWidgetOptions": {
+    "refreshFrequency": 4000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "memoryUsageThreshold": 0,
+    "memoryMonitorApp": "Activity Monitor"
+  },
+  "batteryWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "toggleCaffeinateOnClick": true,
+    "disableCaffeinateInvertedBackground": false,
+    "caffeinateOption": ""
+  },
+  "networkWidgetOptions": {
+    "refreshFrequency": 20000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "networkDevice": "en0",
+    "hideWifiIfDisabled": false,
+    "toggleWifiOnClick": false,
+    "hideNetworkName": false
+  },
+  "vpnWidgetOptions": {
+    "refreshFrequency": 8000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "vpnConnectionName": "",
+    "vpnShowConnectionName": false
+  },
+  "zoomWidgetOptions": {
+    "refreshFrequency": 5000,
+    "showOnDisplay": "",
+    "showVideo": true,
+    "showMic": true
+  },
+  "soundWidgetOptions": {
+    "refreshFrequency": 20000,
+    "showOnDisplay": "",
+    "showIcon": true
+  },
+  "micWidgetOptions": {
+    "refreshFrequency": 20000,
+    "showOnDisplay": "",
+    "showIcon": true
+  },
+  "dateWidgetOptions": {
+    "refreshFrequency": 30000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "shortDateFormat": true,
+    "locale": "en-UK",
+    "calendarApp": ""
+  },
+  "timeWidgetOptions": {
+    "refreshFrequency": 1000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "hour12": false,
+    "dayProgress": true,
+    "showSeconds": false
+  },
+  "keyboardWidgetOptions": {
+    "refreshFrequency": 20000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "keyboardMaxLength": 0
+  },
+  "cryptoWidgetOptions": {
+    "refreshFrequency": 300000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "denomination": "usd",
+    "identifiers": "bitcoin,ethereum,celo",
+    "precision": 5
+  },
+  "stockWidgetOptions": {
+    "refreshFrequency": 900000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "yahooFinanceApiKey": "YOUR_API_KEY",
+    "symbols": "AAPL,TSLA",
+    "showSymbol": true,
+    "showCurrency": true,
+    "showMarketPrice": true,
+    "showMarketChange": false,
+    "showMarketPercent": true,
+    "showColor": true
+  },
+  "spotifyWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "showSpecter": true,
+    "showSpotifyMetadata": true
+  },
+  "youtubeMusicWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "showSpecter": true,
+    "youtubeMusicPort": 26538
+  },
+  "musicWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "showSpecter": true
+  },
+  "mpdWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "showSpecter": true,
+    "mpdBinaryPath": "/opt/homebrew/bin/mpc",
+    "mpdPort": "6600",
+    "mpdHost": "127.0.0.1",
+    "mpdFormatString": "%title%[ - %artist%]|[%file%]"
+  },
+  "browserTrackWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "showIcon": true,
+    "showSpecter": true
+  },
+  "notificationsWidgetOptions": {
+    "refreshFrequency": 10000,
+    "showOnDisplay": "",
+    "excludedApps": ""
+  },
+  "nextMeetingWidgetOptions": {
+    "refreshFrequency": 60000,
+    "showOnDisplay": "",
+    "showJoinButton": true,
+    "showTimeOnly": false,
+    "icalBuddyPath": "",
+    "lookAheadHours": 12
+  },
+  "userWidgets": {
+    "userWidgetsList": {}
+  },
+  "customStyles": {
+    "styles": "/* your custom css styles here */"
+  }
+}

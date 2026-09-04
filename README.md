@@ -98,7 +98,7 @@ moves on. Pick a policy to resolve it:
 These files hold anything specific to one machine. None is in git.
 
 | File | Holds |
-|---|---|
+| --- | --- |
 | `~/.config/environments/hosts.sh` | Paths and identities. zsh sources it at login. |
 | `~/.env.json` | Tokens. mise loads it into the environment. |
 | `~/.pi/agent/settings.json` | pi settings. pi rewrites it, so it is a copy. |
@@ -137,7 +137,7 @@ kernel returns `EBADF`, which a tool reports as
 `~/.zshenv` detects that case and splits the two kinds of data:
 
 | Data | Location | Reason |
-|---|---|---|
+| --- | --- | --- |
 | mise tool installs, 3.4 G | `$HOME` | Large. Must survive a reboot. |
 | Caches: mise, npm, uv, pip, go | `/var/tmp/$USER-cache` | Locks work. Rebuildable. |
 
@@ -204,6 +204,68 @@ On Linux and macOS the bootstrap installs the kitty binary into
 `komorebi`, `glazewm`, and `rio/windows` target Windows. On WSL, the
 bootstrap links them into the Windows user profile. Run it from WSL with
 developer mode on, or run `tools/symlinkwsl.ps1` from PowerShell.
+
+## Window management
+
+The tiling setup matches across platforms. On Windows, komorebi tiles and
+whkd binds the keys. On macOS, AeroSpace does both.
+
+| Platform | Tiler | Keys | Config |
+| --- | --- | --- | --- |
+| Windows, WSL | komorebi | whkd | `komorebi/` |
+| macOS | AeroSpace | AeroSpace | `~/.config/aerospace/aerospace.toml` |
+
+On macOS the bootstrap installs AeroSpace with Homebrew
+(`brew install --cask nikitabobko/tap/aerospace`). Homebrew must be present
+first. The bootstrap never installs Homebrew, because Homebrew needs a
+privileged step, and this repo installs with no root. When brew is absent,
+the bootstrap prints the manual command.
+
+### The status bar
+
+Windows uses YASB to draw the bar. macOS uses
+[simple-bar](https://github.com/Jean-Tinland/simple-bar), a widget for the
+[Übersicht](https://github.com/felixhageloh/uebersicht) desktop layer.
+simple-bar has native AeroSpace support and shows on every screen. The
+bootstrap installs Übersicht as a cask, then clones simple-bar into the
+Übersicht widgets directory, the way it clones the antidote submodule.
+
+simple-bar reads its look from `~/.simplebarrc`, so the repo versions it in
+`simplebar/`. The config sets AeroSpace as the window manager, the YASB
+palette (`#242424` background, `#4cc2ff` accent), and a widget set matched to
+YASB: spaces and the front app on the left, and the clock, cpu, memory,
+battery, wifi, sound, and weather on the right.
+
+### The modifier map
+
+whkd uses two modifiers. macOS has no free `win` key, so the move chords
+move to `cmd+ctrl`. Every focus and workspace chord stays the same.
+
+| Action | Windows (whkd) | macOS (AeroSpace) |
+| --- | --- | --- |
+| Focus a direction | `alt+shift+h/j/k/l` | `alt+shift+h/j/k/l` |
+| Move a window | `win+shift+h/j/k/l` | `cmd+ctrl+h/j/k/l` |
+| Go to workspace N | `alt+shift+N` | `alt+shift+N` |
+| Send window to workspace N | `win+shift+N` | `cmd+ctrl+N` |
+
+Focus stays on `alt+shift`, not plain `alt`. The Neovim config owns the
+plain `alt` keys: `alt+h/j/k/l` move between windows, `alt+'` and `alt+;`
+switch tabs, and `alt+g/c/f/r/n` open terminal floats. AeroSpace binds keys
+for the whole system, so it must not claim one of those. The map above
+leaves every Neovim `alt` key free.
+
+### Command differences
+
+A few komorebi commands have no exact AeroSpace match. The closest one is
+bound instead.
+
+| whkd | komorebi | macOS (AeroSpace) | Note |
+| --- | --- | --- | --- |
+| `alt+shift+return` | promote | `swap --swap-focus dfs-next` | AeroSpace has no promote. |
+| `alt+arrow` | stack | `join-with <dir>` | A join plus accordion is the near match. |
+| `alt+x` / `alt+y` | flip layout | set tiles / accordion | AeroSpace has no orientation flip. |
+| `alt+m` | minimize | `macos-native-minimize` | The Dock or cmd+tab restores it. |
+| `alt+p` | toggle-pause | service mode | `alt+p` again, or `esc`, resumes. |
 
 ## Troubleshooting
 
