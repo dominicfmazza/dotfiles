@@ -23,3 +23,7 @@ if [[ -f "$XDG_DATA_HOME/bob/env/env.sh" ]]; then
 fi
 
 export PATH="$XDG_DATA_HOME/mise/shims:$PATH"
+
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :
