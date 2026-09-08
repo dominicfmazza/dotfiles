@@ -171,8 +171,8 @@ gaps.outer.bottom =     5
     alt-shift-f = 'fullscreen'
 
     # Cycle workspace. whkd: alt+s next, alt+a previous.
-    alt-s = 'workspace next'       # whkd: cycle-workspace next
-    alt-a = 'workspace prev'       # whkd: cycle-workspace previous
+    alt-s = 'workspace next --wrap-around'       # whkd: cycle-workspace next
+    alt-a = 'workspace prev --wrap-around'       # whkd: cycle-workspace previous
 
     # Retile / redraw. whkd: alt+shift+r (retile). aerospace flattens and
     # re-lays the workspace tree.
