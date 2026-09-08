@@ -1,5 +1,51 @@
 # Global conventions
 
+## Code comments
+
+A comment explains the code. A comment does not explain the change.
+
+The commit message and the MR body carry the history. A comment carries
+only the facts a reader needs to understand the code as it stands.
+
+Write a comment when the code cannot explain itself. Examples:
+
+- A non-obvious constraint from an external system or a standard.
+- A unit, a range, or a boundary that the type does not show.
+- A reason for a workaround, with a ticket ID.
+- An algorithm choice that a reader would question.
+
+Do not write a comment that:
+
+- Describes an edit. Example: "Add the tag guard."
+- Refers to a past state. Examples: "Without this...", "Previously...",
+  "This used to...", "Now we...", "Changed to...", "Fixed...".
+- Names a bug that the code already fixes.
+- Repeats what the next line says.
+- Marks a section that a reader can see. Example: "Loop over items."
+
+Test for a bad comment: read it without the diff. If it only makes sense
+next to the old code, delete it.
+
+Write a comment in the present tense. Describe the current behavior.
+
+Bad, then good:
+
+```yaml
+# The rules mirror publish-int. Without the tag guard, a tag pipeline
+# drops publish-int and the pipeline fails.
+# -> publish-int supplies CFE_CMAKE_VERSION, so the rules must match.
+```
+
+```js
+// Fixed the off-by-one here
+// -> The API returns an inclusive end index.
+
+// Now uses UTC
+// -> Timestamps are UTC. The device clock is local.
+```
+
+Apply the same test to a docstring and to a rule file.
+
 ## Commit messages
 
 Use Conventional Commits for every commit.
