@@ -6,7 +6,11 @@
 # formatters
 "aqua:JohnnyMorganz/StyLua" = "2.5.2"
 "aqua:google/yamlfmt" = "0.21.0"
-"aqua:psf/black" = "26.5.1"
+# The aqua registry ships black as a PyInstaller onefile binary. It unpacks
+# its embedded archive to a temp dir on every run, which costs about 6 seconds
+# on macOS. That exceeds the conform.nvim format timeout, so formatting fails.
+# The pipx wheel starts in about 0.3 seconds.
+"pipx:black" = "26.5.1"
 "pipx:gersemi" = "0.27.7"
 "pipx:beautysh" = "6.4.3"
 "pipx:mdformat" = "1.0.0"
