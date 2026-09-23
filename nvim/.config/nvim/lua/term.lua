@@ -49,13 +49,13 @@ local function current_tab_cwd()
   return vim.fn.getcwd(-1, tab)
 end
 
-local function resolve_float_term_name(config)
+local function resolve_term_name(config)
   if config.name then return config.name end
   return config.name_prefix .. get_unique_wd_name(current_tab_cwd())
 end
 
-local function toggle_float_terminal(config)
-  local name = resolve_float_term_name(config)
+local function toggle_terminal(config, layout)
+  local name = resolve_term_name(config)
   local server = ergoterm.find(function(term) return term.name == name end)
   if server then
     server:toggle()
@@ -63,7 +63,7 @@ local function toggle_float_terminal(config)
   end
 
   local term_opts = {
-    layout = "float",
+    layout = layout,
     name = name,
   }
 
@@ -75,13 +75,20 @@ end
 
 local float_terminal_maps = {
   { lhs = "<M-g>", name_prefix = "lg-", cmd = "lazygit", cleanup_on_success = true, desc = "Open Lazygit window" },
-  { lhs = "<M-c>", name_prefix = "ai-", cmd = "zsh -l -c pi", cleanup_on_success = true, desc = "Open Claude window" },
   { lhs = "<M-f>", name_prefix = "shell-", desc = "Open project shell" },
   { lhs = "<M-r>", name = "scratch", desc = "Open scratch space" },
 }
 
+local side_terminal_maps = {
+  { lhs = "<M-c>", name_prefix = "ai-", cmd = "zsh -l -c pi", cleanup_on_success = true, desc = "Open Claude window" },
+}
+
 for _, config in ipairs(float_terminal_maps) do
-  map({ "x", "n", "t" }, config.lhs, function() toggle_float_terminal(config) end, { noremap = true, silent = true, desc = config.desc })
+  map({ "x", "n", "t" }, config.lhs, function() toggle_terminal(config, "float") end, { noremap = true, silent = true, desc = config.desc })
+end
+
+for _, config in ipairs(side_terminal_maps) do
+  map({ "x", "n", "t" }, config.lhs, function() toggle_terminal(config, "right") end, { noremap = true, silent = true, desc = config.desc })
 end
 
 
