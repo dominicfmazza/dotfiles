@@ -230,3 +230,8 @@ gaps.outer.bottom =     5
     j = ['move-node-to-monitor --focus-follows-window down', 'mode main']
     k = ['move-node-to-monitor --focus-follows-window up', 'mode main']
     l = ['move-node-to-monitor --focus-follows-window right', 'mode main']
+
+    shift-h = ['move-workspace-to-monitor --wrap-around left', 'mode main']
+    shift-j = ['move-workspace-to-monitor --wrap-around down', 'mode main']
+    shift-k = ['move-workspace-to-monitor --wrap-around up', 'mode main']
+    shift-l = ['move-workspace-to-monitor --wrap-around right', 'mode main']
