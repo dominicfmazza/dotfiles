@@ -133,10 +133,10 @@ gaps.outer.bottom =     5
     alt-shift-rightSquareBracket = 'focus dfs-next'  # whkd: cycle-focus next
 
     # Move a window. whkd: win+shift+h/j/k/l. cmd+ctrl replaces win+shift.
-    cmd-ctrl-h = 'move left'
-    cmd-ctrl-j = 'move down'
-    cmd-ctrl-k = 'move up'
-    cmd-ctrl-l = 'move right'
+    cmd-ctrl-h = 'move left --boundaries all-monitors-outer-frame'
+    cmd-ctrl-j = 'move down --boundaries all-monitors-outer-frame'
+    cmd-ctrl-k = 'move up --boundaries all-monitors-outer-frame'
+    cmd-ctrl-l = 'move right --boundaries all-monitors-outer-frame'
 
     # Stack. komorebi stacks windows in place; aerospace has no direct stack.
     # join-with pulls the neighbor into a shared container, and the accordion
