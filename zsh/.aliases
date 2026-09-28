@@ -7,3 +7,7 @@ if command -v nvr >/dev/null 2>&1; then
   alias nvr="nvr --servername $NVR_SERVER"
   alias nvrt="nvr --remote-tab"
 fi
+
+if command -v kitty >/dev/null 2>&1; then
+  alias ssh="kitty +kitten ssh"
+fi
