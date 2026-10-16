@@ -8,6 +8,18 @@ if command -v nvr >/dev/null 2>&1; then
   alias nvrt="nvr --remote-tab"
 fi
 
+# ssh goes through the kitty kitten. A host in VAULT_SYNC_HOSTS also gets
+# a Mutagen copy of the vault, and the remote shell points nvim at it.
 if command -v kitty >/dev/null 2>&1; then
-  alias ssh="kitty +kitten ssh"
+  ssh() {
+    local host
+    host=$(command ssh -G "$@" 2>/dev/null | awk '$1 == "host" { print $2; exit }')
+    if [[ -n $host ]] && vault-sync enabled "$host" 2>/dev/null; then
+      vault-sync up "$host" || print -u2 "vault-sync failed. Connecting anyway."
+      kitty +kitten ssh \
+        --kitten "env=OBSIDIAN_VAULT_ROOT=\$HOME/$(vault-sync remote-dir)" "$@"
+    else
+      kitty +kitten ssh "$@"
+    fi
+  }
 fi

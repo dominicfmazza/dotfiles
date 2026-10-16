@@ -109,6 +109,24 @@ These files hold anything specific to one machine. None is in git.
 The bootstrap seeds each one from `install/templates/`, and never overwrites
 an existing file.
 
+## Vault sync over SSH
+
+`vault-sync` keeps a copy of the Obsidian vault on a remote host. It uses
+Mutagen over SSH, so the remote host needs only SSH. Edits on the remote
+host come back to the local vault, and OneDrive uploads them.
+
+1. Add an alias for the remote host to `~/.ssh/config`.
+2. Add the alias to `VAULT_SYNC_HOSTS` in `hosts.sh`.
+3. Connect with `ssh <alias>`.
+
+The `ssh` function in `.aliases` starts the sync before it connects. It
+also sets `OBSIDIAN_VAULT_ROOT` on the remote host through the kitty kitten.
+The sync continues after you disconnect. Run `vault-sync pause <alias>` to
+stop it. Run `vault-sync status` to see conflicts.
+
+Set the vault folder to "Always keep on this device" in OneDrive. Mutagen
+cannot read an online-only placeholder file.
+
 Add `GITHUB_TOKEN` to `~/.env.json` on a shared network. The GitHub API
 allows 60 calls per hour per address, and mise reads release lists from it.
 
