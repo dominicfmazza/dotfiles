@@ -1,0 +1,103 @@
+#!/bin/sh
+# vault-sync: sync the Obsidian vault to a remote host with Mutagen.
+# Run `vault-sync --help` for the commands and the variables.
+
+set -eu
+
+usage() {
+  cat <<'EOF'
+Usage:
+  vault-sync up HOST       create or resume the session, then wait for a sync
+  vault-sync pause HOST    pause the session for HOST
+  vault-sync rm HOST       terminate the session for HOST
+  vault-sync status        list every vault session
+  vault-sync enabled HOST  exit 0 when HOST is in VAULT_SYNC_HOSTS
+  vault-sync remote-dir    print the remote vault path
+
+HOST is an alias from ~/.ssh/config. Mutagen reads that file.
+
+Variables (set them in ~/.config/environments/hosts.sh):
+  OBSIDIAN_VAULT_ROOT  the local vault. OneDrive syncs this copy.
+  VAULT_SYNC_HOSTS     SSH aliases that get a vault copy, space separated.
+  VAULT_REMOTE_DIR     the remote vault path, relative to the remote home.
+                       Default: vaults. The path must not contain a space.
+EOF
+}
+
+die() {
+  printf 'vault-sync: %s\n' "$1" >&2
+  exit 1
+}
+
+# Mutagen allows letters, digits, and dashes in a session name.
+session_name() {
+  printf 'vault-%s\n' "$(printf '%s' "$1" | tr -c 'A-Za-z0-9-' '-')"
+}
+
+need_host() {
+  [ -n "${1:-}" ] || die "missing HOST"
+}
+
+need_mutagen() {
+  command -v mutagen >/dev/null 2>&1 || die "no mutagen on PATH. Run: mise install"
+}
+
+remote_dir() {
+  printf '%s\n' "${VAULT_REMOTE_DIR:-vaults}"
+}
+
+cmd_enabled() {
+  need_host "${1:-}"
+  for h in ${VAULT_SYNC_HOSTS:-}; do
+    [ "$h" = "$1" ] && return 0
+  done
+  return 1
+}
+
+cmd_up() {
+  need_host "${1:-}"
+  need_mutagen
+  : "${OBSIDIAN_VAULT_ROOT:?OBSIDIAN_VAULT_ROOT is not set}"
+  [ -d "$OBSIDIAN_VAULT_ROOT" ] || die "$OBSIDIAN_VAULT_ROOT is not a directory"
+
+  name=$(session_name "$1")
+  if mutagen sync list "$name" >/dev/null 2>&1; then
+    mutagen sync resume "$name" >/dev/null
+  else
+    # Obsidian rewrites the workspace files on every pane move.
+    mutagen sync create \
+      --name="$name" \
+      --label=vault-sync=true \
+      --mode=two-way-safe \
+      --ignore-vcs \
+      --ignore='.obsidian/workspace*.json' \
+      --ignore='.trash/' \
+      --ignore='.DS_Store' \
+      "$OBSIDIAN_VAULT_ROOT" "$1:~/$(remote_dir)" >/dev/null
+  fi
+
+  # flush returns after one full sync cycle.
+  mutagen sync flush "$name"
+}
+
+case "${1:-}" in
+up) cmd_up "${2:-}" ;;
+pause)
+  need_host "${2:-}"
+  need_mutagen
+  mutagen sync pause "$(session_name "$2")"
+  ;;
+rm)
+  need_host "${2:-}"
+  need_mutagen
+  mutagen sync terminate "$(session_name "$2")"
+  ;;
+status)
+  need_mutagen
+  mutagen sync list --label-selector=vault-sync=true
+  ;;
+enabled) cmd_enabled "${2:-}" ;;
+remote-dir) remote_dir ;;
+-h | --help | '') usage ;;
+*) die "unknown command: $1" ;;
+esac
