@@ -1,0 +1,23 @@
+#!/bin/sh
+#MISE description="Check out antidote, the zsh plugin manager"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Submodules"
+dir="$REPO_ROOT/zsh/.antidote"
+[ -f "$dir/antidote.zsh" ] && { ok "antidote is present"; exit 0; }
+
+if [ -e "$REPO_ROOT/.git" ] &&
+  act git -C "$REPO_ROOT" submodule update --init --recursive 2>/dev/null; then
+  ok "antidote is checked out"
+  exit 0
+fi
+
+warn "the submodule checkout failed. Cloning antidote directly."
+act rm -rf "$dir"
+if act git clone --quiet --depth 1 --branch v1.10.3 \
+  https://github.com/mattmc3/antidote.git "$dir"; then
+  ok "antidote is cloned"
+else
+  fail "antidote is missing. zsh will start with no plugin."
+  exit 1
+fi

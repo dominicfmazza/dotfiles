@@ -1,0 +1,14 @@
+#!/bin/sh
+# font-install DIR: copy every .ttf and .otf in DIR into the user font
+# directory, then refresh the font cache. mise runs this after it installs
+# a font tool. No root is needed.
+set -eu
+src=${1:?usage: font-install DIR}
+case "$(uname -s)" in
+  Darwin) dst="$HOME/Library/Fonts" ;;
+  *) dst="${XDG_DATA_HOME:-$HOME/.local/share}/fonts" ;;
+esac
+mkdir -p "$dst"
+find "$src" -type f \( -name '*.ttf' -o -name '*.otf' \) -exec cp -f {} "$dst/" \;
+command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$dst" >/dev/null 2>&1
+exit 0

@@ -1,0 +1,40 @@
+#!/bin/sh
+#MISE description="Install AeroSpace and simple-bar on macOS"
+# mise has no package for these GUI apps, so this step needs Homebrew.
+# Homebrew needs a privileged step, so the bootstrap never installs it.
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+[ "$PLATFORM" = darwin ] || exit 0
+info "Window manager"
+
+if ! have brew; then
+  warn "no Homebrew. Install these by hand:"
+  say "  ${C_DIM}brew install --cask nikitabobko/tap/aerospace ubersicht$C_OFF"
+  exit 0
+fi
+
+cask() {
+  # cask NAME APP: install a cask when the app is absent.
+  if [ -d "$2" ]; then ok "$(basename "$2" .app) is installed"; return 0; fi
+  if [ "$DRY_RUN" = 1 ]; then skip "would run brew install --cask $1"; return 0; fi
+  if brew install --cask "$1" >/dev/null 2>&1; then
+    ok "$(basename "$2" .app) is installed"
+  else
+    warn "brew install --cask $1 failed. Run it by hand to see why."
+  fi
+}
+cask nikitabobko/tap/aerospace /Applications/AeroSpace.app
+cask ubersicht "/Applications/Übersicht.app"
+
+# simple-bar is an Übersicht widget. Its look is in ~/.simplebarrc.
+dir="$HOME/Library/Application Support/Übersicht/widgets/simple-bar"
+if [ -d "$dir/.git" ]; then
+  ok "simple-bar is present"
+elif [ "$DRY_RUN" = 1 ]; then
+  skip "would clone simple-bar into the Übersicht widgets directory"
+elif mkdir -p "$(dirname "$dir")" &&
+  git clone --quiet --depth 1 https://github.com/Jean-Tinland/simple-bar "$dir"; then
+  ok "simple-bar is cloned"
+else
+  warn "the simple-bar clone failed."
+fi

@@ -1,0 +1,27 @@
+#!/bin/sh
+#MISE description="Sync the Neovim plugins from the lock file"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Neovim"
+cd "$HOME"
+nv=$("$MISE_BIN" which nvim 2>/dev/null || command -v nvim 2>/dev/null || true)
+[ -x "$XDG_DATA_HOME/bob/nvim-bin/nvim" ] && [ -z "$nv" ] && nv="$XDG_DATA_HOME/bob/nvim-bin/nvim"
+if [ -z "$nv" ]; then
+  warn "no nvim binary. Run 'mise install neovim' and try again."
+  exit 0
+fi
+
+min=$("$MISE_BIN" config get -f "$REPO_ROOT/mise.toml" vars.nvim_min 2>/dev/null || echo 0.13)
+v=$(tool_version "$nv" --version)
+if version_ge "$v" "$min"; then ok "nvim $v"; else warn "nvim $v is too old. init.lua needs $min or later."; fi
+
+if [ "$DRY_RUN" = 1 ]; then
+  skip "would sync the plugins from nvim-pack-lock.json"
+  exit 0
+fi
+# A headless start makes vim.pack clone each plugin at the locked commit.
+if "$nv" --headless '+qa' >/dev/null 2>&1; then
+  ok "plugins are in sync"
+else
+  warn "the plugin sync reported an error. Open nvim and read :messages."
+fi

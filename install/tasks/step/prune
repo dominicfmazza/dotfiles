@@ -1,0 +1,76 @@
+#!/bin/sh
+#MISE description="Repair an older install of this repo"
+# Each block repairs one layout that an older version of this repo left on
+# a host. A rerun finds nothing to do.
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Stale links"
+removed=0
+
+# A link into the repo whose target is gone. A layout change leaves these.
+for dir in "$HOME" "$XDG_CONFIG_HOME" "$HOME/.local/bin" \
+  "$XDG_CONFIG_HOME/mise/conf.d" "$HOME/.pi/agent"; do
+  [ -d "$dir" ] || continue
+  for l in "$dir"/* "$dir"/.[!.]*; do
+    [ -L "$l" ] && [ ! -e "$l" ] || continue
+    owned_by_repo "$l" || continue
+    act rm -f "$l"
+    ok "removed the stale link $(pretty "$l")"
+    removed=$((removed + 1))
+  done
+done
+
+# An old install put the zsh files in ~/.config/zsh and exported ZDOTDIR
+# there. A session that still has that ZDOTDIR and finds no startup file
+# runs zsh-newuser-install, which shows a menu instead of a prompt.
+zdir="$XDG_CONFIG_HOME/zsh"
+if [ -d "$zdir" ] && [ ! -L "$zdir" ] &&
+  [ ! -e "$zdir/.zshrc" ] && [ ! -e "$zdir/.zprofile" ] && [ ! -e "$zdir/.zlogin" ]; then
+  if act rmdir "$zdir" 2>/dev/null; then
+    ok "removed the empty $(pretty "$zdir")"
+    removed=$((removed + 1))
+  else
+    # The directory holds other files, so it stays. zsh reads
+    # $ZDOTDIR/.zshenv first, so a shim there sends zsh to $HOME.
+    shim="$zdir/.zshenv"
+    if [ -e "$shim" ] && ! grep -q 'bootstrap.sh: ZDOTDIR shim' "$shim" 2>/dev/null; then
+      warn "$(pretty "$shim") is not a shim. Leaving it alone."
+    elif [ -e "$shim" ]; then
+      skip "$(pretty "$shim") forwards to \$HOME"
+    else
+      act cp "$REPO_ROOT/install/templates/zdotdir-shim.zshenv" "$shim"
+      ok "$(pretty "$shim") now forwards to \$HOME"
+      removed=$((removed + 1))
+    fi
+  fi
+fi
+
+# GNU stow linked ~/.config/mise as one link into the repo. conf.d and
+# mise.lock written through that link would land in the checkout.
+misedir="$XDG_CONFIG_HOME/mise"
+if [ -L "$misedir" ] && owned_by_repo "$misedir"; then
+  act rm -f "$misedir"
+  act mkdir -p "$misedir"
+  ok "$(pretty "$misedir") is a real directory again"
+  removed=$((removed + 1))
+fi
+
+# An old install put kitty in ~/.local/kitty.app with its own installer,
+# and linked it into ~/.local/bin. mise now owns kitty.
+for b in kitty kitten; do
+  l="$HOME/.local/bin/$b"
+  [ -L "$l" ] || continue
+  case "$(readlink "$l")" in
+  "$HOME/.local/kitty.app/"*)
+    act rm -f "$l"
+    ok "removed $(pretty "$l"). mise now installs kitty."
+    removed=$((removed + 1))
+    ;;
+  esac
+done
+if [ -d "$HOME/.local/kitty.app" ]; then
+  say "  ${C_DIM}~/.local/kitty.app is unused. Delete it when kitty works from mise.$C_OFF"
+fi
+
+[ "$removed" = 0 ] && skip "nothing to repair"
+exit 0

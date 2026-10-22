@@ -1,0 +1,77 @@
+# The bootstrap commands. Run `mise tasks` to list them.
+#
+#   ./bootstrap.sh [command] [flags]     on a new host, before mise exists
+#   mise run <command> [flags]           after the first install
+#
+# A command runs its steps in order. Each step is a script in
+# install/tasks/step/. To add a step, add a script there and add its name
+# to a steps_* value below.
+
+min_version = "2026.9.0"
+
+[settings]
+task.run_auto_install = false
+
+[task_config]
+includes = ["install/tasks"]
+
+[vars]
+# The mise profile files that each --profile value links into
+# ~/.config/mise/conf.d. The files are in mise/.config/mise/profiles.
+profile_core = "00-core"
+profile_lang = "00-core 10-lang"
+profile_editor = "00-core 10-lang 20-editor"
+profile_full = "00-core 10-lang 20-editor 25-desktop"
+profile_work = "00-core 10-lang 20-editor 25-desktop 30-work"
+
+# The oldest Neovim that init.lua supports.
+nvim_min = "0.13"
+# The oldest tree-sitter CLI that can build a parser for nvim-treesitter.
+tree_sitter_min = "0.26.1"
+
+# The steps of each command, in order.
+steps_install = "preflight submodules hooks prune link seed tools neovim wm shell"
+steps_link = "preflight submodules hooks prune link seed"
+
+[task_templates.cli]
+usage = '''
+flag "-p --profile <name>" help="The tool set. See [vars] in mise.toml." default="full" {
+  choices "core" "lang" "editor" "full" "work"
+}
+flag "-o --only <package>" var=#true help="Only this package. Repeat for more."
+flag "-n --dry-run" help="Print the actions. Change nothing."
+flag "--skip-tools" help="Do not install tools or sync plugins."
+flag "--backup" help="Move a conflicting file to <name>.bak.<stamp>."
+flag "--adopt" help="Move a conflicting file into the repo."
+flag "--force" help="Delete a conflicting file."
+'''
+env = { DOTFILES_MISE = "{{mise_bin}}", DOTFILES_REPO = "{{config_root}}" }
+
+[tasks.install]
+extends = "cli"
+description = "Link the packages and install the tools"
+run = 'sh install/run.sh "{{vars.steps_install}}"'
+
+[tasks.link]
+extends = "cli"
+description = "Link the packages and seed the host files"
+run = 'sh install/run.sh "{{vars.steps_link}}"'
+
+[tasks.doctor]
+description = "Check an existing install"
+env = { DOTFILES_MISE = "{{mise_bin}}", DOTFILES_REPO = "{{config_root}}" }
+run = "sh install/doctor.sh"
+
+[tasks.uninstall]
+description = "Remove every link this repo owns"
+env = { DOTFILES_MISE = "{{mise_bin}}", DOTFILES_REPO = "{{config_root}}" }
+run = "sh install/run.sh unlink"
+
+[tasks.scan]
+description = "Check the repo for a leaked credential"
+run = "sh install/scan-secrets.sh"
+
+[tasks.lock]
+description = "Write mise.lock for every profile and platform"
+env = { DOTFILES_MISE = "{{mise_bin}}", DOTFILES_REPO = "{{config_root}}" }
+run = "sh install/lock.sh"

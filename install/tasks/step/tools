@@ -1,0 +1,62 @@
+#!/bin/sh
+#MISE description="Install every tool in the profile with mise"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Tools"
+[ -x "$MISE_BIN" ] || { warn "no mise. Skipping the tool install."; exit 0; }
+if [ "$DRY_RUN" = 1 ]; then
+  skip "would run mise install --locked"
+  exit 0
+fi
+
+# mise reads release lists from the GitHub API. An unauthenticated caller
+# gets 60 calls per hour, shared with each host behind the same address.
+if [ -z "${GITHUB_TOKEN:-}" ] && [ -z "${GITHUB_API_TOKEN:-}" ]; then
+  tok=$(sed -n 's/.*"GITHUB_TOKEN"[[:space:]]*:[[:space:]]*"\([^"]\{1,\}\)".*/\1/p' \
+    "$HOME/.env.json" 2>/dev/null | head -1)
+  if [ -n "$tok" ]; then
+    export GITHUB_TOKEN="$tok"
+    ok "a GitHub token from ~/.env.json raises the API limit"
+  else
+    warn "no GITHUB_TOKEN. The GitHub API allows 60 calls per hour per address."
+    say "  ${C_DIM}Add GITHUB_TOKEN to ~/.env.json when a download hits the limit.$C_OFF"
+  fi
+fi
+
+# The tool configs are in $HOME, so mise must run from $HOME. The repo
+# mise.toml would add the repo tasks config to the tool set.
+cd "$HOME"
+
+# --locked installs the exact URLs and checksums in mise.lock. Two passes,
+# because a rate limit or a slow mirror often clears on the retry.
+lock="$XDG_CONFIG_HOME/mise/mise.lock"
+flags=--yes
+[ -f "$lock" ] && flags="--yes --locked"
+# shellcheck disable=SC2086
+if "$MISE_BIN" install $flags || "$MISE_BIN" install $flags; then
+  ok "every tool is installed"
+else
+  warn "some tools failed. Run 'mise install' to see which."
+  if [ -f "$lock" ]; then
+    say "  ${C_DIM}A tool that is not in mise.lock fails with --locked.$C_OFF"
+    say "  ${C_DIM}Run 'mise run lock' in the repo after a pin change.$C_OFF"
+  fi
+fi
+"$MISE_BIN" reshim >/dev/null 2>&1 || true
+
+# .zshrc guards each optional tool, so a missing one fails with no
+# message. A missing oh-my-posh gives the bare zsh prompt.
+missing=''
+for t in oh-my-posh sk zoxide fzf eza rg; do
+  "$MISE_BIN" which "$t" >/dev/null 2>&1 || have "$t" || missing="$missing $t"
+done
+if [ -z "$missing" ]; then
+  ok "every shell tool resolves"
+  exit 0
+fi
+fail "the shell needs these tools, and they are missing:$missing"
+case "$missing" in
+*oh-my-posh*) say "  ${C_DIM}Retry with: mise install -y ubi:JanDeDobbeleer/oh-my-posh$C_OFF" ;;
+esac
+say "  ${C_DIM}A proxy that intercepts TLS is the usual cause. See the README.$C_OFF"
+exit 1

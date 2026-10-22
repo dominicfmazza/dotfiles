@@ -1,0 +1,69 @@
+#!/bin/sh
+#MISE description="Link every package in install/manifest.conf"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Links"
+
+resolve_target() {
+  case $1 in
+  home) printf '%s\n' "$HOME" ;;
+  xdg:*) printf '%s/%s\n' "$XDG_CONFIG_HOME" "${1#xdg:}" ;;
+  win:.) win_home ;;
+  win:*) wh=$(win_home) && printf '%s/%s\n' "$wh" "${1#win:}" ;;
+  *) return 1 ;;
+  esac
+}
+
+# A directory that two packages share, or that a tool writes into, must
+# stay real. `real` rows name the second kind. This finds the first kind.
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/dotlink.XXXXXX")
+trap 'rm -rf "$tmp"' EXIT
+real_dirs="$tmp/real"
+rows="$tmp/rows"
+manifest link >"$rows"
+: >"$tmp/all"
+while read -r pkg platforms target flags <&3; do
+  want_package "$pkg" "$platforms" || continue
+  dst=$(resolve_target "$target") || continue
+  [ -d "$REPO_ROOT/$pkg" ] || continue
+  find "$REPO_ROOT/$pkg" -mindepth 1 -type d -not -path '*/.git*' \
+    -not -name profiles 2>/dev/null | sed -e "s|^$REPO_ROOT/$pkg|$dst|" >>"$tmp/all"
+done 3<"$rows"
+sort "$tmp/all" | uniq -d >"$real_dirs"
+manifest real | while read -r d; do expand_path "$d"; done >>"$real_dirs"
+
+# The loop reads the rows on descriptor 3. win_home runs cmd.exe, which
+# reads stdin and would eat the rest of the rows.
+while read -r pkg platforms target flags <&3; do
+  want_package "$pkg" "$platforms" || continue
+  dst=$(resolve_target "$target") || { skip "$pkg (no target on $PLATFORM)"; continue; }
+  [ -d "$REPO_ROOT/$pkg" ] || { warn "$pkg is in the manifest but not on disk"; continue; }
+
+  say "  $C_DIM$pkg -> $(pretty "$dst")$C_OFF"
+  act mkdir -p "$dst"
+  mode=fold
+  [ "${flags:-}" = nofold ] && mode=nofold
+  link_tree "$REPO_ROOT/$pkg" "$dst" "$mode" profiles "$real_dirs"
+done 3<"$rows"
+
+# The mise profile files for --profile go into ~/.config/mise/conf.d.
+want_package mise linux,wsl,darwin || exit 0
+srcdir="$REPO_ROOT/mise/.config/mise/profiles"
+dstdir="$XDG_CONFIG_HOME/mise/conf.d"
+say "  ${C_DIM}mise profile: $DOTFILES_PROFILE ($DOTFILES_PROFILE_FILES)$C_OFF"
+act mkdir -p "$dstdir"
+
+# A profile file that this profile does not want goes. The test uses -L
+# too, because -e is false for a link whose target is gone.
+for old in "$dstdir"/*.toml; do
+  [ -e "$old" ] || [ -L "$old" ] || continue
+  base=$(basename "$old" .toml)
+  case " $DOTFILES_PROFILE_FILES " in *" $base "*) continue ;; esac
+  owned_by_repo "$old" || continue
+  act rm -f "$old"
+  ok "$(pretty "$old") removed"
+done
+for f in $DOTFILES_PROFILE_FILES; do
+  [ -e "$srcdir/$f.toml" ] || { warn "no profile file $f.toml"; continue; }
+  make_link "$srcdir/$f.toml" "$dstdir/$f.toml"
+done

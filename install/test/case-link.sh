@@ -59,7 +59,9 @@ echo "=== 4. mise conf.d holds the profile"
 check "~/.config/mise/config.toml" is_link_to "$HOME/.config/mise/config.toml" mise/.config/mise/config.toml
 check "conf.d/00-core.toml" is_link_to "$HOME/.config/mise/conf.d/00-core.toml" profiles/00-core.toml
 check "conf.d/20-editor.toml" is_link_to "$HOME/.config/mise/conf.d/20-editor.toml" profiles/20-editor.toml
+check "conf.d/25-desktop.toml" is_link_to "$HOME/.config/mise/conf.d/25-desktop.toml" profiles/25-desktop.toml
 check "no work profile by default" test ! -e "$HOME/.config/mise/conf.d/30-work.toml"
+check "~/.config/mise/mise.lock" is_link_to "$HOME/.config/mise/mise.lock" mise/.config/mise/mise.lock
 check "~/.config/mise is a real directory" sh -c '[ -d "$HOME/.config/mise" ] && [ ! -L "$HOME/.config/mise" ]'
 
 echo
@@ -172,7 +174,7 @@ check "paths.sh" test -f "$HOME/.config/environments/paths.sh"
 check "langs.sh" test -f "$HOME/.config/environments/langs.sh"
 check "~/.env.json" test -f "$HOME/.env.json"
 check "no token leaked into the seed" sh -c '! grep -qE "glpat-|sk-|bgpat-" "$HOME/.env.json"'
-check "CC points at zcc on a host with no gcc" grep -q zcc "$HOME/.config/environments/langs.sh"
+check "no CC override in langs.sh" sh -c '! grep -q "^export CC=" "$HOME/.config/environments/langs.sh"'
 
 echo
 echo "=== 6b. the env template names GITHUB_TOKEN"
@@ -225,6 +227,12 @@ echo "=== 11. doctor runs"
 ./bootstrap.sh doctor >/tmp/doctor.log 2>&1 || true
 check "doctor reports no broken link" sh -c '! grep -q "is broken" /tmp/doctor.log'
 check "doctor names the missing tools" grep -q "nvim is missing" /tmp/doctor.log
+
+echo
+echo "=== 11b. mise runs the same commands"
+check "mise lists the commands" sh -c '"$HOME/.local/bin/mise" -C "$HOME/dotfiles" tasks ls 2>/dev/null | grep -q "^install"'
+check "a bad profile fails" sh -c '! ./bootstrap.sh link -p nope >/dev/null 2>&1'
+check "a step runs alone" sh -c '"$HOME/.local/bin/mise" -C "$HOME/dotfiles" run -q step:hooks >/dev/null 2>&1' 
 
 echo
 # The tilde in a check description is display text, not a path.

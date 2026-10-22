@@ -1,0 +1,18 @@
+#!/bin/sh
+#MISE description="Install the secret scan as a pre-commit hook"
+# This repo is public. A token or an internal hostname must not reach a commit.
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Git hooks"
+[ -d "$REPO_ROOT/.git" ] || { skip "not a git checkout"; exit 0; }
+
+hook="$REPO_ROOT/.git/hooks/pre-commit"
+if [ -e "$hook" ] && [ ! -L "$hook" ]; then
+  warn "$(pretty "$hook") exists and is not a link. Leaving it alone."
+elif [ -L "$hook" ] && [ "$(readlink "$hook")" = ../../install/scan-secrets.sh ]; then
+  skip "the pre-commit scan hook is installed"
+else
+  act mkdir -p "$REPO_ROOT/.git/hooks"
+  act ln -sf ../../install/scan-secrets.sh "$hook"
+  ok "the pre-commit scan hook is installed"
+fi

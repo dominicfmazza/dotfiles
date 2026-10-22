@@ -339,7 +339,7 @@ unlink_tree() {
   rm -f "${TMPDIR:-/tmp}/dotlinks.$$"
 }
 
-# ---------------------------------------------------------------- fetch -----
+# ------------------------------------------------------------------ host ----
 
 home_fstype() {
   stat -f -c %T "$HOME" 2>/dev/null || echo unknown
@@ -352,32 +352,6 @@ home_is_remote() {
   esac
 }
 
-fetch() {
-  # fetch URL OUT
-  if have curl; then
-    act curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1"
-  elif have wget; then
-    act wget -qO "$2" "$1"
-  else
-    die "no curl and no wget"
-  fi
-}
-
-tls_probe() {
-  # Report whether HTTPS to github.com works. A proxy that intercepts TLS
-  # breaks every download until the host trusts the proxy CA.
-  have curl || return 0
-  curl -fsS --max-time 20 -o /dev/null https://github.com 2>/dev/null && return 0
-
-  warn "HTTPS to github.com failed. A proxy may intercept TLS."
-  say "  ${C_DIM}Point the tools at the corporate CA bundle:$C_OFF"
-  say "  ${C_DIM}  export SSL_CERT_FILE=/path/to/ca-bundle.pem$C_OFF"
-  say "  ${C_DIM}  export CURL_CA_BUNDLE=\$SSL_CERT_FILE$C_OFF"
-  say "  ${C_DIM}  export NODE_EXTRA_CA_CERTS=\$SSL_CERT_FILE$C_OFF"
-  say "  ${C_DIM}  export CARGO_HTTP_CAINFO=\$SSL_CERT_FILE$C_OFF"
-  return 1
-}
-
 seed_file() {
   # seed_file TEMPLATE DEST. Never overwrites.
   if [ -e "$2" ]; then
@@ -387,4 +361,31 @@ seed_file() {
   act mkdir -p "$(dirname "$2")"
   act cp "$1" "$2"
   ok "$(pretty "$2") seeded"
+}
+
+# --------------------------------------------------------------- manifest ----
+
+expand_path() {
+  # Expand a leading ~ or $XDG_CONFIG_HOME in a manifest path.
+  case "$1" in
+    "~") printf '%s\n' "$HOME" ;;
+    "~/"*) printf '%s/%s\n' "$HOME" "${1#\~/}" ;;
+    '$XDG_CONFIG_HOME'*) printf '%s%s\n' "$XDG_CONFIG_HOME" "${1#\$XDG_CONFIG_HOME}" ;;
+    *) printf '%s\n' "$1" ;;
+  esac
+}
+
+on_platform() {
+  # on_platform LIST. True when LIST is empty, `all`, or holds $PLATFORM.
+  case ",${1:-all}," in
+    *,all,* | *",$PLATFORM,"*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+manifest() {
+  # manifest KIND. Print every row of that kind, minus the kind and any
+  # comment. The rows keep their field order.
+  sed -e 's/#.*//' "$REPO_ROOT/install/manifest.conf" |
+    awk -v k="$1" '$1 == k { $1 = ""; sub(/^ +/, ""); print }'
 }
