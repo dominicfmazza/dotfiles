@@ -14,8 +14,12 @@ require("fzf-lua").setup {
       ["ctrl-Q"] = FzfLua.actions.file_sel_to_ll,
     },
   },
+  buffers = {
+    cwd_only = true,
+  },
 }
 
+vim.keymap.set("n", "<leader>fb", function() require("fzf-lua").buffers() end, { desc = "Find Buffers" })
 vim.keymap.set("n", "<leader>ff", function() require("fzf-lua").global() end, { desc = "Find Global" })
 vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Find TODOs" })
 vim.keymap.set("n", "<leader>fg", function() require("fzf-lua").grep_project { hidden = true } end, { desc = "Live Grep" })

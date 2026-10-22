@@ -1871,6 +1871,7 @@ function M.board_toggle(opts)
       style = cfg.border,
       text = { top = cfg.title, top_align = "center" },
     },
+    relative = "editor",
     position = "50%",
     size = cfg.size,
     buf_options = { modifiable = false, filetype = "obsidian-tasks" },
@@ -2373,6 +2374,7 @@ function M.help_toggle(zindex, context)
       style = cfg.border,
       text = { top = cfg.title, top_align = "center" },
     },
+    relative = "editor",
     position = "50%",
     size = { width = math.min(width + 4, vim.o.columns - 4), height = math.min(#lines, vim.o.lines - 6) },
     win_options = {

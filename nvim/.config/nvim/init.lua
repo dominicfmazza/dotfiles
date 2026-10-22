@@ -183,6 +183,7 @@ vim.api.nvim_set_keymap("n", "<Leader>nf", ":lua require('neogen').generate()<CR
 
 require "term"
 require "tabline"
+require "tabscope"
 require "git"
 require "lsp"
 require "picker"
