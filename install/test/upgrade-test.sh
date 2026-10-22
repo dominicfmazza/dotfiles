@@ -6,6 +6,8 @@
 # where a stale link or a stale ZDOTDIR shows up.
 #
 # Usage: install/test/upgrade-test.sh <old-git-ref>
+#
+# The new side is the working tree, with any change that is not committed.
 set -eu
 
 OLD_REF=${1:?usage: upgrade-test.sh <old-git-ref>}
@@ -19,7 +21,7 @@ cd "$REPO"
 cat >/tmp/upgrade.Dockerfile <<'DOCKER'
 ARG BASE=registry.access.redhat.com/ubi9/ubi:latest
 FROM ${BASE}
-RUN dnf -q -y install ca-certificates git gzip tar unzip xz zsh \
+RUN dnf -q -y install ca-certificates clang git gzip tar unzip xz zsh \
     glibc-langpack-en shadow-utils findutils && dnf -q clean all
 COPY install/test/ca/ /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust >/dev/null 2>&1 || true
@@ -31,6 +33,13 @@ ENV HOME=/home/tester LANG=en_US.UTF-8 TERM=xterm-256color \
 COPY --chown=tester:tester . /home/tester/dotfiles
 WORKDIR /home/tester/dotfiles
 CMD ["/bin/bash"]
+DOCKER
+
+# Commit the working tree inside the image copy, so that the test can
+# check out the old ref and then come back to the new tree.
+cat >>/tmp/upgrade.Dockerfile <<'DOCKER'
+RUN git -c user.email=t@example.invalid -c user.name=t add -A >/dev/null 2>&1 \
+    && git -c user.email=t@example.invalid -c user.name=t commit -qm worktree --no-verify >/dev/null 2>&1 || true
 DOCKER
 
 echo "==> Building $IMAGE"
@@ -69,6 +78,12 @@ git -c advice.detachedHead=false checkout -q "$OLD_REF" 2>/dev/null || true
 mkdir -p zsh/.config/zsh
 [ -d zsh/.config/zsh/.antidote ] || cp -r /tmp/antidote-keep zsh/.config/zsh/.antidote
 ./bootstrap.sh link >/dev/null 2>&1 || true
+# The old kitty installer put kitty in ~/.local/kitty.app and linked it
+# into ~/.local/bin. A fake app is enough to test the repair.
+mkdir -p "$HOME/.local/kitty.app/bin"
+printf '#!/bin/sh\n' >"$HOME/.local/kitty.app/bin/kitty"
+chmod +x "$HOME/.local/kitty.app/bin/kitty"
+ln -sf "$HOME/.local/kitty.app/bin/kitty" "$HOME/.local/bin/kitty"
 echo "    links after the old install:"
 for f in .zshenv .zprofile .zshrc; do
   printf '      %-12s %s\n' "$f" "$([ -L "$HOME/$f" ] && echo link || echo '-')"
@@ -107,6 +122,13 @@ for l in "$HOME"/.* "$HOME"/.config/*; do
 done
 check "no broken link in the home" test "$stale" = 0
 check "no ~/.config/zsh left behind" test ! -e "$HOME/.config/zsh"
+check "~/.config/mise is a real directory" sh -c '[ -d "$HOME/.config/mise" ] && [ ! -L "$HOME/.config/mise" ]'
+check "mise.lock is linked" test -L "$HOME/.config/mise/mise.lock"
+check "conf.d holds the full profile" test -L "$HOME/.config/mise/conf.d/25-desktop.toml"
+check "no conf.d inside the repo" test ! -e "$HOME/dotfiles/mise/.config/mise/conf.d"
+check "no kitty link into ~/.local/kitty.app" test ! -L "$HOME/.local/bin/kitty"
+rerun=$(./bootstrap.sh link 2>&1 | grep -cE "ok +~.* (linked|removed|relinked)" || true)
+check "a second run makes no link" test "$rerun" = 0
 
 echo
 echo "--- step 5: the configurator must NOT appear"

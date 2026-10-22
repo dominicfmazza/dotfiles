@@ -1,0 +1,23 @@
+# Profile: full. The terminal and its font, for a host with a display.
+#
+# Versions are pinned. See 00-core.toml for why. WSL renders in Windows,
+# so install kitty and the font on the Windows host there.
+
+[tools."github:kovidgoyal/kitty"]
+version = "0.49.2"
+os = ["linux", "macos"]
+
+# kitty also releases a kitten-only binary. The pattern picks the full app.
+[tools."github:kovidgoyal/kitty".platforms]
+linux-x64 = { asset_pattern = "kitty-{{version}}-x86_64.txz" }
+linux-arm64 = { asset_pattern = "kitty-{{version}}-arm64.txz" }
+macos-x64 = { asset_pattern = "kitty-{{version}}.dmg" }
+macos-arm64 = { asset_pattern = "kitty-{{version}}.dmg" }
+
+# The hook copies the fonts into the user font directory, where the
+# terminal finds them. mise keeps the archive in its own install directory.
+[tools."http:hack-nerd-font"]
+version = "3.2.1"
+url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{version}}/Hack.zip"
+os = ["linux", "macos"]
+postinstall = "sh ~/.local/bin/font-install \"$MISE_TOOL_INSTALL_PATH\""

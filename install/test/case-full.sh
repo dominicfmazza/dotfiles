@@ -17,6 +17,8 @@ check() {
   fi
 }
 
+LOCK_SUM=$(grep -v "^provenance = " "$HOME/dotfiles/mise/.config/mise/mise.lock" | cksum)
+
 echo "=== 1. install with the editor profile"
 ./bootstrap.sh install --profile editor 2>&1 | tee /tmp/install.log
 
@@ -30,6 +32,14 @@ echo "=== 3. core tools resolve through the shims"
 for t in fzf fd rg bat jq eza zoxide lazygit yazi oh-my-posh sk tldr; do
   check "$t" sh -c "PATH=\"\$HOME/.local/share/mise/shims:\$PATH\" command -v $t >/dev/null"
 done
+
+echo
+echo "=== 3a. the install used the lock file"
+check "mise.lock is linked" test -L "$HOME/.config/mise/mise.lock"
+# An install records a provenance check that `mise lock` cannot see, such
+# as the minisign signature of zig. Any other change means a stale lock.
+check "the install changed no URL or checksum in the lock" sh -c \
+  'grep -v "^provenance = " "$HOME/dotfiles/mise/.config/mise/mise.lock" | cksum | grep -qx "$1"' _ "$LOCK_SUM"
 
 echo
 echo "=== 3b. every tool in the profile installed"
@@ -47,11 +57,9 @@ check "oh-my-posh registered its precmd hook" sh -c "case '$hooks' in *_omp_prec
 check "no fallback-prompt warning" sh -c '! zsh -i -c true 2>&1 >/dev/null | grep -q "oh-my-posh is missing"'
 
 echo
-echo "=== 4. zig supplies a compiler on a host with no gcc"
-check "no system gcc" sh -c '! command -v gcc >/dev/null'
-check "zig runs" sh -c 'PATH="$HOME/.local/share/mise/shims:$PATH" zig version >/dev/null'
+echo "=== 4. clang supplies the C compiler"
 printf 'int main(void){return 0;}\n' >/tmp/probe.c
-check "zcc compiles a C file" sh -c 'PATH="$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH" zcc -o /tmp/probe /tmp/probe.c'
+check "clang compiles a C file" clang -o /tmp/probe /tmp/probe.c
 check "the binary runs" /tmp/probe
 
 echo

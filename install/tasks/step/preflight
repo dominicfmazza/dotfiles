@@ -1,0 +1,65 @@
+#!/bin/sh
+#MISE description="Check the host requirements"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Preflight on $PLATFORM/$ARCH"
+[ "$PLATFORM" = unknown ] && die "unsupported platform: $(uname -s)"
+
+for c in git tar; do
+  if have "$c"; then ok "$c $(tool_version "$c" --version)"; else fail "$c is missing"; fi
+done
+if have curl || have wget; then ok "a downloader is present"; else fail "curl or wget is needed"; fi
+for c in unzip gzip xz; do
+  if have "$c"; then ok "$c"; else warn "$c is missing. Some archives will not unpack."; fi
+done
+
+if have git; then
+  gv=$(tool_version git --version)
+  version_ge "$gv" 2.7 || fail "git $gv is too old. Need 2.7 or later."
+fi
+
+if have zsh; then
+  zv=$(tool_version zsh --version)
+  if version_ge "$zv" 5.8; then ok "zsh $zv"; else warn "zsh $zv is old. Need 5.8 for every plugin."; fi
+else
+  fail "zsh is missing. mise has no zsh package. Ask the host owner for it."
+fi
+
+[ -w "$HOME" ] || fail "\$HOME is not writable"
+
+# cargo crates and treesitter parsers link with the system `cc`.
+if have clang; then
+  ok "clang $(tool_version clang --version)"
+else
+  case $PLATFORM in
+  darwin) hint="xcode-select --install" ;;
+  *) hint="dnf install clang, or apt-get install clang" ;;
+  esac
+  fail "clang is missing. Ask the host owner to run: $hint"
+fi
+
+# A proxy that intercepts TLS breaks every download until the host trusts
+# the proxy CA.
+if have curl && ! curl -fsS --max-time 20 -o /dev/null https://github.com 2>/dev/null; then
+  warn "HTTPS to github.com failed. A proxy may intercept TLS."
+  say "  ${C_DIM}Point the tools at the corporate CA bundle:$C_OFF"
+  say "  ${C_DIM}  export SSL_CERT_FILE=/path/to/ca-bundle.pem$C_OFF"
+  say "  ${C_DIM}  export CURL_CA_BUNDLE=\$SSL_CERT_FILE$C_OFF"
+  say "  ${C_DIM}  export NODE_EXTRA_CA_CERTS=\$SSL_CERT_FILE$C_OFF"
+  say "  ${C_DIM}  export CARGO_HTTP_CAINFO=\$SSL_CERT_FILE$C_OFF"
+elif have curl; then
+  ok "HTTPS to github.com works"
+fi
+
+# A network home breaks a tool that locks a cache file. zsh moves the
+# caches to local disk. This line shows the state before the first install.
+fs=$(home_fstype)
+if home_is_remote; then
+  ok "\$HOME is on $fs. The caches go to local disk."
+  say "  ${C_DIM}Tool installs stay on \$HOME and survive a reboot.$C_OFF"
+else
+  ok "\$HOME is on $fs. The caches stay on \$HOME."
+fi
+
+[ "$FAIL_COUNT" -gt 0 ] && die "$FAIL_COUNT requirement(s) failed. Fix them and run again."
+exit 0

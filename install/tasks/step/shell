@@ -1,0 +1,35 @@
+#!/bin/sh
+#MISE description="Warm the zsh plugin cache and start zsh at login"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Shell"
+have zsh || { warn "no zsh. Skipping the shell setup."; exit 0; }
+
+if [ "$DRY_RUN" = 1 ]; then
+  skip "would warm the antidote plugin cache"
+elif zsh -ic true >/dev/null 2>&1; then
+  ok "the plugin cache is warm"
+else
+  warn "the first zsh start reported an error. Open zsh and read it."
+fi
+
+case "${SHELL:-}" in */zsh) ok "zsh is the login shell"; exit 0 ;; esac
+
+zpath=$(command -v zsh)
+for rc in "$HOME/.profile" "$HOME/.bash_profile"; do
+  if grep -q 'bootstrap.sh: start zsh' "$rc" 2>/dev/null; then
+    skip "$(pretty "$rc") already starts zsh"
+  elif [ "$DRY_RUN" = 1 ]; then
+    skip "would add a zsh start block to $(pretty "$rc")"
+  else
+    cat >>"$rc" <<BLOCK
+
+# bootstrap.sh: start zsh when this is an interactive login shell.
+case \$- in
+  *i*) [ -z "\${ZSH_VERSION:-}" ] && [ -x "$zpath" ] && exec "$zpath" -l ;;
+esac
+BLOCK
+    ok "$(pretty "$rc") now starts zsh"
+  fi
+done
+say "  ${C_DIM}To change the login shell instead: chsh -s $zpath$C_OFF"

@@ -4,7 +4,7 @@
 # Usage:
 #   install/test/run.sh [link|full|nfs|upgrade|all|shell] [--keep]
 #
-#   link    link only. Needs no network beyond the antidote clone. Fast.
+#   link    link only. Needs network for the mise install. Fast.
 #   full    link plus the whole tool install. Slow. Needs network egress.
 #   nfs     a network home: the cache redirect and the zsh startup order.
 #   upgrade an older install, then an upgrade to HEAD. Catches a stale link.
@@ -60,14 +60,22 @@ case $MODE in
   full) SCRIPT=/home/tester/dotfiles/install/test/case-full.sh ;;
   nfs) SCRIPT=/home/tester/dotfiles/install/test/case-nfs.sh ;;
   upgrade)
-    # A different image and flow, so hand off to its own script.
-    exec "$(dirname "$0")/upgrade-test.sh" "${UPGRADE_FROM:-417d42f}"
+    # A different image and flow, so hand off to its own script. Each ref
+    # is an older install to upgrade from. 417d42f has the ~/.config/zsh
+    # layout. 39fd89d has the shell bootstrap from before mise tasks.
+    for ref in ${UPGRADE_FROM:-417d42f 39fd89d}; do
+      echo "==> Upgrading from $ref"
+      "$(dirname "$0")/upgrade-test.sh" "$ref" || exit 1
+    done
+    exit 0
     ;;
   all)
     for m in link nfs upgrade full; do
       echo "==> Running the $m case"
       if [ "$m" = upgrade ]; then
-        "$(dirname "$0")/upgrade-test.sh" "${UPGRADE_FROM:-417d42f}" || exit 1
+        for ref in ${UPGRADE_FROM:-417d42f 39fd89d}; do
+          "$(dirname "$0")/upgrade-test.sh" "$ref" || exit 1
+        done
         continue
       fi
       # shellcheck disable=SC2086

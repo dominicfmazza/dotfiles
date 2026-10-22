@@ -1,0 +1,9 @@
+#!/bin/sh
+#MISE description="Remove every link this repo owns"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Uninstall"
+unlink_tree "$HOME/.local/bin"
+unlink_tree "$XDG_CONFIG_HOME"
+unlink_tree "$HOME"
+say "  ${C_DIM}The seeded host files stay in place.$C_OFF"

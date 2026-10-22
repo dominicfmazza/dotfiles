@@ -1,0 +1,17 @@
+#!/bin/sh
+#MISE description="Copy the host files in install/manifest.conf"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "Host files"
+seeds=$(manifest seed)
+while read -r tpl dst platforms; do
+  on_platform "${platforms:-all}" || continue
+  seed_file "$REPO_ROOT/install/templates/$tpl" "$(expand_path "$dst")"
+done <<EOS
+$seeds
+EOS
+
+if on_platform linux,wsl,darwin && [ ! -f "$HOME/.pi/agent/auth.json" ]; then
+  say "  ${C_DIM}No pi credential yet. Run 'pi' and use /login.$C_OFF"
+fi
+exit 0

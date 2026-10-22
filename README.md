@@ -11,17 +11,42 @@ cd ~/dotfiles
 
 ## What the bootstrap does
 
-1. Checks the host requirements and stops on a missing one.
-2. Checks out the antidote submodule, or clones it when git cannot.
-3. Links every package into `$HOME`, the way GNU stow did.
-4. Seeds the host files under `~/.config/environments/` and `~/.env.json`.
-5. Installs `mise` into `~/.local/bin/mise`.
-6. Installs every tool in the selected profile.
-7. Pulls the Neovim nightly and syncs the plugins from the lock file.
-8. Installs Hack Nerd Font and the kitty terminal on Linux and macOS.
-9. Warms the zsh plugin cache and makes zsh the interactive shell.
+`bootstrap.sh` installs mise into `~/.local/bin/mise`, then runs a mise
+task. After the first run, `mise run <command>` does the same thing.
 
-Run it again at any time. Every phase is idempotent.
+The `install` command runs these steps in order:
+
+1. `preflight`: checks the host requirements and stops on a missing one.
+2. `submodules`: checks out antidote, or clones it when git cannot.
+3. `hooks`: installs the secret scan as a `pre-commit` hook.
+4. `prune`: repairs a host that has an older install of this repo.
+5. `link`: links every package into `$HOME`, the way GNU stow did.
+6. `seed`: copies the host files, such as `~/.env.json`, one time.
+7. `tools`: installs the tools of the profile from `mise.lock`.
+8. `neovim`: syncs the Neovim plugins from the lock file.
+9. `wm`: installs AeroSpace and simple-bar on macOS.
+10. `shell`: warms the zsh plugin cache and makes zsh the shell.
+
+Run it again at any time. Every step is idempotent.
+
+## Change what gets installed
+
+Each change is an edit to a data file. No script needs a change.
+
+| To change | Edit |
+| --- | --- |
+| A config package, or its platforms | a `link` row in `install/manifest.conf` |
+| A file that a host copies one time | a `seed` row in `install/manifest.conf` |
+| A tool | a profile file in `mise/.config/mise/profiles/` |
+| The files in a profile | `profile_*` in `mise.toml` |
+| The steps of a command | `steps_*` in `mise.toml` |
+| A custom step | a script in `install/tasks/step/` |
+
+After a tool change, run `mise run lock` and commit `mise.lock`.
+
+A step is a small shell script. Its `#MISE description=` line names it in
+`mise tasks`. It sources `install/env.sh` and can use the helpers
+in `install/lib.sh`. `mise run step:<name>` runs one step alone.
 
 ## Host requirements
 
@@ -34,28 +59,25 @@ The host must supply these. A rootless install cannot create them.
 | `curl` or `wget` | any | The mise installer and every download. |
 | `tar`, `gzip`, `xz`, `unzip` | any | Archive extraction. |
 | `zsh` | 5.8 | The interactive shell. mise has no zsh package. |
+| `clang` | any | tree-sitter, the treesitter parsers, and `cargo:` crates. |
 | Writable `$HOME` | — | Every install target. |
 | Network to github.com and mise.jdx.dev | — | Tool downloads. |
 | A true-color terminal | — | `termguicolors` and the prompt. |
 | A Nerd Font on the terminal host | — | Glyphs in the prompt, Neovim, and yazi. |
 
-On Linux and macOS the bootstrap installs Hack Nerd Font into the user font
-directory, so no root is needed. On WSL the terminal runs on Windows. Install
-the font on the Windows host in that case.
+The `full` profile installs Hack Nerd Font with mise. A mise hook copies
+it into the user font directory, so no root is needed. On WSL the terminal
+runs on Windows. Install the font on the Windows host in that case.
 
 mise supplies everything else: node, go, rust, python, uv, zig, cmake, fzf,
 fd, ripgrep, bat, jq, eza, zoxide, skim, lazygit, yazi, Neovim, every
 language server, and every formatter.
 
-A C compiler is optional. When the host has no `gcc` and no `clang`, the
-bootstrap points `CC` and `CXX` at `zcc` and `zxx`. Both wrap `zig cc`, and
-mise installs zig. Treesitter parsers and `cargo:` crates build with it.
+The host must have clang. tree-sitter, the treesitter parsers, and the
+`cargo:` crates build with it. The preflight step stops when clang is
+missing. On macOS, `xcode-select --install` supplies clang.
 
-`zcc` and `zxx` pin the target glibc to the host glibc. A `.so` they build
-then loads on an old host such as RHEL 9. Set `ZIG_GLIBC_TARGET` to override
-the version, for example `2.34`, or to `none` to use the zig default.
-
-On a RHEL 9 host, `dnf install zsh git tar gzip xz unzip` covers
+On a RHEL 9 host, `dnf install zsh git tar gzip xz unzip clang` covers
 every requirement. Ask the host owner for that one command.
 
 ## Commands
@@ -67,20 +89,35 @@ every requirement. Ask the host owner for that one command.
 ./bootstrap.sh doctor             # check an existing install
 ./bootstrap.sh scan               # check the repo for a leaked credential
 ./bootstrap.sh uninstall          # remove every link this repo owns
-./bootstrap.sh --help             # every flag
+./bootstrap.sh install --help     # every flag
 ```
+
+After the first install, `mise run install`, `mise run doctor`, and the
+others do the same thing. `mise tasks` lists them.
 
 ### Profiles
 
-The mise tool list lives in `mise/.config/mise/profiles/`. A profile decides
-which files the bootstrap links into `~/.config/mise/conf.d/`.
+The mise tool list is in `mise/.config/mise/profiles/`. A profile decides
+which files the bootstrap links into `~/.config/mise/conf.d/`. The
+`profile_*` values in `mise.toml` set the files of each profile.
 
 | Profile | Files | Use for |
 | --- | --- | --- |
 | `core` | `00-core` | A shell on a jump host. |
 | `lang` | `+ 10-lang` | A build box. |
-| `editor`, `full` | `+ 20-editor` | A workstation. The default. |
+| `editor` | `+ 20-editor` | A workstation with no display. |
+| `full` | `+ 25-desktop` | A workstation. The default. Adds kitty and the font. |
 | `work` | `+ 30-work` | An employer host: aws, terraform, glab, jira. |
+
+### The lock file
+
+`mise/.config/mise/mise.lock` holds the exact URL and checksum of each
+tool, for every profile and platform. The bootstrap links it into
+`~/.config/mise`, and the `tools` step runs `mise install --locked`. A
+host then gets the same files as every other host, with no release lookup.
+
+After a pin change, run `mise run lock` and commit the file. A tool that
+is not in the lock file fails with `--locked`.
 
 ### Conflicts
 
@@ -213,9 +250,10 @@ Three terminal configs share one look: the vague palette and Hack Nerd Font.
 The kitty config hides the tab bar for a single tab, uses a block cursor, and
 opens a 120x28 window. This matches the rio and wezterm setup.
 
-On Linux and macOS the bootstrap installs the kitty binary into
-`~/.local/kitty.app` with the official installer, and links `kitty` into
-`~/.local/bin`. No root is needed. On WSL, install kitty on the Windows host.
+On Linux and macOS the `full` profile installs kitty with mise, from the
+kitty release archive. No root is needed. On WSL, install kitty on the
+Windows host. An older install put kitty in `~/.local/kitty.app`. The
+bootstrap removes its links. Delete the directory when kitty works.
 
 ## Windows
 
@@ -307,38 +345,27 @@ back to a plain prompt with the directory and git branch. Fix it with:
 mise install -y ubi:JanDeDobbeleer/oh-my-posh
 ```
 
-`./bootstrap.sh install` verifies each shell tool and fails when one is
-missing, so this should not appear after a clean run.
+`./bootstrap.sh install` checks each shell tool and fails when one is
+missing. A clean run does not show this problem.
 
 ### An npm install reports a bad file descriptor
 
 See "A network home" above. The cache must not sit on NFS.
 
-### A treesitter parser fails to load with a GLIBC error
-
-Neovim reports a parser `.so` that needs a `GLIBC_2.xx` the host lacks, for
-example on RHEL 9. This happens when `zig cc` builds the parser against a
-glibc newer than the host.
-
-`zcc` and `zxx` pin the target glibc to the host glibc, so a fresh build loads.
-Rebuild the parsers after an upgrade:
-
-```sh
-rm -rf ~/.local/share/nvim/site/parser
-nvim --headless '+qa'
-```
-
-Override the target glibc with `ZIG_GLIBC_TARGET` when detection is wrong, for
-example `export ZIG_GLIBC_TARGET=2.34`.
-
 ## Layout
 
 ```text
-bootstrap.sh              the installer
-install/lib.sh            shared shell helpers
-install/manifest.conf     package -> platform -> target map
+bootstrap.sh              installs mise, then runs a mise task
+mise.toml                 the commands, the profiles, and the step lists
+install/manifest.conf     the packages to link and the files to seed
+install/tasks/step/       one script per step
+install/run.sh            runs the steps of a command
+install/env.sh            the shared state of every step
+install/lib.sh            the link engine and the output helpers
+install/doctor.sh         the doctor command
+install/lock.sh           writes mise.lock for every profile
 install/scan-secrets.sh   the pre-commit credential scan
-install/templates/        seeds for the host files
-install/test/             container tests, including an upgrade case
+install/templates/        the seeds for the host files
+install/test/             container tests, including two upgrade cases
 <package>/                a tree that mirrors $HOME
 ```
