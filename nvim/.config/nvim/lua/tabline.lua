@@ -1,43 +1,16 @@
 local api, fn = vim.api, vim.fn
 
-local filetypes = {
-  git = "Git",
-}
-
 --- @param name string
 --- @return {bg?:integer, fg?:integer}
 local function get_hl(name) return api.nvim_get_hl(0, { name = name }) end
 
-local buftypes = {
-  help = function(file) return "help:" .. fn.fnamemodify(file, ":t:r") end,
-  quickfix = "quickfix",
-  terminal = function(file)
-    local mtch = string.match(file, "term:.*:(%a+)")
-    return mtch or fn.fnamemodify(vim.env.SHELL, ":t")
-  end,
-}
-
-local function title(bufnr, tabnr)
-  local filetype = vim.bo[bufnr].filetype
-
-  if filetypes[filetype] then return filetypes[filetype] end
-
-  local file = fn.bufname(bufnr)
-  local buftype = vim.bo[bufnr].buftype
-
-  local bt = buftypes[buftype]
-  if bt then
-    if type(bt) == "function" then return bt(file) end
-    return bt
-  end
-
-  local working_directory = vim.fn.getcwd(-1, tabnr)
-  local project_name = vim.fn.fnamemodify(working_directory, ":t")
-  return project_name
-end
+--- @param tabnr integer
+--- @return string
+local function title(tabnr) return fn.fnamemodify(fn.getcwd(-1, tabnr), ":t") end
 
 local function flags(bufnr)
   local ret = {} --- @type string[]
+  if vim.bo[bufnr].buftype == "terminal" then return "" end
   if vim.bo[bufnr].modified then ret[#ret + 1] = "[+]" end
   if not vim.bo[bufnr].modifiable then ret[#ret + 1] = "[RO]" end
   return table.concat(ret)
@@ -64,7 +37,7 @@ local function cell(index, selected)
 
   local hl = not selected and "TabLineFill" or "TabLineSel"
   local common = "%#" .. hl .. "#"
-  local ret = string.format("%s%%%dT %s%s ", common, index, title(bufnr, index), flags(bufnr))
+  local ret = string.format("%s%%%dT %s%s ", common, index, title(index), flags(bufnr))
 
   if #bufnrs > 1 then ret = string.format("%s%s(%d) ", ret, common, #bufnrs) end
 
