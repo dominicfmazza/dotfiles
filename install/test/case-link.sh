@@ -88,7 +88,7 @@ check "~/.pi/agent is a real directory" sh -c '[ -d "$HOME/.pi/agent" ] && [ ! -
 # settings.json must be a copy. pi rewrites it, and a link would dirty the repo.
 check "settings.json is a real file" sh -c '[ -f "$HOME/.pi/agent/settings.json" ] && [ ! -L "$HOME/.pi/agent/settings.json" ]'
 check "models.json is a real file" sh -c '[ -f "$HOME/.pi/agent/models.json" ] && [ ! -L "$HOME/.pi/agent/models.json" ]'
-check "mcp.json is a real file" sh -c '[ -f "$HOME/.config/mcp/mcp.json" ] && [ ! -L "$HOME/.config/mcp/mcp.json" ]'
+check "mcp.json is a real file" sh -c '[ -f "$HOME/.pi/agent/mcp.json" ] && [ ! -L "$HOME/.pi/agent/mcp.json" ]'
 check "no auth.json is created" test ! -e "$HOME/.pi/agent/auth.json"
 check "no agent model is pinned to a provider" sh -c '! grep -rq "^model:" "$HOME/dotfiles/pi/.pi/agent/agents/"'
 
