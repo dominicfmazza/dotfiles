@@ -135,13 +135,14 @@ present() {
 }
 
 for bad in auth.json models.json trust.json models-store.json \
-  mcp-cache.json mcp-onboarding.json settings.json; do
+  mcp.json mcp-auth.json mcp.log mcp-cache.json mcp-onboarding.json \
+  settings.json; do
   if present "pi/.pi/agent/$bad"; then
     record "pi runtime file in the repo" "pi/.pi/agent/$bad"
   fi
 done
 
-for bad in sessions mcp-oauth mcp-auth npm git bin plans .worktrees; do
+for bad in sessions mcp-oauth mcp-auth npm git bin install plans .worktrees; do
   if [ "$MODE" = staged ]; then
     if grep -q "^pi/\.pi/agent/$bad/" "$LIST" 2>/dev/null; then
       record "pi runtime path in the repo" "pi/.pi/agent/$bad/"

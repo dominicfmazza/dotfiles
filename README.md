@@ -141,7 +141,7 @@ These files hold anything specific to one machine. None is in git.
 | `~/.pi/agent/settings.json` | pi settings. pi rewrites it, so it is a copy. |
 | `~/.pi/agent/models.json` | Custom LLM providers and their endpoints. |
 | `~/.pi/agent/auth.json` | pi credentials. Run `pi` and use `/login`. |
-| `~/.config/mcp/mcp.json` | MCP server endpoints. |
+| `~/.pi/agent/mcp.json` | MCP server endpoints. pi reads it natively. |
 
 The bootstrap seeds each one from `install/templates/`, and never overwrites
 an existing file.
