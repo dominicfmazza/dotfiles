@@ -30,8 +30,8 @@ nvim_min = "0.13"
 tree_sitter_min = "0.26.1"
 
 # The steps of each command, in order.
-steps_install = "preflight submodules hooks prune link seed tools neovim wm shell"
-steps_link = "preflight submodules hooks prune link seed"
+steps_install = "preflight submodules hooks prune link seed ssh tools neovim wm shell"
+steps_link = "preflight submodules hooks prune link seed ssh"
 
 [task_templates.cli]
 usage = '''

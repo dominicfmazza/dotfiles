@@ -47,6 +47,12 @@ check "~/.config/lazygit" is_link_to "$HOME/.config/lazygit" dotfiles/lazygit/.c
 check "~/.local/bin/zcc" is_link_to "$HOME/.local/bin/zcc" scripts/.local/bin/zcc
 check "~/.local/bin/zig-target.sh" is_link_to "$HOME/.local/bin/zig-target.sh" scripts/.local/bin/zig-target.sh
 check "~/.wezterm.lua" is_link_to "$HOME/.wezterm.lua" dotfiles/wezterm/.wezterm.lua
+check "~/.local/bin/oob" is_link_to "$HOME/.local/bin/oob" scripts/.local/bin/oob
+check "~/.local/bin/nvim-open" is_link_to "$HOME/.local/bin/nvim-open" scripts/.local/bin/nvim-open
+check "~/.ssh/config.d/00-dotfiles.conf" is_link_to "$HOME/.ssh/config.d/00-dotfiles.conf" ssh/.ssh/config.d/00-dotfiles.conf
+check "~/.ssh is a real directory" sh -c '[ -d "$HOME/.ssh" ] && [ ! -L "$HOME/.ssh" ]'
+check "~/.ssh/config includes the shared settings" grep -q '^Include ~/.ssh/config.d/\*.conf' "$HOME/.ssh/config"
+check "a second link adds no second Include" sh -c './bootstrap.sh link >/dev/null 2>&1; [ "$(grep -c "^Include ~/.ssh/config.d" "$HOME/.ssh/config")" = 1 ]'
 
 echo
 echo "=== 3b. runtime directories stay real"
@@ -232,7 +238,7 @@ echo
 echo "=== 11b. mise runs the same commands"
 check "mise lists the commands" sh -c '"$HOME/.local/bin/mise" -C "$HOME/dotfiles" tasks ls 2>/dev/null | grep -q "^install"'
 check "a bad profile fails" sh -c '! ./bootstrap.sh link -p nope >/dev/null 2>&1'
-check "a step runs alone" sh -c '"$HOME/.local/bin/mise" -C "$HOME/dotfiles" run -q step:hooks >/dev/null 2>&1' 
+check "a step runs alone" sh -c '"$HOME/.local/bin/mise" -C "$HOME/dotfiles" run -q step:hooks >/dev/null 2>&1'
 
 echo
 # The tilde in a check description is display text, not a path.

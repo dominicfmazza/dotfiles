@@ -9,6 +9,9 @@ export OBSIDIAN_VAULT_ROOT="$HOME/vaults"
 # export VAULT_SYNC_HOSTS="my-desktop"
 # export VAULT_REMOTE_DIR="vaults"
 
+# SSH aliases that get a channel for links and the clipboard. See oob --help.
+# export OOB_HOSTS="my-desktop"
+
 # AWS profile and single sign-on endpoints. Leave unset on a personal host.
 # export AWS_PROFILE=
 # export AWS_DEFAULT_SSO_START_URL=

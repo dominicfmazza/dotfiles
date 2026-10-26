@@ -1,0 +1,822 @@
+#!/usr/bin/env python3
+"""oob: open links and use the clipboard of the local machine from an SSH host.
+
+The local machine runs `oob serve`. For each SSH host, a Mutagen session
+forwards a socket on the host to that server. On the host, `oob open`,
+`oob copy`, and `oob paste` send a request through the socket. On the local
+machine, the same commands call the local tools directly. A script then
+works the same way on both sides.
+
+Run `oob --help` for the commands.
+"""
+
+import base64
+import json
+import os
+import re
+import shlex
+import shutil
+import socket
+import socketserver
+import subprocess
+import sys
+import threading
+import time
+import urllib.parse
+from subprocess import PIPE
+
+USAGE = """\
+Usage:
+  oob open URL|-          open URL in the local browser. - reads stdin.
+  oob copy                copy stdin to the local clipboard
+  oob paste               write the local clipboard to stdout
+  oob forward PORT        forward localhost:PORT on this host to the
+                          local machine
+  oob unforward PORT      stop the forward of PORT
+  oob ping                show the mode and test the channel
+
+Local machine only:
+  oob up HOST             start the channel to HOST, an alias from
+                          ~/.ssh/config
+  oob down HOST           stop the channel and the port forwards of HOST
+  oob status              list the channels and the port forwards
+  oob enabled HOST        exit 0 when HOST is in OOB_HOSTS
+  oob serve               run the local server. `oob up` starts it.
+
+A link named xdg-open or oob-open acts as `oob open`. Set BROWSER=oob-open.
+
+Settings ($XDG_CONFIG_HOME/oob/config, one KEY = VALUE per line):
+  paste = no              yes lets an SSH host read the local clipboard
+  auto_forward = yes      forward the port of a localhost URL before the
+                          browser opens it
+  open_cmd, copy_cmd, paste_cmd
+                          replace the local tool for that operation
+
+Variables:
+  OOB_HOSTS   SSH aliases that get a channel, space separated
+  OOB_SOCK    the socket on an SSH host. The default is
+              ~/.local/state/oob/<hostname>.sock.
+"""
+
+MAX_MESSAGE = 16 << 20
+MAX_URL = 8192
+REMOTE_SCHEMES = ("http", "https", "mailto")
+LOOPBACK = ("localhost", "127.0.0.1", "0.0.0.0", "::1")
+# Mutagen allows letters, digits, and dashes in a session name and a label.
+ALIAS_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+HOSTNAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+class OobError(Exception):
+    pass
+
+
+def state_dir():
+    if os.environ.get("OOB_STATE"):
+        return os.environ["OOB_STATE"]
+    base = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
+    return os.path.join(base, "oob")
+
+
+def control_sock():
+    return os.path.join(state_dir(), "control.sock")
+
+
+def server_sock(alias):
+    return os.path.join(state_dir(), "server", alias + ".sock")
+
+
+def marker(alias):
+    return os.path.join(state_dir(), "hosts", alias)
+
+
+def log_file():
+    return os.path.join(state_dir(), "serve.log")
+
+
+# Mutagen cannot read XDG_STATE_HOME on the host, so the path starts with ~.
+# The hostname keeps apart two hosts that share one network home.
+def remote_sock_path(hostname):
+    return "~/.local/state/oob/%s.sock" % hostname
+
+
+def client_sock():
+    if os.environ.get("OOB_SOCK"):
+        return os.environ["OOB_SOCK"]
+    return os.path.expanduser(remote_sock_path(socket.gethostname()))
+
+
+def self_path():
+    return os.path.realpath(__file__)
+
+
+def slug(alias):
+    return re.sub(r"[^A-Za-z0-9-]", "-", alias)
+
+
+def config():
+    path = os.environ.get("OOB_CONFIG") or os.path.join(
+        os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"),
+        "oob",
+        "config",
+    )
+    cfg = {"paste": "no", "auto_forward": "yes"}
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+    except OSError:
+        return cfg
+    for line in lines:
+        line = line.split("#", 1)[0].strip()
+        if "=" in line:
+            key, value = line.split("=", 1)
+            cfg[key.strip()] = value.strip()
+    return cfg
+
+
+def truthy(value):
+    return str(value).strip().lower() in ("1", "yes", "true", "on")
+
+
+def platform():
+    if sys.platform == "darwin":
+        return "darwin"
+    if os.environ.get("WSL_DISTRO_NAME") or "microsoft" in os.uname().release.lower():
+        return "wsl"
+    return "linux"
+
+
+def has_display():
+    return bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
+
+
+def in_ssh():
+    return bool(os.environ.get("SSH_CONNECTION") or os.environ.get("SSH_TTY"))
+
+
+def which_other(name):
+    """Find NAME on PATH, but not a link to this script."""
+    me = self_path()
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        p = os.path.join(d, name)
+        if os.path.isfile(p) and os.access(p, os.X_OK) and os.path.realpath(p) != me:
+            return p
+    return None
+
+
+def first_tool(*candidates):
+    for cmd in candidates:
+        p = which_other(cmd[0])
+        if p:
+            return [p] + list(cmd[1:])
+    return None
+
+
+def open_cmd(cfg):
+    if cfg.get("open_cmd"):
+        return shlex.split(cfg["open_cmd"])
+    plat = platform()
+    if plat == "darwin":
+        return ["/usr/bin/open"]
+    if plat == "wsl":
+        return first_tool(["wslview"], ["explorer.exe"])
+    if has_display():
+        return first_tool(["xdg-open"], ["gio", "open"])
+    return None
+
+
+def copy_cmd(cfg):
+    if cfg.get("copy_cmd"):
+        return shlex.split(cfg["copy_cmd"])
+    plat = platform()
+    if plat == "darwin":
+        return ["pbcopy"]
+    if plat == "wsl":
+        return first_tool(["clip.exe"])
+    if os.environ.get("WAYLAND_DISPLAY"):
+        tool = first_tool(["wl-copy"])
+        if tool:
+            return tool
+    if os.environ.get("DISPLAY"):
+        return first_tool(["xclip", "-selection", "clipboard"], ["xsel", "-ib"])
+    return first_tool(["termux-clipboard-set"])
+
+
+def paste_cmd(cfg):
+    if cfg.get("paste_cmd"):
+        return shlex.split(cfg["paste_cmd"])
+    plat = platform()
+    if plat == "darwin":
+        return ["pbpaste"]
+    if plat == "wsl":
+        return first_tool(["powershell.exe", "-NoProfile", "-Command", "Get-Clipboard -Raw"])
+    if os.environ.get("WAYLAND_DISPLAY"):
+        tool = first_tool(["wl-paste", "--no-newline"])
+        if tool:
+            return tool
+    if os.environ.get("DISPLAY"):
+        return first_tool(["xclip", "-o", "-selection", "clipboard"], ["xsel", "-ob"])
+    return first_tool(["termux-clipboard-get"])
+
+
+def local_open(target, cfg):
+    cmd = open_cmd(cfg)
+    if not cmd:
+        raise OobError("no tool can open a link on this machine")
+    subprocess.Popen(
+        cmd + [target],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+
+
+def local_copy(text, cfg):
+    cmd = copy_cmd(cfg)
+    if not cmd:
+        raise OobError("no clipboard tool on this machine")
+    # xclip and wl-copy stay alive to own the selection. A pipe on stdout
+    # would make this call wait for them, so stdout goes to /dev/null.
+    subprocess.run(
+        cmd,
+        input=text.encode("utf-8"),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=True,
+        timeout=5,
+    )
+
+
+def local_paste(cfg):
+    cmd = paste_cmd(cfg)
+    if not cmd:
+        raise OobError("no clipboard tool on this machine")
+    out = subprocess.run(cmd, stdout=PIPE, stderr=PIPE, check=True, timeout=5).stdout
+    text = out.decode("utf-8", errors="replace")
+    return text.replace("\r\n", "\n") if platform() == "wsl" else text
+
+
+def osc52(text):
+    """Send TEXT to the terminal clipboard. tmux passes it to the terminal."""
+    data = base64.b64encode(text.encode("utf-8")).decode("ascii")
+    try:
+        with open("/dev/tty", "w") as tty:
+            tty.write("\033]52;c;%s\a" % data)
+        return True
+    except OSError:
+        return False
+
+
+# One JSON line in and one JSON line out for each connection.
+# Every answer has "ok", and "error" when ok is false.
+def recv_line(conn):
+    chunks = []
+    size = 0
+    while True:
+        data = conn.recv(65536)
+        if not data:
+            break
+        i = data.find(b"\n")
+        if i >= 0:
+            chunks.append(data[:i])
+            break
+        chunks.append(data)
+        size += len(data)
+        if size > MAX_MESSAGE:
+            raise OobError("the message is too large")
+    return b"".join(chunks)
+
+
+def request(path, req, timeout=15):
+    conn = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    conn.settimeout(timeout)
+    try:
+        conn.connect(path)
+        conn.sendall(json.dumps(req).encode("utf-8") + b"\n")
+        line = recv_line(conn)
+    finally:
+        conn.close()
+    # The Mutagen listener on the host accepts a connection when the local
+    # side is down. It then closes the connection with no answer.
+    if not line:
+        raise OobError("no answer from the local machine. Run `oob up HOST` there.")
+    return json.loads(line)
+
+
+def check_url(url):
+    if len(url) > MAX_URL:
+        raise OobError("the URL is too long")
+    if any(ord(c) < 0x20 or ord(c) == 0x7F for c in url):
+        raise OobError("the URL has a control character")
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme.lower() not in REMOTE_SCHEMES:
+        raise OobError(
+            "the scheme %r is not allowed. Use one of: %s"
+            % (parts.scheme or "(none)", ", ".join(REMOTE_SCHEMES))
+        )
+    return parts
+
+
+def loopback_port(parts):
+    """Return the port of a loopback http(s) URL, or None."""
+    if parts.scheme.lower() not in ("http", "https"):
+        return None
+    if (parts.hostname or "").lower() not in LOOPBACK:
+        return None
+    # A URL with no port uses 80 or 443. A forward of those ports needs root.
+    return parts.port
+
+
+def mutagen(*args, check=True):
+    if not shutil.which("mutagen"):
+        raise OobError("no mutagen on PATH. Run: mise install")
+    res = subprocess.run(["mutagen", *args], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    if check and res.returncode != 0:
+        msg = (res.stderr or res.stdout).strip().splitlines()
+        raise OobError("mutagen %s failed: %s" % (args[0], msg[-1] if msg else res.returncode))
+    return res
+
+
+def session_exists(name):
+    return mutagen("forward", "list", name, check=False).returncode == 0
+
+
+def port_session(alias, port):
+    return "oob-%s-%d" % (slug(alias), port)
+
+
+def forward_port(alias, port):
+    name = port_session(alias, port)
+    if session_exists(name):
+        mutagen("forward", "resume", name)
+        return
+    mutagen(
+        "forward", "create",
+        "--name", name,
+        "--label", "oob=port",
+        "--label", "oob-host=" + slug(alias),
+        "tcp:localhost:%d" % port,
+        "%s:tcp:localhost:%d" % (alias, port),
+    )
+
+
+def unforward_port(alias, port):
+    name = port_session(alias, port)
+    if session_exists(name):
+        mutagen("forward", "terminate", name)
+
+
+def log(msg):
+    sys.stderr.write("%s %s\n" % (time.strftime("%Y-%m-%dT%H:%M:%S"), msg))
+    sys.stderr.flush()
+
+
+def sock_alive(path):
+    conn = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    conn.settimeout(1)
+    try:
+        conn.connect(path)
+        return True
+    except OSError:
+        return False
+    finally:
+        conn.close()
+
+
+def parse_port(value):
+    try:
+        port = int(value)
+    except (TypeError, ValueError):
+        raise OobError("the port must be a number")
+    if not 1 <= port <= 65535:
+        raise OobError("the port must be 1 to 65535")
+    return port
+
+
+class Server:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.listeners = {}
+
+    def bind(self, path, alias):
+        os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+        if os.path.exists(path):
+            os.unlink(path)
+        owner = self
+
+        class Handler(socketserver.BaseRequestHandler):
+            def handle(self):
+                owner.handle(self.request, alias)
+
+        old = os.umask(0o177)
+        try:
+            srv = socketserver.ThreadingUnixStreamServer(path, Handler)
+        finally:
+            os.umask(old)
+        srv.daemon_threads = True
+        return srv
+
+    def listen(self, alias):
+        with self.lock:
+            if alias in self.listeners:
+                return
+            srv = self.bind(server_sock(alias), alias)
+            self.listeners[alias] = srv
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        log("listening for %s" % alias)
+
+    def forget(self, alias):
+        with self.lock:
+            srv = self.listeners.pop(alias, None)
+        if srv:
+            srv.shutdown()
+            srv.server_close()
+            try:
+                os.unlink(server_sock(alias))
+            except OSError:
+                pass
+            log("stopped listening for %s" % alias)
+
+    def handle(self, conn, alias):
+        try:
+            req = json.loads(recv_line(conn))
+            if not isinstance(req, dict):
+                raise OobError("the request is not an object")
+            resp = self.dispatch(req, alias)
+            resp.setdefault("ok", True)
+        except OobError as e:
+            resp = {"ok": False, "error": str(e)}
+        except (ValueError, subprocess.SubprocessError) as e:
+            resp = {"ok": False, "error": str(e)}
+        except Exception as e:  # noqa: BLE001 - the server must stay up
+            log("error from %s: %r" % (alias or "control", e))
+            resp = {"ok": False, "error": "internal error: %s" % e}
+        try:
+            conn.sendall(json.dumps(resp).encode("utf-8") + b"\n")
+        except OSError:
+            pass
+
+    def dispatch(self, req, alias):
+        op = req.get("op")
+        cfg = config()
+        if op == "ping":
+            return {"host": alias, "paste": truthy(cfg.get("paste"))}
+        if op == "open":
+            return self.op_open(str(req.get("url", "")).strip(), alias, cfg)
+        if op == "copy":
+            text = req.get("text")
+            if not isinstance(text, str):
+                raise OobError("copy needs text")
+            local_copy(text, cfg)
+            return {}
+        if op == "paste":
+            if not truthy(cfg.get("paste")):
+                raise OobError("paste is off. Set paste = yes in ~/.config/oob/config.")
+            return {"text": local_paste(cfg)}
+        if op in ("forward", "unforward"):
+            if alias is None:
+                raise OobError("%s needs a host socket" % op)
+            port = parse_port(req.get("port"))
+            if op == "forward":
+                forward_port(alias, port)
+                return {"url": "http://localhost:%d" % port}
+            unforward_port(alias, port)
+            return {}
+        if op in ("listen", "forget"):
+            if alias is not None:
+                raise OobError("%s is for the local machine only" % op)
+            host = str(req.get("host", ""))
+            if not ALIAS_RE.match(host):
+                raise OobError("bad host alias %r" % host)
+            (self.listen if op == "listen" else self.forget)(host)
+            return {}
+        raise OobError("unknown operation %r" % op)
+
+    def op_open(self, url, alias, cfg):
+        parts = check_url(url)
+        port = loopback_port(parts) if alias else None
+        if port is None or not truthy(cfg.get("auto_forward")):
+            local_open(url, cfg)
+            return {}
+        if (parts.hostname or "").lower() in ("0.0.0.0", "::1"):
+            url = urllib.parse.urlunsplit(parts._replace(netloc="localhost:%d" % port))
+
+        # Mutagen needs a second or more to start a forward. The server answers
+        # first, so an editor does not wait for the browser.
+        def work():
+            try:
+                forward_port(alias, port)
+            except OobError as e:
+                log("forward of %s:%d failed: %s" % (alias, port, e))
+            try:
+                local_open(url, cfg)
+            except OobError as e:
+                log("open failed: %s" % e)
+
+        threading.Thread(target=work, daemon=True).start()
+        return {"forwarded": port}
+
+    def run(self):
+        ctrl = control_sock()
+        if sock_alive(ctrl):
+            log("a server already runs on %s" % ctrl)
+            return 0
+        control = self.bind(ctrl, None)
+        hosts = os.path.dirname(marker("x"))
+        if os.path.isdir(hosts):
+            for alias in sorted(os.listdir(hosts)):
+                if ALIAS_RE.match(alias):
+                    self.listen(alias)
+        log("server started, pid %d" % os.getpid())
+        try:
+            control.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        return 0
+
+
+def ensure_server():
+    if sock_alive(control_sock()):
+        return
+    os.makedirs(state_dir(), mode=0o700, exist_ok=True)
+    with open(log_file(), "a") as logf:
+        subprocess.Popen(
+            [sys.executable, self_path(), "serve"],
+            stdin=subprocess.DEVNULL,
+            stdout=logf,
+            stderr=logf,
+            start_new_session=True,
+        )
+    for _ in range(50):
+        if sock_alive(control_sock()):
+            return
+        time.sleep(0.1)
+    raise OobError("the server did not start. See %s" % log_file())
+
+
+def remote_active():
+    """True when this process talks to a local machine through a socket."""
+    if os.environ.get("OOB_SOCK"):
+        return True
+    if not (in_ssh() or (platform() == "linux" and not has_display())):
+        return False
+    return os.path.exists(client_sock())
+
+
+def remote_request(req):
+    resp = request(client_sock(), req)
+    if not resp.get("ok"):
+        raise OobError(resp.get("error", "the request failed"))
+    return resp
+
+
+def print_link(url):
+    # OSC 8 makes the text a link in a terminal that supports it.
+    sys.stderr.write("\033]8;;%s\033\\%s\033]8;;\033\\\n" % (url, url))
+
+
+def cmd_open(args):
+    if not args:
+        raise OobError("open needs a URL")
+    target = sys.stdin.read().strip() if args == ["-"] else args[0]
+    if not remote_active():
+        # A plain open on this machine keeps every xdg-open argument.
+        if args != ["-"] and len(args) > 1:
+            cmd = open_cmd(config())
+            if not cmd:
+                raise OobError("no tool can open a link on this machine")
+            os.execv(cmd[0], cmd + args)
+        try:
+            local_open(target, config())
+            return 0
+        except OobError:
+            if not in_ssh():
+                raise
+            sys.stderr.write("oob: no channel to the local machine. Open this link:\n")
+            print_link(target)
+            return 3
+    try:
+        remote_request({"op": "open", "url": target})
+        return 0
+    except (OobError, OSError) as e:
+        sys.stderr.write("oob: %s\nOpen this link:\n" % e)
+        print_link(target)
+        return 3
+
+
+def cmd_copy(_args):
+    text = sys.stdin.buffer.read().decode("utf-8", errors="replace")
+    if remote_active():
+        try:
+            remote_request({"op": "copy", "text": text})
+            return 0
+        except (OobError, OSError) as e:
+            if osc52(text):
+                return 0
+            raise OobError(str(e))
+    try:
+        local_copy(text, config())
+        return 0
+    except OobError:
+        if osc52(text):
+            return 0
+        raise
+
+
+def cmd_paste(_args):
+    if remote_active():
+        text = remote_request({"op": "paste"})["text"]
+    else:
+        text = local_paste(config())
+    sys.stdout.write(text)
+    return 0
+
+
+def cmd_forward(args, op="forward"):
+    if len(args) != 1:
+        raise OobError("%s needs one PORT" % op)
+    port = parse_port(args[0])
+    if not remote_active():
+        raise OobError("%s works only on an SSH host with a channel" % op)
+    resp = remote_request({"op": op, "port": port})
+    if op == "forward":
+        print(resp["url"])
+    return 0
+
+
+def cmd_ping(_args):
+    if remote_active():
+        sock = client_sock()
+        try:
+            resp = remote_request({"op": "ping"})
+        except (OobError, OSError) as e:
+            print("mode: remote\nsocket: %s\nstatus: down (%s)" % (sock, e))
+            return 1
+        print("mode: remote\nsocket: %s\nstatus: up\nhost alias: %s\npaste: %s"
+              % (sock, resp.get("host"), "on" if resp.get("paste") else "off"))
+        return 0
+    server = "up" if sock_alive(control_sock()) else "down (oob up HOST starts it)"
+    print("mode: local\nserver: %s" % server)
+    return 0 if not in_ssh() else 1
+
+
+def need_alias(args, name):
+    if len(args) != 1:
+        raise OobError("%s needs one HOST" % name)
+    if not ALIAS_RE.match(args[0]):
+        raise OobError("bad host alias %r" % args[0])
+    return args[0]
+
+
+SETUP = r"""
+d="$HOME/.local/state/oob"
+mkdir -p "$d" && chmod 700 "$d" || exit 1
+printf 'host=%s\n' "$(uname -n)"
+c="$HOME/.local/bin/oob"
+if [ -L "$c" ]; then echo client=link
+elif [ -f "$c" ]; then echo "client=$(cksum < "$c" | cut -d' ' -f1)"
+elif command -v oob >/dev/null 2>&1; then echo client=path
+else echo client=none
+fi
+if command -v python3 >/dev/null 2>&1; then echo python=yes; else echo python=no; fi
+"""
+
+PUSH = r"""
+b="$HOME/.local/bin"
+mkdir -p "$b" && cat > "$b/oob.tmp" && chmod 755 "$b/oob.tmp" && mv "$b/oob.tmp" "$b/oob"
+for n in oob-open xdg-open; do
+  [ -e "$b/$n" ] || [ -L "$b/$n" ] || ln -s oob "$b/$n"
+done
+"""
+
+
+def ssh(host, script, stdin=None):
+    cmd = ["ssh", "-o", "ConnectTimeout=10", host, "sh", "-c", shlex.quote(script)]
+    res = subprocess.run(cmd, input=stdin, stdout=PIPE, stderr=PIPE)
+    if res.returncode != 0:
+        err = res.stderr.decode(errors="replace").strip().splitlines()
+        raise OobError("ssh %s failed: %s" % (host, err[-1] if err else res.returncode))
+    return res.stdout.decode(errors="replace")
+
+
+def push_client(host, info):
+    state = info.get("client", "none")
+    if state in ("link", "path"):
+        return
+    with open(self_path(), "rb") as f:
+        body = f.read()
+    local_sum = subprocess.run(["cksum"], input=body, stdout=PIPE).stdout.split()[0].decode()
+    if state == local_sum:
+        return
+    if info.get("python") != "yes":
+        sys.stderr.write("oob: %s has no python3. Neovim still uses the channel.\n" % host)
+        return
+    ssh(host, PUSH, stdin=body)
+
+
+def cmd_up(args):
+    alias = need_alias(args, "up")
+    ensure_server()
+    info = dict(
+        line.split("=", 1) for line in ssh(alias, SETUP).splitlines() if "=" in line
+    )
+    hostname = info.get("host", "")
+    if not HOSTNAME_RE.match(hostname):
+        raise OobError("%s reported a bad hostname %r" % (alias, hostname))
+    push_client(alias, info)
+
+    resp = request(control_sock(), {"op": "listen", "host": alias})
+    if not resp.get("ok"):
+        raise OobError(resp.get("error", "the server refused the host"))
+
+    path = remote_sock_path(hostname)
+    mark = marker(alias)
+    try:
+        with open(mark, encoding="utf-8") as f:
+            old = f.read().strip()
+    except OSError:
+        old = ""
+    name = "oob-" + slug(alias)
+    exists = session_exists(name)
+    if exists and old == path:
+        mutagen("forward", "resume", name)
+    else:
+        if exists:
+            mutagen("forward", "terminate", name)
+        mutagen(
+            "forward", "create",
+            "--name", name,
+            "--label", "oob=socket",
+            "--label", "oob-host=" + slug(alias),
+            "--socket-overwrite-mode-source", "overwrite",
+            "--socket-permission-mode-source", "0600",
+            "%s:unix:%s" % (alias, path),
+            "unix:" + server_sock(alias),
+        )
+    os.makedirs(os.path.dirname(mark), mode=0o700, exist_ok=True)
+    with open(mark, "w", encoding="utf-8") as f:
+        f.write(path + "\n")
+    return 0
+
+
+def cmd_down(args):
+    alias = need_alias(args, "down")
+    mutagen("forward", "terminate", "--label-selector", "oob-host=" + slug(alias), check=False)
+    if sock_alive(control_sock()):
+        request(control_sock(), {"op": "forget", "host": alias})
+    try:
+        os.unlink(marker(alias))
+    except OSError:
+        pass
+    return 0
+
+
+def cmd_status(_args):
+    print("server: %s" % ("up" if sock_alive(control_sock()) else "down"))
+    res = mutagen("forward", "list", "--label-selector", "oob", check=False)
+    sys.stdout.write(res.stdout)
+    return res.returncode
+
+
+def cmd_enabled(args):
+    alias = need_alias(args, "enabled")
+    return 0 if alias in os.environ.get("OOB_HOSTS", "").split() else 1
+
+
+COMMANDS = {
+    "open": cmd_open,
+    "copy": cmd_copy,
+    "paste": cmd_paste,
+    "forward": cmd_forward,
+    "unforward": lambda a: cmd_forward(a, "unforward"),
+    "ping": cmd_ping,
+    "up": cmd_up,
+    "down": cmd_down,
+    "status": cmd_status,
+    "enabled": cmd_enabled,
+    "serve": lambda _a: Server().run(),
+}
+
+
+def main(argv):
+    if os.path.basename(argv[0]) in ("xdg-open", "oob-open"):
+        argv = [argv[0], "open"] + argv[1:]
+    if len(argv) < 2 or argv[1] in ("-h", "--help", "help"):
+        sys.stdout.write(USAGE)
+        return 0 if len(argv) >= 2 else 2
+    cmd = COMMANDS.get(argv[1])
+    if not cmd:
+        sys.stderr.write("oob: unknown command %r\n%s" % (argv[1], USAGE))
+        return 2
+    try:
+        return cmd(argv[2:])
+    except OobError as e:
+        sys.stderr.write("oob: %s\n" % e)
+        return 1
+    except KeyboardInterrupt:
+        return 130
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

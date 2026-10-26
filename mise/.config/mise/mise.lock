@@ -357,30 +357,6 @@ checksum = "sha256:e524b894145d89cb76b584e3a9691196ae56bfa31d51384a44aa774252b7c
 url = "https://github.com/kovidgoyal/kitty/releases/download/v0.49.2/kitty-0.49.2.dmg"
 url_api = "https://api.github.com/repos/kovidgoyal/kitty/releases/assets/602305400"
 
-[[tools."github:mikew/nvrh"]]
-version = "0.9.1"
-backend = "github:mikew/nvrh"
-
-[tools."github:mikew/nvrh"."platforms.linux-arm64"]
-checksum = "sha256:8cacc180c43037a2e63160fafd7fea87f4c7fa5143a8278c4b93e3e662881e79"
-url = "https://github.com/mikew/nvrh/releases/download/v0.9.1/nvrh-linux-arm64"
-url_api = "https://api.github.com/repos/mikew/nvrh/releases/assets/478747445"
-
-[tools."github:mikew/nvrh"."platforms.linux-x64"]
-checksum = "sha256:82df498168bb086a22793089e2937cc99f9342aa619445b635218790088ea943"
-url = "https://github.com/mikew/nvrh/releases/download/v0.9.1/nvrh-linux-amd64"
-url_api = "https://api.github.com/repos/mikew/nvrh/releases/assets/478747447"
-
-[tools."github:mikew/nvrh"."platforms.macos-arm64"]
-checksum = "sha256:b9214b139dcb7d93822dd458895c52f14ba71934e5080813e89eb9776da6177a"
-url = "https://github.com/mikew/nvrh/releases/download/v0.9.1/nvrh-darwin-arm64"
-url_api = "https://api.github.com/repos/mikew/nvrh/releases/assets/478747444"
-
-[tools."github:mikew/nvrh"."platforms.macos-x64"]
-checksum = "sha256:5cab684d6cc6a3374052859e80caec15336d237ad46b1d540e600c157756630f"
-url = "https://github.com/mikew/nvrh/releases/download/v0.9.1/nvrh-darwin-amd64"
-url_api = "https://api.github.com/repos/mikew/nvrh/releases/assets/478747449"
-
 [[tools.go]]
 version = "1.26.5"
 backend = "core:go"

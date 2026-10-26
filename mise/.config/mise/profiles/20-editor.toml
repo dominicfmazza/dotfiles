@@ -45,7 +45,6 @@ ty = "0.0.60"
 # The flag makes mise skip cargo-binstall too. binstall would fetch the same
 # glibc 2.39 binary from the upstream release and reintroduce the failure.
 "cargo:tree-sitter-cli" = { version = "0.27.0", default-features = false }
-"github:mikew/nvrh" = "0.9.1"
 "pipx:neovim-remote" = "2.5.1"
 
 # C and C++ support

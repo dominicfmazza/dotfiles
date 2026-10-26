@@ -1,0 +1,25 @@
+#!/bin/sh
+#MISE description="Include the shared SSH settings and add the oob channel"
+. "${DOTFILES_REPO:-$MISE_CONFIG_ROOT}/install/env.sh"
+
+info "SSH"
+on_platform linux,wsl,darwin || exit 0
+
+dir="$HOME/.ssh"
+cfg="$dir/config"
+act mkdir -p "$dir/cm"
+act chmod 700 "$dir" "$dir/cm"
+
+# ssh keeps the first value it reads, so the shared file goes last.
+# Match all ends any Host block above it.
+mark='# dotfiles: shared SSH settings'
+if grep -qF "$mark" "$cfg" 2>/dev/null; then
+  skip "$(pretty "$cfg") includes the shared settings"
+elif [ "$DRY_RUN" = 1 ]; then
+  skip "would add an Include block to $(pretty "$cfg")"
+else
+  [ -e "$cfg" ] || { : >"$cfg" && chmod 600 "$cfg"; }
+  printf '\n%s\nMatch all\nInclude ~/.ssh/config.d/*.conf\n' "$mark" >>"$cfg"
+  ok "$(pretty "$cfg") includes the shared settings"
+fi
+exit 0

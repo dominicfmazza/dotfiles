@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Edit FILE in the parent Neovim, or in a new nvim. --man reads a man page.
+# Neovim sets NVIM in a terminal buffer. nvr reads it to find the server.
+
+set -eu
+
+parent() { [ -n "${NVIM:-}" ] && command -v nvr >/dev/null 2>&1; }
+
+if [ "${1:-}" = --man ]; then
+  shift
+  if parent; then
+    # nvr sends one RPC call per stdin line, so the page goes through a file.
+    page=$(mktemp "${TMPDIR:-/tmp}/nvim-man.XXXXXX")
+    cat >"$page"
+    exec nvr --remote-tab-silent "$page" -c 'setlocal bufhidden=wipe | Man!' \
+      -c "call delete('$page')"
+  fi
+  exec nvim +Man! "$@"
+fi
+
+if parent; then
+  exec nvr --remote-wait-silent "$@"
+fi
+exec nvim "$@"

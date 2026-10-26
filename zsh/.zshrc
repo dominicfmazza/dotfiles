@@ -5,15 +5,14 @@
 # requires a $HOME/.zshenv anyway. Keeping the files in $HOME removes that
 # whole ordering trap.
 
-# nvr talks to a running Neovim server. Fall back to plain nvim when the
-# host has no nvr, so a bare host still gets a working editor.
-if (( $+commands[nvr] )); then
-  export EDITOR='zsh -l -c nvr'
-  export MANPAGER='zsh -l -c nvrt +Man!'
-elif (( $+commands[nvim] )); then
-  export EDITOR=nvim
-  export MANPAGER='nvim +Man!'
+# nvim-open edits in the parent Neovim from a terminal, or starts nvim.
+if (( $+commands[nvim] )); then
+  export EDITOR=nvim-open
+  export MANPAGER='nvim-open --man'
 fi
+
+# On an SSH host, oob-open sends a link to the local browser.
+export BROWSER=oob-open
 export NPM_PACKAGES="${HOME}/.npm-packages"
 export PATH="$NPM_PACKAGES/bin:$PATH"
 

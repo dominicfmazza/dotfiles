@@ -22,10 +22,11 @@ The `install` command runs these steps in order:
 4. `prune`: repairs a host that has an older install of this repo.
 5. `link`: links every package into `$HOME`, the way GNU stow did.
 6. `seed`: copies the host files, such as `~/.env.json`, one time.
-7. `tools`: installs the tools of the profile from `mise.lock`.
-8. `neovim`: syncs the Neovim plugins from the lock file.
-9. `wm`: installs AeroSpace and simple-bar on macOS.
-10. `shell`: warms the zsh plugin cache and makes zsh the shell.
+7. `ssh`: adds the shared SSH settings to `~/.ssh/config`, one time.
+8. `tools`: installs the tools of the profile from `mise.lock`.
+9. `neovim`: syncs the Neovim plugins from the lock file.
+10. `wm`: installs AeroSpace and simple-bar on macOS.
+11. `shell`: warms the zsh plugin cache and makes zsh the shell.
 
 Run it again at any time. Every step is idempotent.
 
@@ -146,6 +147,56 @@ These files hold anything specific to one machine. None is in git.
 The bootstrap seeds each one from `install/templates/`, and never overwrites
 an existing file.
 
+## Remote development
+
+A session on an SSH host works like a local session. A link opens in the
+local browser. A copy goes to the local clipboard. A `localhost` link from a
+dev server on the host opens in the local browser too.
+
+`oob` is the channel for this. The local machine runs `oob serve`. For each
+host, a Mutagen session forwards a socket on the host to that server. Mutagen
+reconnects after a network drop, and the host needs only SSH.
+
+1. Add an alias for the host to `~/.ssh/config`.
+2. Add the alias to `OOB_HOSTS` in `hosts.sh`.
+3. Connect with `ssh <alias>`.
+
+The `ssh` function in `.aliases` runs `oob up <alias>` before it connects.
+The first `oob up` starts the local server. It also copies the `oob` client
+to `~/.local/bin` on the host, unless the host has this repo.
+
+On the host, these use the channel:
+
+| Tool | Action |
+|---|---|
+| `gx` in Neovim, `vim.ui.open` | open the link in the local browser |
+| `"+y` in Neovim | copy to the local clipboard |
+| `y` in tmux copy mode | copy to the local clipboard |
+| `o` in tmux copy mode | open the selection in the local browser |
+| `$BROWSER`, `xdg-open` | `gh`, `glab`, and `aws sso login` open links locally |
+| `:OobForward [PORT]` | forward a port on the host to the local machine |
+| `oob ping`, `:OobPing` | test the channel |
+
+A `localhost:PORT` link opens after `oob` forwards the port. Run
+`oob status` to see each forward. Run `oob down <alias>` to stop the
+channel and the forwards of that host.
+
+Paste from the local clipboard is off. Any process of your user on the host
+can read the socket. To turn paste on, put `paste = yes` in
+`~/.config/oob/config` on the local machine. When paste is off, Neovim
+pastes from its own register.
+
+When the channel is down, copy uses OSC 52 and open prints the link. tmux
+passes both to the terminal.
+
+`~/.ssh/config.d/00-dotfiles.conf` holds the settings for every host:
+a shared connection (`ControlMaster`) and a keepalive. The bootstrap adds
+an `Include` for it at the end of `~/.ssh/config`. A value in a `Host` block
+above it wins.
+
+On a nested tmux, press `F12` to send every key to the inner session.
+Press `F12` again to go back.
+
 ## Vault sync over SSH
 
 `vault-sync` keeps a copy of the Obsidian vault on a remote host. It uses
@@ -157,7 +208,7 @@ host come back to the local vault, and OneDrive uploads them.
 3. Connect with `ssh <alias>`.
 
 The `ssh` function in `.aliases` starts the sync before it connects. It
-also sets `OBSIDIAN_VAULT_ROOT` on the remote host through the kitty kitten.
+also sets `OBSIDIAN_VAULT_ROOT` on the remote host when the terminal is kitty.
 The sync continues after you disconnect. Run `vault-sync pause <alias>` to
 stop it. Run `vault-sync status` to see conflicts.
 

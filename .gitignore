@@ -27,3 +27,4 @@ pi/.pi/agent/bin/
 pi/.pi/agent/plans/
 pi/.pi/agent/.worktrees/
 pi/.pi/agent/node_modules/
+__pycache__/

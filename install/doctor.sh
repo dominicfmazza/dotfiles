@@ -24,7 +24,10 @@ for d in "$HOME" "$HOME/.local/bin" "$XDG_CONFIG_HOME" "$XDG_CONFIG_HOME/mise/co
   [ -d "$d" ] || continue
   for l in "$d"/* "$d"/.[!.]*; do
     owned_by_repo "$l" || continue
-    if [ -e "$l" ]; then ok "$(pretty "$l")"; else fail "$(pretty "$l") is broken"; broken=1; fi
+    if [ -e "$l" ]; then ok "$(pretty "$l")"; else
+      fail "$(pretty "$l") is broken"
+      broken=1
+    fi
   done
 done
 [ "$broken" = 0 ] && ok "no broken link"
@@ -116,6 +119,31 @@ linux | darwin)
   check_bin kitty
   ;;
 esac
+
+say "  ${C_DIM}remote$C_OFF"
+check_bin mutagen
+check_bin python3
+if grep -qF '# dotfiles: shared SSH settings' "$HOME/.ssh/config" 2>/dev/null; then
+  ok "$(pretty "$HOME/.ssh/config") includes the shared settings"
+else
+  warn "$(pretty "$HOME/.ssh/config") does not include the shared settings. Run: mise run link"
+fi
+if have tmux; then
+  if infocmp tmux-256color >/dev/null 2>&1; then
+    ok "the tmux-256color terminfo is present"
+  else
+    warn "no tmux-256color terminfo. tmux falls back to xterm-256color."
+  fi
+fi
+if have oob; then
+  if out=$(oob ping 2>&1); then
+    ok "oob: $(printf '%s' "$out" | awk '/^(mode|status|server):/ { printf "%s ", $0 }')"
+  else
+    warn "oob: $(printf '%s' "$out" | awk '/^status:/ { print }')"
+  fi
+else
+  warn "oob is not on PATH. Run: mise run link"
+fi
 
 if [ "$PLATFORM" = darwin ]; then
   say "  ${C_DIM}window manager$C_OFF"
