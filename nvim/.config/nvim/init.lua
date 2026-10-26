@@ -5,8 +5,6 @@ local opt = vim.opt
 opt.title = true
 opt.titlestring = vim.fs.basename(vim.fn.getcwd())
 
-vim.env.NVR_SERVER = vim.v.servername
-
 -- global options --
 opt.incsearch = true -- Find the next match as we type the search
 opt.hlsearch = true -- Hilight searches by default
