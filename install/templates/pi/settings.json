@@ -1,9 +1,10 @@
 {
   "defaultThinkingLevel": "off",
   "theme": "dark",
+  "tuiMode": "regular",
   "packages": [
     "npm:pi-lens",
-    "npm:@juicesharp/rpiv-todo",
-    "git:github.com/dominicfmazza/pi-ste"
+    "git:github.com/dominicfmazza/pi-ste",
+    "npm:@tintinweb/pi-tasks"
   ]
 }

@@ -12,8 +12,18 @@ this tree into `~/.pi/agent/`.
 | `package.json` | Registers the `subagent` extension and the prompt directory. |
 | `extensions/subagent/` | Dispatch isolated pi subagents in single, parallel, or chain mode. |
 | `extensions/single-line-footer.ts` | A one-line footer. `/footer` toggles it. |
+| `extensions/comment-hygiene.ts` | Blocks a comment that narrates an edit. `PI_COMMENT_HYGIENE` sets the mode. |
+| `extensions/no-offload-code.ts` | Blocks the `edit` and `write` tools. `/self-code [on\|off]` toggles it. |
 | `agents/` | Three review agents: implementer, spec reviewer, quality reviewer. |
 | `prompts/` | Four prompt templates: `/commit`, `/mr`, `/implement`, `/implement-and-review`. |
+
+`settings.json` installs these packages:
+
+| Package | What it does |
+|---|---|
+| `npm:pi-lens` | LSP diagnostics, lint runners, and code navigation tools. |
+| `git:github.com/dominicfmazza/pi-ste` | The Simplified Technical English writing mode. |
+| `npm:@tintinweb/pi-tasks` | A task list tool for multi-step work. |
 
 The agents declare no `model`. Each one inherits the model of the parent
 session, so they work on any host and any provider.
