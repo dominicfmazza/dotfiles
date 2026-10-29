@@ -19,6 +19,32 @@ vim.opt.scrollback = 10000
 local map = vim.keymap.set
 local ergoterm = require "ergoterm"
 
+-- A mouse click leaves terminal mode before WinLeave, so persist_mode saves
+-- normal mode. This WinLeave runs after the ergoterm one and saves insert.
+local mouse_keys = {
+  [vim.keycode "<LeftMouse>"] = true,
+  [vim.keycode "<RightMouse>"] = true,
+  [vim.keycode "<MiddleMouse>"] = true,
+}
+local clicked_in_insert = nil
+
+vim.on_key(function(key)
+  if not mouse_keys[key] or vim.api.nvim_get_mode().mode ~= "t" then return end
+  clicked_in_insert = vim.api.nvim_get_current_buf()
+  vim.schedule(function() clicked_in_insert = nil end)
+end, vim.api.nvim_create_namespace "ergoterm_mouse_mode")
+
+vim.api.nvim_create_autocmd("WinLeave", {
+  group = vim.api.nvim_create_augroup("ErgoTermMouseMode", { clear = true }),
+  pattern = "term://*",
+  callback = function(args)
+    if clicked_in_insert ~= args.buf then return end
+    clicked_in_insert = nil
+    local term = ergoterm.identify()
+    if term and term.persist_mode then term._state.mode = "i" end
+  end,
+})
+
 -- Open terminal picker
 map("n", "<leader>tl", ":TermSelect<CR>", { noremap = true, silent = true, desc = "Terminal picker" })
 
