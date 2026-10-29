@@ -48,6 +48,21 @@ if is_wsl then
     },
     cache_enabled = 0,
   }
+elseif vim.env.TMUX ~= nil and has "tmux" then
+  -- `load-buffer -w` sends the text to the outer terminal as OSC 52.
+  -- A paste asks the outer terminal through tmux `get-clipboard both`.
+  vim.g.clipboard = {
+    name = "tmux",
+    copy = {
+      ["+"] = { "tmux", "load-buffer", "-w", "-" },
+      ["*"] = { "tmux", "load-buffer", "-w", "-" },
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste "+",
+      ["*"] = require("vim.ui.clipboard.osc52").paste "*",
+    },
+    cache_enabled = 0,
+  }
 elseif is_ssh or not has_local_tool then
   vim.g.clipboard = oob_clipboard()
 end
